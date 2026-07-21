@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- VARIABLES CSS (Le cœur du Dark Mode) --- */
+        :root {
+            /* Mode Clair */
+            --bg-color: #f4f4f9;
+            --text-color: #333;
+            --link-bg: #ffffff;
+            --link-hover: #eef2ff;
+            --link-border: #ddd;
+            --btn-bg: #e0e0e0;
+            --btn-text: #333;
+        }
+
+        .dark-mode {
+            /* Mode Sombre (Les mêmes variables, valeurs différentes) */
+            --bg-color: #121212;
+            --text-color: #f0f0f0;
+            --link-bg: #1e1e1e;
+            --link-hover: #2d2d2d;
+            --link-border: #333;
+            --btn-bg: #333;
+            --btn-text: #f0f0f0;
+        }
+
+        /* --- STYLES GENERAUX (Utilisent les variables) --- */
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            /* Transition douce pour le changement de thème */
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* --- LE BOUTON TOGGLE (UI) --- */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        /* Afficher la bonne icône selon le thème */
+        .theme-toggle .fa-sun { display: none; }
+        .theme-toggle .fa-moon { display: inline; }
+
+        .dark-mode .theme-toggle .fa-sun { display: inline; }
+        .dark-mode .theme-toggle .fa-moon { display: none; }
+
+        /* --- PROFIL & LIENS --- */
+        .profile h1 { margin-bottom: 0.5rem; }
+        .profile p { color: #666; margin-bottom: 2rem; }
+        .dark-mode .profile p { color: #999; } /* Ajustement subtil */
+
+        .links-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .link-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: var(--link-bg);
+            border: 1px solid var(--link-border);
+            border-radius: 50px;
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            width: 100%;
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+
+        .link-item i { margin-right: 15px; font-size: 1.2rem; width: 25px; text-align: center; }
+        
+        .link-item:hover {
+            background-color: var(--link-hover);
+            border-color: #6366f1; /* Accentuation */
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+    <button class="theme-toggle" id="theme-toggle">
+        <i class="fa-solid fa-sun"></i>
+        <i class="fa-solid fa-moon"></i>
+    </button>
+
+    <main id="app" class="container"></main>
+
+    <script>
+        // --- 1. CONFIGURATION (Modulaire) ---
+        const config = {
+            name: "Mario",
+            bio: "Building in public 🚀",
+            links: [
+                { 
+					title: "Instagram", 
+					url: "https://www.instagram.com/muvunyi_1?igsh=MWZ6OXNtNHpoZ3RuZA==", 
+					icon: "fa-brands fa-instagram" 
+				},
+                { 
+					title: "Youtube", 
+					url: "https://youtube.com/@mario-try-again?si=v7Nm_L8VYk1KXwdg", 
+					icon: "fa-brands fa-youtube" 
+				
+				},
+                { 
+					title: "Tiktok", 
+					url: "https://www.tiktok.com/@justdidit64?_r=1&_t=ZN-97vIqHhqkEA", 
+					icon: "fa-brands fa-tiktok" 
+				},
+                { title: "Contact me", url: "mailto:gilbertmarioh@gmail.com", icon: "fa-solid fa-envelope" }
+            ]
+        };
+
+        // --- 2. GESTION DE L'ETAT (STATE) DU THEME ---
+        
+        // Lire le thème sauvegardé dans le localStorage (ou 'light' par défaut)
+        let currentTheme = localStorage.getItem('theme') || 'light';
+
+        // Fonction pour appliquer le thème
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+            // Sauvegarder le choix
+            localStorage.setItem('theme', theme);
+        }
+
+        // --- 3. LOGIQUE DU BOUTON (CONTROL) ---
+        const toggleButton = document.getElementById('theme-toggle');
+        
+        toggleButton.addEventListener('click', () => {
+            // Basculer l'état
+            currentTheme = (currentTheme === 'light') ? 'dark' : 'light';
+            applyTheme(currentTheme);
+        });
+
+        // --- 4. FONCTION DE RENDU (VIEW) ---
+        function renderLinks() {
+            const app = document.getElementById('app');
+            
+            const htmlContent = `
+                <header class="profile">
+                    <h1>${config.name}</h1>
+                    <p>${config.bio}</p>
+                </header>
+                <nav>
+                    <ul class="links-list">
+                        ${config.links.map(link => `
+                            <li>
+                                <a href="${link.url}" class="link-item" target="_blank" rel="noopener">
+                                    <i class="${link.icon}"></i>
+                                    ${link.title}
+                                </a>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </nav>
+            `;
+            
+            app.innerHTML = htmlContent;
+        }
+
+        // --- 5. INITIALISATION COMPLETE ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Appliquer le thème initial avant le rendu pour éviter le flash
+            applyTheme(currentTheme);
+            // Faire le rendu
+            renderLinks();
+        });
+
+    </script>
+</body>
+</html>
