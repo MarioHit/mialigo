@@ -186,7 +186,7 @@
                     <ul class="links-list">
                         ${config.links.map(link => `
                             <li>
-                                <a href="${link.url}" class="link-item" target="_blank" rel="noopener">
+                                <a href="${link.url}" class="link-item" ${link.url.startsWith('mailto:') ? '' : 'target="_blank" rel="noopener"'}>
                                     <i class="${link.icon}"></i>
                                     ${link.title}
                                 </a>
