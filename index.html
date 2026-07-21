@@ -111,6 +111,56 @@
             border-color: #6366f1; /* Accentuation */
             transform: translateY(-2px);
         }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 20px;
+            background-color: var(--link-bg);
+            border: 1px solid var(--link-border);
+            border-radius: 24px;
+            text-align: left;
+        }
+
+        .contact-form label {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid var(--link-border);
+            border-radius: 14px;
+            background: transparent;
+            color: var(--text-color);
+            padding: 12px 14px;
+            font: inherit;
+        }
+
+        .contact-form textarea {
+            min-height: 140px;
+            resize: vertical;
+        }
+
+        .contact-form button {
+            border: none;
+            border-radius: 999px;
+            padding: 14px 18px;
+            background: #6366f1;
+            color: #fff;
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        .contact-form button:hover {
+            transform: translateY(-2px);
+            opacity: 0.95;
+        }
     </style>
 </head>
 <body>
@@ -144,7 +194,7 @@
 					url: "https://www.tiktok.com/@justdidit64?_r=1&_t=ZN-97vIqHhqkEA", 
 					icon: "fa-brands fa-tiktok" 
 				},
-                { title: "Contact me", url: "mailto:gilbertmarioh@gmail.com", icon: "fa-solid fa-envelope" }
+                { title: "Contact me", type: "contact", email: "gilbertmarioh@gmail.com", icon: "fa-solid fa-envelope" }
             ]
         };
 
@@ -186,10 +236,22 @@
                     <ul class="links-list">
                         ${config.links.map(link => `
                             <li>
-                                <a href="${link.url}" class="link-item" ${link.url.startsWith('mailto:') ? '' : 'target="_blank" rel="noopener"'}>
-                                    <i class="${link.icon}"></i>
-                                    ${link.title}
-                                </a>
+                                ${link.type === 'contact' ? `
+                                    <form class="contact-form" data-contact-form data-contact-email="${link.email}">
+                                        <label for="contact-email">Adresse mail</label>
+                                        <input id="contact-email" name="email" type="email" placeholder="votre@email.com" required>
+
+                                        <label for="contact-message">Message</label>
+                                        <textarea id="contact-message" name="message" placeholder="Votre message" required></textarea>
+
+                                        <button type="submit">Envoyer</button>
+                                    </form>
+                                ` : `
+                                    <a href="${link.url}" class="link-item" target="_blank" rel="noopener">
+                                        <i class="${link.icon}"></i>
+                                        ${link.title}
+                                    </a>
+                                `}
                             </li>
                         `).join('')}
                     </ul>
@@ -205,6 +267,23 @@
             applyTheme(currentTheme);
             // Faire le rendu
             renderLinks();
+
+            const contactForm = document.querySelector('[data-contact-form]');
+
+            if (contactForm) {
+                contactForm.addEventListener('submit', (event) => {
+                    event.preventDefault();
+
+                    const senderEmail = contactForm.querySelector('[name="email"]').value.trim();
+                    const message = contactForm.querySelector('[name="message"]').value.trim();
+                    const recipientEmail = contactForm.dataset.contactEmail;
+
+                    const subject = encodeURIComponent('Nouveau message depuis le site');
+                    const body = encodeURIComponent(`Adresse mail: ${senderEmail}\n\nMessage:\n${message}`);
+
+                    window.location.href = `mailto:${recipientEmail}?subject=${subject}&body=${body}`;
+                });
+            }
         });
 
     </script>
