@@ -16,12 +16,13 @@
 - ✅ FontAwesome chargé dans le `<head>`
 - ✅ Variables CSS pour le thème
 
-### 3. **Déploiement GitHub Pages**
+### 3. **Déploiement GitHub Pages avec Domaine Personnalisé**
 
 - ✅ Workflow GitHub Actions créé (`.github/workflows/deploy.yml`)
-- ✅ Configuration Next.js pour basePath `/mialigo`
-- ✅ Fichier `.nojekyll` pour GitHub Pages
-- ✅ README complet avec instructions
+- ✅ Configuration Next.js avec `basePath: ""` (domaine personnalisé)
+- ✅ Fichier `.nojekyll` dans `public/`
+- ✅ CNAME configuré avec `www.mialigo.com`
+- ✅ Structure déplacée à la racine (plus de sous-dossier)
 
 ## 🚀 Prochaines Étapes
 
@@ -103,7 +104,7 @@ Ajoutez simplement dans l'array `links` dans `page.tsx`
 - Vérifiez que localStorage est activé dans le navigateur
 - Le code utilise `useEffect` pour sauvegarder automatiquement
 
-## 🎉 Félicitations !
+## 🎉 Félicitations
 
 Votre site est maintenant :
 
