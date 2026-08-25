@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+:root {
+  --bg-color: #f4f4f9;
+  --text-color: #333;
+  --link-bg: #ffffff;
+  --link-hover: #eef2ff;
+  --link-border: #ddd;
+  --btn-bg: #e0e0e0;
+  --btn-text: #333;
+}
+
+.dark-mode {
+  --bg-color: #121212;
+  --text-color: #f0f0f0;
+  --link-bg: #1e1e1e;
+  --link-hover: #2d2d2d;
+  --link-border: #333;
+  --btn-bg: #333;
+  --btn-text: #f0f0f0;
+}
+
+body {
+  font-family: "Segoe UI", sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  transition:
+    background-color 0.4s ease,
+    color 0.4s ease;
+}
+
+.dark-mode .profile-bio {
+  color: #999;
+}
+
+.theme-toggle .fa-sun {
+  display: none;
+}
+.theme-toggle .fa-moon {
+  display: inline;
+}
+
+.dark-mode .theme-toggle .fa-sun {
+  display: inline;
+}
+.dark-mode .theme-toggle .fa-moon {
+  display: none;
+}
