@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  output: "export", // Pour export statique (GitHub Pages)
+  basePath: process.env.NODE_ENV === "production" ? "/mialigo" : "",
+  images: {
+    unoptimized: true, // Requis pour export statique
+  },
 };
 
 export default nextConfig;

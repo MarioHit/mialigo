@@ -28,20 +28,9 @@ export default function Home() {
   };
 
   useEffect(() => {
-    // Charger FontAwesome
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href =
-      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css";
-    document.head.appendChild(link);
-
     // Charger le thème sauvegardé
     const savedTheme = localStorage.getItem("theme") || "light";
     setIsDarkMode(savedTheme === "dark");
-
-    return () => {
-      document.head.removeChild(link);
-    };
   }, []);
 
   useEffect(() => {
