@@ -7,7 +7,7 @@ export default function Home() {
 
   const config = {
     name: "Mario",
-    bio: "Building in public 🚀",
+    bio: "Building in publics 🚀",
     links: [
       {
         title: "Instagram",
