@@ -1,42 +1,15 @@
+import { supabase } from "@/lib/supabase";
 import { notFound } from "next/navigation";
 import UserPageClient from "./user-page-client";
 
-// Données temporaires - sera remplacé par Supabase
-export const USERS_DATA: Record<
-  string,
-  {
-    name: string;
-    bio: string;
-    links: Array<{ title: string; url: string; icon: string }>;
-  }
-> = {
-  mario: {
-    name: "Mario",
-    bio: "Building in public 🚀",
-    links: [
-      {
-        title: "Instagram",
-        url: "https://www.instagram.com/muvunyi_1?igsh=MWZ6OXNtNHpoZ3RuZA==",
-        icon: "fa-brands fa-instagram",
-      },
-      {
-        title: "Youtube",
-        url: "https://youtube.com/@mario-try-again?si=v7Nm_L8VYk1KXwdg",
-        icon: "fa-brands fa-youtube",
-      },
-      {
-        title: "Tiktok",
-        url: "https://www.tiktok.com/@justdidit64?_r=1&_t=ZN-97vIqHhqkEA",
-        icon: "fa-brands fa-tiktok",
-      },
-    ],
-  },
-};
-
-// Générer les pages statiques pour GitHub Pages
+// Générer les pages statiques pour tous les utilisateurs
 export async function generateStaticParams() {
-  return Object.keys(USERS_DATA).map((username) => ({
-    username,
+  const { data: users } = await supabase.from("users").select("username");
+
+  if (!users) return [];
+
+  return users.map((user) => ({
+    username: user.username,
   }));
 }
 
@@ -48,11 +21,34 @@ export default async function UserPage({ params }: PageProps) {
   const { username } = await params;
   const user = username.toLowerCase();
 
-  // Vérifier si l'utilisateur existe
-  const userData = USERS_DATA[user];
-  if (!userData) {
+  // Récupérer l'utilisateur depuis Supabase
+  const { data: userData, error: userError } = await supabase
+    .from("users")
+    .select("*")
+    .eq("username", user)
+    .single();
+
+  if (userError || !userData) {
     notFound();
   }
 
-  return <UserPageClient userData={userData} />;
+  // Récupérer les liens de l'utilisateur
+  const { data: links } = await supabase
+    .from("links")
+    .select("*")
+    .eq("user_id", userData.id)
+    .order("order", { ascending: true });
+
+  const userWithLinks = {
+    name: userData.name,
+    bio: userData.bio || "",
+    links:
+      links?.map((link) => ({
+        title: link.title,
+        url: link.url,
+        icon: link.icon,
+      })) || [],
+  };
+
+  return <UserPageClient userData={userWithLinks} />;
 }
