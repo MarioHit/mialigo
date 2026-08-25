@@ -60,150 +60,47 @@ export default function Home() {
 
   return (
     <>
-      <style jsx global>{`
-        :root {
-          --bg-color: #f4f4f9;
-          --text-color: #333;
-          --link-bg: #ffffff;
-          --link-hover: #eef2ff;
-          --link-border: #ddd;
-          --btn-bg: #e0e0e0;
-          --btn-text: #333;
-        }
-
-        .dark-mode {
-          --bg-color: #121212;
-          --text-color: #f0f0f0;
-          --link-bg: #1e1e1e;
-          --link-hover: #2d2d2d;
-          --link-border: #333;
-          --btn-bg: #333;
-          --btn-text: #f0f0f0;
-        }
-
-        body {
-          font-family: "Segoe UI", sans-serif;
-          background-color: var(--bg-color);
-          color: var(--text-color);
-          margin: 0;
-          padding: 20px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          min-height: 100vh;
-          transition:
-            background-color 0.4s ease,
-            color 0.4s ease;
-        }
-
-        .container {
-          width: 100%;
-          max-width: 400px;
-          text-align: center;
-          padding: 20px;
-        }
-
-        .theme-toggle {
-          position: fixed;
-          top: 20px;
-          right: 20px;
-          background-color: var(--btn-bg);
-          color: var(--btn-text);
-          border: none;
-          padding: 10px;
-          border-radius: 50%;
-          cursor: pointer;
-          font-size: 1.2rem;
-          transition: all 0.3s ease;
-        }
-
-        .theme-toggle:hover {
-          transform: scale(1.1);
-        }
-
-        .theme-toggle .fa-sun {
-          display: none;
-        }
-        .theme-toggle .fa-moon {
-          display: inline;
-        }
-
-        .dark-mode .theme-toggle .fa-sun {
-          display: inline;
-        }
-        .dark-mode .theme-toggle .fa-moon {
-          display: none;
-        }
-
-        .profile h1 {
-          margin-bottom: 0.5rem;
-        }
-        .profile p {
-          color: #666;
-          margin-bottom: 2rem;
-        }
-        .dark-mode .profile p {
-          color: #999;
-        }
-
-        .links-list {
-          list-style: none;
-          padding: 0;
-          display: flex;
-          flex-direction: column;
-          gap: 15px;
-        }
-
-        .link-item {
-          display: flex;
-          align-items: center;
-          padding: 15px 20px;
-          background-color: var(--link-bg);
-          border: 1px solid var(--link-border);
-          border-radius: 50px;
-          text-decoration: none;
-          color: var(--text-color);
-          font-weight: 500;
-          width: 100%;
-          box-sizing: border-box;
-          transition: all 0.2s ease;
-        }
-
-        .link-item i {
-          margin-right: 15px;
-          font-size: 1.2rem;
-          width: 25px;
-          text-align: center;
-        }
-
-        .link-item:hover {
-          background-color: var(--link-hover);
-          border-color: #6366f1;
-          transform: translateY(-2px);
-        }
-      `}</style>
-
-      <button className="theme-toggle" onClick={toggleTheme}>
+      <button
+        className="theme-toggle fixed top-5 right-5 p-2.5 rounded-full border-0 cursor-pointer text-xl transition-all duration-300 hover:scale-110"
+        style={{
+          backgroundColor: "var(--btn-bg)",
+          color: "var(--btn-text)",
+        }}
+        onClick={toggleTheme}
+      >
         <i className="fa-solid fa-sun"></i>
         <i className="fa-solid fa-moon"></i>
       </button>
 
-      <main className="container">
-        <header className="profile">
-          <h1>{config.name}</h1>
-          <p>{config.bio}</p>
+      <main className="w-full max-w-md text-center p-5">
+        <header className="mb-8">
+          <h1 className="text-3xl font-semibold mb-2">{config.name}</h1>
+          <p className="profile-bio text-[#666] mb-8">{config.bio}</p>
         </header>
         <nav>
-          <ul className="links-list">
+          <ul className="list-none p-0 flex flex-col gap-4">
             {config.links.map((link, index) => (
               <li key={index}>
                 <a
                   href={link.url}
-                  className="link-item"
+                  className="flex items-center px-5 py-4 rounded-full border no-underline font-medium w-full transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-500"
+                  style={{
+                    backgroundColor: "var(--link-bg)",
+                    borderColor: "var(--link-border)",
+                    color: "var(--text-color)",
+                  }}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "var(--link-hover)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "var(--link-bg)";
+                  }}
                 >
-                  <i className={link.icon}></i>
+                  <i
+                    className={`${link.icon} mr-4 text-xl w-6 text-center`}
+                  ></i>
                   {link.title}
                 </a>
               </li>
