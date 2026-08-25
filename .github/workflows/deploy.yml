@@ -26,14 +26,12 @@ jobs:
         with:
           node-version: "20"
           cache: "npm"
-          cache-dependency-path: "./mialigo/package-lock.json"
+          cache-dependency-path: "./package-lock.json"
 
       - name: Install dependencies
-        working-directory: ./mialigo
         run: npm ci
 
       - name: Build Next.js app
-        working-directory: ./mialigo
         run: npm run build
         env:
           NODE_ENV: production
@@ -41,7 +39,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./mialigo/out
+          path: ./out
 
   deploy:
     environment:
