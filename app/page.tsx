@@ -1,102 +1,70 @@
-"use client";
+import Link from "next/link";
 
-import { useEffect, useState } from "react";
-
-export default function Home() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  const config = {
-    name: "Mario",
-    bio: "Building in publics 🚀",
-    links: [
-      {
-        title: "Instagram",
-        url: "https://www.instagram.com/muvunyi_1?igsh=MWZ6OXNtNHpoZ3RuZA==",
-        icon: "fa-brands fa-instagram",
-      },
-      {
-        title: "Youtube",
-        url: "https://youtube.com/@mario-try-again?si=v7Nm_L8VYk1KXwdg",
-        icon: "fa-brands fa-youtube",
-      },
-      {
-        title: "Tiktok",
-        url: "https://www.tiktok.com/@justdidit64?_r=1&_t=ZN-97vIqHhqkEA",
-        icon: "fa-brands fa-tiktok",
-      },
-    ],
-  };
-
-  useEffect(() => {
-    // Charger le thème sauvegardé
-    const savedTheme = localStorage.getItem("theme") || "light";
-    setIsDarkMode(savedTheme === "dark");
-  }, []);
-
-  useEffect(() => {
-    // Appliquer le thème
-    if (isDarkMode) {
-      document.body.classList.add("dark-mode");
-    } else {
-      document.body.classList.remove("dark-mode");
-    }
-    localStorage.setItem("theme", isDarkMode ? "dark" : "light");
-  }, [isDarkMode]);
-
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-  };
-
+export default function HomePage() {
   return (
-    <>
-      <button
-        className="theme-toggle fixed top-5 right-5 p-2.5 rounded-full border-0 cursor-pointer text-xl transition-all duration-300 hover:scale-110"
-        style={{
-          backgroundColor: "var(--btn-bg)",
-          color: "var(--btn-text)",
-        }}
-        onClick={toggleTheme}
-      >
-        <i className="fa-solid fa-sun"></i>
-        <i className="fa-solid fa-moon"></i>
-      </button>
+    <div className="flex flex-col items-center justify-center min-h-screen p-8">
+      <main className="max-w-2xl w-full text-center">
+        {/* Logo / Titre */}
+        <div className="mb-12">
+          <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent">
+            Mialigo
+          </h1>
+          <p className="text-xl text-gray-600 dark:text-gray-400">
+            Votre lien unique pour tout partager
+          </p>
+        </div>
 
-      <main className="w-full max-w-md text-center p-5">
-        <header className="mb-8">
-          <h1 className="text-3xl font-semibold mb-2">{config.name}</h1>
-          <p className="profile-bio text-[#666] mb-8">{config.bio}</p>
-        </header>
-        <nav>
-          <ul className="list-none p-0 flex flex-col gap-4">
-            {config.links.map((link, index) => (
-              <li key={index}>
-                <a
-                  href={link.url}
-                  className="flex items-center px-5 py-4 rounded-full border no-underline font-medium w-full transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-500"
-                  style={{
-                    backgroundColor: "var(--link-bg)",
-                    borderColor: "var(--link-border)",
-                    color: "var(--text-color)",
-                  }}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = "var(--link-hover)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = "var(--link-bg)";
-                  }}
-                >
-                  <i
-                    className={`${link.icon} mr-4 text-xl w-6 text-center`}
-                  ></i>
-                  {link.title}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        {/* Description */}
+        <div className="mb-12">
+          <p className="text-lg text-gray-700 dark:text-gray-300 mb-6">
+            Créez votre page personnalisée et partagez tous vos liens en un seul
+            endroit. Simple, élégant, et gratuit.
+          </p>
+        </div>
+
+        {/* CTA Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+          <button className="px-8 py-4 bg-indigo-500 text-white rounded-full font-semibold hover:bg-indigo-600 transition-colors shadow-lg">
+            Créer mon lien gratuitement
+          </button>
+          <Link
+            href="/mario"
+            className="px-8 py-4 border-2 border-indigo-500 text-indigo-500 rounded-full font-semibold hover:bg-indigo-50 dark:hover:bg-indigo-950 transition-colors"
+          >
+            Voir un exemple
+          </Link>
+        </div>
+
+        {/* Features */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
+          <div className="p-6 rounded-lg bg-white dark:bg-gray-800 shadow-md">
+            <div className="text-4xl mb-4">🎨</div>
+            <h3 className="text-lg font-semibold mb-2">Design élégant</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Interface moderne avec mode sombre
+            </p>
+          </div>
+          <div className="p-6 rounded-lg bg-white dark:bg-gray-800 shadow-md">
+            <div className="text-4xl mb-4">⚡</div>
+            <h3 className="text-lg font-semibold mb-2">Ultra rapide</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Chargement instantané, 100% optimisé
+            </p>
+          </div>
+          <div className="p-6 rounded-lg bg-white dark:bg-gray-800 shadow-md">
+            <div className="text-4xl mb-4">🔗</div>
+            <h3 className="text-lg font-semibold mb-2">Liens illimités</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Partagez autant de liens que vous voulez
+            </p>
+          </div>
+        </div>
       </main>
-    </>
+
+      {/* Footer */}
+      <footer className="mt-16 text-sm text-gray-500">
+        <p>Made with ❤️ by Mario • 2026</p>
+      </footer>
+    </div>
   );
 }
