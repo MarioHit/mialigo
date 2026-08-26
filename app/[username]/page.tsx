@@ -1,10 +1,7 @@
 import { supabase } from "@/lib/supabase";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 //import UserPageClient from "./user-page-client";
 import UserPageClient from "@/app/[username]/user-page-client";
-
-// En production (static export), ne générer que les pages existantes
-export const dynamicParams = false;
 
 // Générer les pages statiques pour tous les utilisateurs
 export async function generateStaticParams() {
@@ -25,6 +22,11 @@ interface PageProps {
 export default async function UserPage({ params }: PageProps) {
   const { username } = await params;
   const user = username.toLowerCase();
+
+  // Rediriger si l'URL contient des majuscules
+  if (username !== user) {
+    redirect(`/${user}`);
+  }
 
   // Récupérer l'utilisateur depuis Supabase
   const { data: userData, error: userError } = await supabase
