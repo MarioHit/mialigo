@@ -1,6 +1,10 @@
 import { supabase } from "@/lib/supabase";
 import { notFound } from "next/navigation";
-import UserPageClient from "./user-page-client";
+//import UserPageClient from "./user-page-client";
+import UserPageClient from "@/app/[username]/user-page-client";
+
+// En production (static export), ne générer que les pages existantes
+export const dynamicParams = false;
 
 // Générer les pages statiques pour tous les utilisateurs
 export async function generateStaticParams() {
@@ -8,8 +12,9 @@ export async function generateStaticParams() {
 
   if (!users) return [];
 
+  // Générer uniquement les versions lowercase (convention)
   return users.map((user) => ({
-    username: user.username,
+    username: user.username.toLowerCase(),
   }));
 }
 
