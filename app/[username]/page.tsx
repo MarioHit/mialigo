@@ -3,9 +3,6 @@ import { notFound } from "next/navigation";
 //import UserPageClient from "./user-page-client";
 import UserPageClient from "@/app/[username]/user-page-client";
 
-// En production (static export), ne générer que les pages existantes
-export const dynamicParams = false;
-
 // Générer les pages statiques pour tous les utilisateurs
 export async function generateStaticParams() {
   const { data: users } = await supabase.from("users").select("username");
