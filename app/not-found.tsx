@@ -1,6 +1,29 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function NotFound() {
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const path = window.location.pathname;
+      const lower = path.toLowerCase();
+
+      // Si l'URL contient des majuscules, rediriger vers la version minuscule
+      if (path !== lower) {
+        setIsRedirecting(true);
+        window.location.replace(lower);
+      }
+    }
+  }, []);
+
+  // Évite de faire clignoter le texte 404 pendant la redirection
+  if (isRedirecting) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="text-center max-w-md">
