@@ -3,17 +3,8 @@ import { notFound, redirect } from "next/navigation";
 //import UserPageClient from "./user-page-client";
 import UserPageClient from "@/app/[username]/user-page-client";
 
-// Générer les pages statiques pour tous les utilisateurs
-export async function generateStaticParams() {
-  const { data: users } = await supabase.from("users").select("username");
-
-  if (!users) return [];
-
-  // Générer uniquement les versions lowercase (convention)
-  return users.map((user) => ({
-    username: user.username.toLowerCase(),
-  }));
-}
+// Relire le profil et ses liens depuis Supabase à chaque visite.
+export const dynamic = "force-dynamic";
 
 interface PageProps {
   params: Promise<{ username: string }>;
