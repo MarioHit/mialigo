@@ -168,10 +168,10 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4">
+    <div className="min-h-screen w-full bg-gray-50 dark:bg-gray-900 px-4 py-20 sm:px-6 sm:py-8 lg:px-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 mb-8">
           <div>
             <Link
               href="/"
@@ -183,12 +183,11 @@ export default function DashboardPage() {
               Dashboard
             </h1>
           </div>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             {profile && (
               <Link
                 href={`/${profile.username}`}
-                target="_blank"
-                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors inline-flex items-center gap-1.5"
+                className="justify-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors inline-flex items-center gap-1.5"
               >
                 🔗 Voir ma page
               </Link>
@@ -203,7 +202,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Profil */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 mb-6">
           <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
             Mon Profil
           </h2>
@@ -212,8 +211,8 @@ export default function DashboardPage() {
               <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
                 Nom d'utilisateur (URL)
               </label>
-              <div className="flex items-center gap-2">
-                <span className="text-gray-500">mialigo.com/</span>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                <span className="text-gray-500 shrink-0">mialigo.com/</span>
                 <input
                   type="text"
                   value={username}
@@ -222,7 +221,7 @@ export default function DashboardPage() {
                       e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""),
                     )
                   }
-                  className="flex-1 px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="w-full min-w-0 flex-1 px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   required
                 />
               </div>
@@ -264,7 +263,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Liens */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
           <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
             Mes Liens
           </h2>
@@ -279,14 +278,18 @@ export default function DashboardPage() {
               links.map((link) => (
                 <div
                   key={link.id}
-                  className="flex items-center gap-4 p-4 border rounded-lg dark:border-gray-600"
+                  className="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 border rounded-lg dark:border-gray-600"
                 >
-                  <i className={`${link.icon} text-xl w-6 text-center`}></i>
-                  <div className="flex-1">
+                  <i
+                    className={`${link.icon} shrink-0 text-xl w-6 text-center mt-0.5`}
+                  ></i>
+                  <div className="min-w-0 flex-1">
                     <p className="font-medium text-gray-900 dark:text-white">
                       {link.title}
                     </p>
-                    <p className="text-sm text-gray-500 truncate">{link.url}</p>
+                    <p className="text-sm text-gray-500 break-all">
+                      {link.url}
+                    </p>
                   </div>
                   <button
                     onClick={() => handleDeleteLink(link.id)}
