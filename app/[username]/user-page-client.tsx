@@ -1,6 +1,8 @@
 "use client";
 
+import { supabaseClient } from "@/lib/supabase-auth";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 interface UserData {
   name: string;
@@ -13,6 +15,33 @@ interface UserPageClientProps {
 }
 
 export default function UserPageClient({ userData }: UserPageClientProps) {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const checkSession = async () => {
+      const {
+        data: { session },
+      } = await supabaseClient.auth.getSession();
+
+      if (mounted) setIsAuthenticated(Boolean(session));
+    };
+
+    checkSession();
+
+    const {
+      data: { subscription },
+    } = supabaseClient.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(Boolean(session));
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
   return (
     <>
       {/* Bouton retour accueil */}
@@ -28,6 +57,21 @@ export default function UserPageClient({ userData }: UserPageClientProps) {
       >
         <span>← Accueil</span>
       </Link>
+
+      {isAuthenticated && (
+        <Link
+          href="/dashboard"
+          className="fixed top-5 right-20 px-3.5 py-2 rounded-full text-sm font-medium transition-all duration-300 hover:scale-105 flex items-center gap-2 shadow-sm border"
+          style={{
+            backgroundColor: "var(--btn-bg)",
+            color: "var(--btn-text)",
+            borderColor: "var(--link-border)",
+          }}
+          aria-label="Modifier ma page"
+        >
+          <span>✎ Modifier</span>
+        </Link>
+      )}
 
       <main className="w-full max-w-md text-center p-5">
         <header className="mb-8">
