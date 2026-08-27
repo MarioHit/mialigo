@@ -1,5 +1,11 @@
 <!-- BEGIN:nextjs-agent-rules -->
 
+## Git permissions
+
+- You may run read-only Git commands such as `git status`, `git diff`, `git log`, and `git branch`.
+- Never run `git commit`, `git push`, `git reset`, or `git checkout`.
+- Do not create commits or push changes, even if explicitly requested in a later message.
+
 # This is NOT the Next.js you know
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
