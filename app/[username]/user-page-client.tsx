@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
 interface UserData {
   name: string;
@@ -14,43 +13,8 @@ interface UserPageClientProps {
 }
 
 export default function UserPageClient({ userData }: UserPageClientProps) {
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  useEffect(() => {
-    // Charger le thème sauvegardé
-    const savedTheme = localStorage.getItem("theme") || "light";
-    setIsDarkMode(savedTheme === "dark");
-  }, []);
-
-  useEffect(() => {
-    // Appliquer le thème
-    if (isDarkMode) {
-      document.body.classList.add("dark-mode");
-    } else {
-      document.body.classList.remove("dark-mode");
-    }
-    localStorage.setItem("theme", isDarkMode ? "dark" : "light");
-  }, [isDarkMode]);
-
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-  };
-
   return (
     <>
-      <button
-        className="theme-toggle fixed top-5 right-5 p-2.5 rounded-full border-0 cursor-pointer text-xl transition-all duration-300 hover:scale-110"
-        style={{
-          backgroundColor: "var(--btn-bg)",
-          color: "var(--btn-text)",
-        }}
-        onClick={toggleTheme}
-        aria-label="Toggle theme"
-      >
-        <i className="fa-solid fa-sun"></i>
-        <i className="fa-solid fa-moon"></i>
-      </button>
-
       {/* Bouton retour accueil */}
       <Link
         href="/"
