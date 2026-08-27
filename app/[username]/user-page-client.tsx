@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 interface UserData {
@@ -50,6 +51,20 @@ export default function UserPageClient({ userData }: UserPageClientProps) {
         <i className="fa-solid fa-moon"></i>
       </button>
 
+      {/* Bouton retour accueil */}
+      <Link
+        href="/"
+        className="fixed top-5 left-5 px-3.5 py-2 rounded-full text-sm font-medium transition-all duration-300 hover:scale-105 flex items-center gap-2 shadow-sm border"
+        style={{
+          backgroundColor: "var(--btn-bg)",
+          color: "var(--btn-text)",
+          borderColor: "var(--link-border)",
+        }}
+        aria-label="Retour à l'accueil"
+      >
+        <span>← Accueil</span>
+      </Link>
+
       <main className="w-full max-w-md text-center p-5">
         <header className="mb-8">
           <h1 className="text-3xl font-semibold mb-2">{userData.name}</h1>
@@ -85,6 +100,18 @@ export default function UserPageClient({ userData }: UserPageClientProps) {
             ))}
           </ul>
         </nav>
+
+        <footer className="mt-8 pt-4">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-xs opacity-60 hover:opacity-100 transition-opacity"
+            style={{ color: "var(--text-color)" }}
+          >
+            <span>
+              Créé avec <strong className="font-semibold">Mialigo</strong>
+            </span>
+          </Link>
+        </footer>
       </main>
     </>
   );

@@ -24,9 +24,12 @@ export default function HomePage() {
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-          <button className="px-8 py-4 bg-indigo-500 text-white rounded-full font-semibold hover:bg-indigo-600 transition-colors shadow-lg">
-            Créer mon lien gratuitement
-          </button>
+          <Link
+            href="/login"
+            className="px-8 py-4 bg-indigo-500 text-white rounded-full font-semibold hover:bg-indigo-600 transition-colors shadow-lg"
+          >
+            ✨ Créer mon lien gratuitement
+          </Link>
           <Link
             href="/mario"
             className="px-8 py-4 border-2 border-indigo-500 text-indigo-500 rounded-full font-semibold hover:bg-indigo-50 dark:hover:bg-indigo-950 transition-colors"
