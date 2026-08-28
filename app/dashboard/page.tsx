@@ -1,9 +1,11 @@
 "use client";
 
+import { defaultNetworkIcon } from "@/lib/social-networks";
 import { supabaseClient } from "@/lib/supabase-auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import SocialNetworkPicker from "./social-network-picker";
 
 interface UserProfile {
   id: string;
@@ -27,6 +29,13 @@ export default function DashboardPage() {
   const [links, setLinks] = useState<UserLink[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [editingLinkId, setEditingLinkId] = useState<string | null>(null);
+  const [savingLinkId, setSavingLinkId] = useState<string | null>(null);
+  const [editedLink, setEditedLink] = useState({
+    title: "",
+    url: "",
+    icon: "",
+  });
   const router = useRouter();
 
   // Form states
@@ -38,7 +47,7 @@ export default function DashboardPage() {
   const [newLink, setNewLink] = useState({
     title: "",
     url: "",
-    icon: "fa-solid fa-link",
+    icon: defaultNetworkIcon,
   });
 
   useEffect(() => {
@@ -131,7 +140,7 @@ export default function DashboardPage() {
     if (error) {
       alert("Erreur : " + error.message);
     } else {
-      setNewLink({ title: "", url: "", icon: "fa-solid fa-link" });
+      setNewLink({ title: "", url: "", icon: defaultNetworkIcon });
       await loadLinks(user.id);
     }
   };
@@ -149,6 +158,43 @@ export default function DashboardPage() {
     } else {
       await loadLinks(user.id);
     }
+  };
+
+  const handleEditLink = (link: UserLink) => {
+    setEditingLinkId(link.id);
+    setEditedLink({
+      title: link.title,
+      url: link.url,
+      icon: link.icon,
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingLinkId(null);
+    setEditedLink({ title: "", url: "", icon: "" });
+  };
+
+  const handleSaveLink = async (e: React.FormEvent, linkId: string) => {
+    e.preventDefault();
+    setSavingLinkId(linkId);
+
+    const { error } = await supabaseClient
+      .from("links")
+      .update({
+        title: editedLink.title,
+        url: editedLink.url,
+        icon: editedLink.icon,
+      })
+      .eq("id", linkId);
+
+    if (error) {
+      alert("Erreur : " + error.message);
+    } else {
+      await loadLinks(user.id);
+      handleCancelEdit();
+    }
+
+    setSavingLinkId(null);
   };
 
   const handleLogout = async () => {
@@ -280,23 +326,97 @@ export default function DashboardPage() {
                   key={link.id}
                   className="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 border rounded-lg dark:border-gray-600"
                 >
-                  <i
-                    className={`${link.icon} shrink-0 text-xl w-6 text-center mt-0.5`}
-                  ></i>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium text-gray-900 dark:text-white">
-                      {link.title}
-                    </p>
-                    <p className="text-sm text-gray-500 break-all">
-                      {link.url}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => handleDeleteLink(link.id)}
-                    className="px-3 py-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
-                  >
-                    🗑️
-                  </button>
+                  {editingLinkId === link.id ? (
+                    <form
+                      onSubmit={(e) => handleSaveLink(e, link.id)}
+                      className="w-full space-y-3"
+                    >
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                        <input
+                          type="text"
+                          value={editedLink.title}
+                          onChange={(e) =>
+                            setEditedLink({
+                              ...editedLink,
+                              title: e.target.value,
+                            })
+                          }
+                          aria-label="Nom du lien"
+                          className="min-w-0 w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                          required
+                        />
+                        <input
+                          type="url"
+                          value={editedLink.url}
+                          onChange={(e) =>
+                            setEditedLink({
+                              ...editedLink,
+                              url: e.target.value,
+                            })
+                          }
+                          aria-label="URL du lien"
+                          className="min-w-0 w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                          required
+                        />
+                        <SocialNetworkPicker
+                          value={editedLink.icon}
+                          onChange={(icon) =>
+                            setEditedLink({ ...editedLink, icon })
+                          }
+                        />
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="submit"
+                          disabled={savingLinkId === link.id}
+                          className="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                        >
+                          {savingLinkId === link.id
+                            ? "Enregistrement..."
+                            : "Enregistrer"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleCancelEdit}
+                          className="px-3 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                        >
+                          Annuler
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <>
+                      <i
+                        className={`${link.icon} shrink-0 text-xl w-6 text-center mt-0.5`}
+                      ></i>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-gray-900 dark:text-white">
+                          {link.title}
+                        </p>
+                        <p className="text-sm text-gray-500 break-all">
+                          {link.url}
+                        </p>
+                      </div>
+                      <div className="flex shrink-0 gap-1">
+                        <button
+                          type="button"
+                          onClick={() => handleEditLink(link)}
+                          aria-label={`Modifier ${link.title}`}
+                          className="px-3 py-1 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded transition-colors"
+                        >
+                          ✎
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteLink(link.id)}
+                          aria-label={`Supprimer ${link.title}`}
+                          className="px-3 py-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               ))
             )}
@@ -329,14 +449,9 @@ export default function DashboardPage() {
                 }
                 className="px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
-              <input
-                type="text"
-                placeholder="Icône (fa-brands fa-instagram)"
+              <SocialNetworkPicker
                 value={newLink.icon}
-                onChange={(e) =>
-                  setNewLink({ ...newLink, icon: e.target.value })
-                }
-                className="px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                onChange={(icon) => setNewLink({ ...newLink, icon })}
               />
             </div>
             <button
