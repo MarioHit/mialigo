@@ -76,6 +76,110 @@ export const socialNetworks: SocialNetwork[] = [
     ],
   },
   {
+    id: "twitch",
+    name: "Twitch",
+    variants: [
+      { id: "official", label: "Logo officiel", icon: "fa-brands fa-twitch" },
+      { id: "video", label: "Vidéo en direct", icon: "fa-solid fa-video" },
+    ],
+  },
+  {
+    id: "whatsapp",
+    name: "WhatsApp",
+    variants: [
+      { id: "official", label: "Logo officiel", icon: "fa-brands fa-whatsapp" },
+      { id: "message", label: "Message", icon: "fa-solid fa-comment" },
+    ],
+  },
+  {
+    id: "telegram",
+    name: "Telegram",
+    variants: [
+      { id: "official", label: "Logo officiel", icon: "fa-brands fa-telegram" },
+      { id: "send", label: "Envoyer", icon: "fa-solid fa-paper-plane" },
+    ],
+  },
+  {
+    id: "x",
+    name: "X / Twitter",
+    variants: [
+      { id: "official", label: "Logo officiel", icon: "fa-brands fa-twitter" },
+      { id: "at", label: "Compte", icon: "fa-solid fa-at" },
+    ],
+  },
+  {
+    id: "snapchat",
+    name: "Snapchat",
+    variants: [
+      { id: "official", label: "Logo officiel", icon: "fa-brands fa-snapchat" },
+      { id: "camera", label: "Appareil photo", icon: "fa-solid fa-camera" },
+    ],
+  },
+  {
+    id: "pinterest",
+    name: "Pinterest",
+    variants: [
+      {
+        id: "official",
+        label: "Logo officiel",
+        icon: "fa-brands fa-pinterest",
+      },
+      { id: "pin", label: "Épingle", icon: "fa-solid fa-thumbtack" },
+    ],
+  },
+  {
+    id: "spotify",
+    name: "Spotify",
+    variants: [
+      { id: "official", label: "Logo officiel", icon: "fa-brands fa-spotify" },
+      { id: "music", label: "Musique", icon: "fa-solid fa-music" },
+    ],
+  },
+  {
+    id: "gitlab",
+    name: "GitLab",
+    variants: [
+      { id: "official", label: "Logo officiel", icon: "fa-brands fa-gitlab" },
+      { id: "code", label: "Code", icon: "fa-solid fa-code" },
+    ],
+  },
+  {
+    id: "reddit",
+    name: "Reddit",
+    variants: [
+      { id: "official", label: "Logo officiel", icon: "fa-brands fa-reddit" },
+      { id: "comment", label: "Discussion", icon: "fa-solid fa-comments" },
+    ],
+  },
+  {
+    id: "patreon",
+    name: "Patreon",
+    variants: [
+      { id: "official", label: "Logo officiel", icon: "fa-brands fa-patreon" },
+      { id: "heart", label: "Soutien", icon: "fa-solid fa-heart" },
+    ],
+  },
+  {
+    id: "email",
+    name: "Email",
+    variants: [
+      { id: "envelope", label: "Enveloppe", icon: "fa-solid fa-envelope" },
+      { id: "at", label: "Adresse email", icon: "fa-solid fa-at" },
+    ],
+  },
+  {
+    id: "phone",
+    name: "Téléphone",
+    variants: [
+      { id: "phone", label: "Téléphone", icon: "fa-solid fa-phone" },
+      {
+        id: "mobile",
+        label: "Mobile",
+        icon: "fa-solid fa-mobile-screen-button",
+      },
+    ],
+  },
+  {
     id: "website",
     name: "Site web",
     variants: [
