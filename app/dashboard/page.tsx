@@ -1,9 +1,11 @@
 "use client";
 
+import { defaultNetworkIcon } from "@/lib/social-networks";
 import { supabaseClient } from "@/lib/supabase-auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import SocialNetworkPicker from "./social-network-picker";
 
 interface UserProfile {
   id: string;
@@ -45,7 +47,7 @@ export default function DashboardPage() {
   const [newLink, setNewLink] = useState({
     title: "",
     url: "",
-    icon: "fa-solid fa-link",
+    icon: defaultNetworkIcon,
   });
 
   useEffect(() => {
@@ -138,7 +140,7 @@ export default function DashboardPage() {
     if (error) {
       alert("Erreur : " + error.message);
     } else {
-      setNewLink({ title: "", url: "", icon: "fa-solid fa-link" });
+      setNewLink({ title: "", url: "", icon: defaultNetworkIcon });
       await loadLinks(user.id);
     }
   };
@@ -356,18 +358,11 @@ export default function DashboardPage() {
                           className="min-w-0 w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                           required
                         />
-                        <input
-                          type="text"
+                        <SocialNetworkPicker
                           value={editedLink.icon}
-                          onChange={(e) =>
-                            setEditedLink({
-                              ...editedLink,
-                              icon: e.target.value,
-                            })
+                          onChange={(icon) =>
+                            setEditedLink({ ...editedLink, icon })
                           }
-                          aria-label="Icône du lien"
-                          className="min-w-0 w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                          required
                         />
                       </div>
                       <div className="flex flex-wrap gap-2">
@@ -454,14 +449,9 @@ export default function DashboardPage() {
                 }
                 className="px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
-              <input
-                type="text"
-                placeholder="Icône (fa-brands fa-instagram)"
+              <SocialNetworkPicker
                 value={newLink.icon}
-                onChange={(e) =>
-                  setNewLink({ ...newLink, icon: e.target.value })
-                }
-                className="px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                onChange={(icon) => setNewLink({ ...newLink, icon })}
               />
             </div>
             <button
