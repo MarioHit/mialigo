@@ -2,15 +2,24 @@
 
 import { supabaseClient } from "@/lib/supabase-auth";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // Vérifier si déjà connecté
   useEffect(() => {
@@ -23,6 +32,12 @@ export default function LoginPage() {
     checkUser();
   }, [router]);
 
+  useEffect(() => {
+    if (searchParams.get("error") === "auth") {
+      setError("Le lien magique est invalide ou a expiré. Réessayez.");
+    }
+  }, [searchParams]);
+
   const handleMagicLink = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -33,7 +48,7 @@ export default function LoginPage() {
       const { error } = await supabaseClient.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
         },
       });
 
