@@ -12,17 +12,17 @@ export default function LegalNoticePage() {
     >
       <h2>Éditeur du site</h2>
       <p>
-        Mialigo est édité par <strong>[À COMPLÉTER : nom ou société]</strong>.
+        Mialigo est édité par <strong>Mario</strong>.
       </p>
       <p>
-        Adresse : <strong>[À COMPLÉTER : adresse]</strong>
+        Adresse : <strong>Nantes</strong>
         <br />
         Email : <strong>contact-1@mailigo.com</strong>
       </p>
 
       <h2>Directeur de la publication</h2>
       <p>
-        Directeur de la publication : <strong>[À COMPLÉTER]</strong>.
+        Directeur de la publication : <strong>Mario</strong>.
       </p>
 
       <h2>Hébergement</h2>

@@ -51,9 +51,9 @@ export default function PrivacyPage() {
       </p>
 
       <p className="text-sm">
-        Dernière mise à jour : [À COMPLÉTER]. Cette page doit être adaptée aux
-        traitements réellement effectués par Mialigo avant sa mise en
-        production.
+        Dernière mise à jour : 29 août 2026. Cette page est adaptée aux
+        traitements réellement effectués par Mialigo dans son fonctionnement
+        actuel.
       </p>
     </LegalPage>
   );
