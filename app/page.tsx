@@ -65,8 +65,31 @@ export default function HomePage() {
       </main>
 
       {/* Footer */}
-      <footer className="mt-16 text-sm text-gray-500">
+      <footer className="mt-16 flex flex-col items-center gap-3 text-sm text-gray-500">
         <p>Made with ❤️ by Mario • 2026</p>
+        <nav className="flex flex-wrap justify-center gap-x-4 gap-y-2">
+          <Link
+            href="/contact"
+            className="hover:text-indigo-500 hover:underline"
+          >
+            Contact
+          </Link>
+          <Link
+            href="/mentions-legales"
+            className="hover:text-indigo-500 hover:underline"
+          >
+            Mentions légales
+          </Link>
+          <Link
+            href="/confidentialite"
+            className="hover:text-indigo-500 hover:underline"
+          >
+            Confidentialité
+          </Link>
+          <Link href="/cgu" className="hover:text-indigo-500 hover:underline">
+            CGU
+          </Link>
+        </nav>
       </footer>
     </div>
   );
