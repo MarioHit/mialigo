@@ -2,15 +2,24 @@
 
 import { supabaseClient } from "@/lib/supabase-auth";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 
-export default function LoginPage() {
+function LoginForm() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Afficher une erreur venant du callback (lien expiré/invalide)
+  useEffect(() => {
+    const callbackError = searchParams.get("error");
+    if (callbackError) {
+      setError(callbackError);
+    }
+  }, [searchParams]);
 
   // Vérifier si déjà connecté
   useEffect(() => {
@@ -33,7 +42,7 @@ export default function LoginPage() {
       const { error } = await supabaseClient.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
         },
       });
 
@@ -174,5 +183,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
   );
 }
