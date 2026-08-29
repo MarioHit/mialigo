@@ -3,14 +3,21 @@ import "./globals.css";
 import ThemeToggle from "./theme-toggle";
 
 export const metadata: Metadata = {
-  title: "Mario - Building in public",
+  title: "Mialigo - Tous vos liens au même endroit",
   description:
-    "Mario's social links - Instagram, YouTube, TikTok. Building in public 🚀",
-  keywords: ["Mario", "social links", "Instagram", "YouTube", "TikTok"],
-  authors: [{ name: "Mario" }],
+    "Créez votre page personnalisée et partagez tous vos liens au même endroit avec Mialigo.",
+  keywords: [
+    "Mialigo",
+    "page de liens",
+    "liens sociaux",
+    "profil personnalisé",
+    "réseaux sociaux",
+  ],
+  authors: [{ name: "Mialigo" }],
   openGraph: {
-    title: "Mario - Building in public",
-    description: "Mario's social links - Follow my journey!",
+    title: "Mialigo - Tous vos liens au même endroit",
+    description:
+      "Créez votre page personnalisée et partagez tous vos liens au même endroit avec Mialigo.",
     type: "website",
   },
 };

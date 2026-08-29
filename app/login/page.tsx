@@ -146,6 +146,21 @@ export default function LoginPage() {
               lien de connexion sécurisé. Pas de mot de passe à retenir !
             </p>
           </div>
+
+          <p className="mt-6 text-center text-xs text-gray-500 dark:text-gray-400">
+            En continuant, vous acceptez les{" "}
+            <Link href="/cgu" className="underline hover:text-indigo-600">
+              CGU
+            </Link>{" "}
+            et la{" "}
+            <Link
+              href="/confidentialite"
+              className="underline hover:text-indigo-600"
+            >
+              politique de confidentialité
+            </Link>
+            .
+          </p>
         </div>
 
         {/* Lien retour */}
