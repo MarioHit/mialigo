@@ -1,6 +1,12 @@
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { NextRequest, NextResponse } from "next/server";
 
+function debug(message: string) {
+  if (process.env.NODE_ENV !== "production") {
+    console.log(message);
+  }
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
@@ -12,35 +18,25 @@ export async function GET(request: NextRequest) {
     | null;
   const next = searchParams.get("next") ?? "/dashboard";
 
-  console.log(`[Auth/Callback] 📥 Requête reçue:`, {
-    origin,
-    hasCode: Boolean(code),
-    hasTokenHash: Boolean(token_hash),
-    type,
-    next,
-  });
+  debug("[Auth/Callback] Requête reçue.");
 
   const supabase = await createSupabaseServerClient();
   let authenticatedUser = null;
 
   // Cas 1 : Token hash (Server-side OTP / True Magic Link) -> Fonctionne sur N'IMPORTE QUEL appareil/navigateur !
   if (token_hash && type) {
-    console.log(
-      `[Auth/Callback] 🔑 Validation du Magic Link par token_hash (type: ${type})...`,
-    );
+    debug("[Auth/Callback] Validation du lien magique par token hash.");
     const { data, error } = await supabase.auth.verifyOtp({
       token_hash,
       type: type === "signup" ? "signup" : "magiclink",
     });
 
     if (!error && data.user) {
-      console.log(
-        `[Auth/Callback] ✅ Magic Link (token_hash) validé avec succès !`,
-      );
+      debug("[Auth/Callback] Lien magique validé.");
       authenticatedUser = data.user;
     } else {
       console.error(
-        `[Auth/Callback] ❌ Échec de la vérification token_hash:`,
+        "[Auth/Callback] Échec de la vérification du lien magique.",
         error?.message || "Utilisateur introuvable",
       );
     }
@@ -48,17 +44,15 @@ export async function GET(request: NextRequest) {
 
   // Cas 2 : Code PKCE standard (Fallback si lien classique)
   if (!authenticatedUser && code) {
-    console.log(
-      `[Auth/Callback] 🔄 Échange du code PKCE contre une session...`,
-    );
+    debug("[Auth/Callback] Échange du code PKCE contre une session.");
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error && data.user) {
-      console.log(`[Auth/Callback] ✅ Session PKCE échangée avec succès !`);
+      debug("[Auth/Callback] Session PKCE échangée.");
       authenticatedUser = data.user;
     } else {
       console.error(
-        `[Auth/Callback] ❌ Échec de l'échange du code PKCE:`,
+        "[Auth/Callback] Échec de l'échange du code PKCE.",
         error?.message || "Utilisateur introuvable",
       );
     }
@@ -66,15 +60,11 @@ export async function GET(request: NextRequest) {
 
   // Traitement de l'utilisateur authentifié
   if (authenticatedUser) {
-    console.log(`[Auth/Callback] 👤 Utilisateur identifié:`, {
-      id: authenticatedUser.id,
-      email: authenticatedUser.email,
-      metadata: authenticatedUser.user_metadata,
-    });
+    debug("[Auth/Callback] Utilisateur authentifié.");
 
     // Synchronisation de sécurité du profil public.users
     try {
-      console.log(`[Auth/Callback] 🔍 Vérification du profil public.users...`);
+      debug("[Auth/Callback] Vérification du profil.");
       const { data: existingUser, error: fetchErr } = await supabase
         .from("users")
         .select("id, username")
@@ -83,15 +73,13 @@ export async function GET(request: NextRequest) {
 
       if (fetchErr) {
         console.warn(
-          `[Auth/Callback] ⚠️ Erreur lors de la vérification du profil:`,
+          "[Auth/Callback] Erreur lors de la vérification du profil.",
           fetchErr.message,
         );
       }
 
       if (!existingUser) {
-        console.log(
-          `[Auth/Callback] ℹ️ Aucun profil public.users trouvé. Création automatique en cours...`,
-        );
+        debug("[Auth/Callback] Création du profil absent.");
         const meta = authenticatedUser.user_metadata || {};
         const emailPrefix = authenticatedUser.email?.split("@")[0] || "user";
         const newUsername = (meta.username || emailPrefix)
@@ -110,36 +98,28 @@ export async function GET(request: NextRequest) {
 
         if (insertError) {
           console.error(
-            `[Auth/Callback] ❌ Erreur lors de la création du profil:`,
+            "[Auth/Callback] Erreur lors de la création du profil.",
             insertError.message,
           );
         } else {
-          console.log(
-            `[Auth/Callback] ✅ Profil public.users créé pour "${newUsername}" (ID: ${authenticatedUser.id})`,
-          );
+          debug("[Auth/Callback] Profil créé.");
         }
       } else {
-        console.log(
-          `[Auth/Callback] ✅ Profil public.users existant confirmé pour "${existingUser.username}"`,
-        );
+        debug("[Auth/Callback] Profil existant confirmé.");
       }
     } catch (profileErr) {
       console.error(
-        `[Auth/Callback] ❌ Exception synchronisation profil:`,
-        profileErr,
+        "[Auth/Callback] Exception pendant la synchronisation du profil.",
+        profileErr instanceof Error ? profileErr.message : "Erreur inconnue",
       );
     }
 
-    console.log(
-      `[Auth/Callback] 🚀 Authentification réussie. Redirection vers "${origin}${next}"...`,
-    );
+    debug("[Auth/Callback] Authentification réussie, redirection en cours.");
     return NextResponse.redirect(`${origin}${next}`);
   }
 
   // En cas d'échec
-  console.warn(
-    `[Auth/Callback] ⚠️ Échec de validation du lien magique, redirection vers /login avec message d'erreur.`,
-  );
+  console.warn("[Auth/Callback] Échec de validation du lien magique.");
   return NextResponse.redirect(
     `${origin}/login?error=Le lien de connexion est invalide ou a expiré`,
   );
