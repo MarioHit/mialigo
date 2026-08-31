@@ -3,6 +3,12 @@ import { notFound, redirect } from "next/navigation";
 //import UserPageClient from "./user-page-client";
 import UserPageClient from "@/app/[username]/user-page-client";
 
+function debug(message: string) {
+  if (process.env.NODE_ENV !== "production") {
+    console.log(message);
+  }
+}
+
 // Relire le profil et ses liens depuis Supabase à chaque visite.
 export const dynamic = "force-dynamic";
 
@@ -14,20 +20,16 @@ export default async function UserPage({ params }: PageProps) {
   const { username } = await params;
   const user = username.toLowerCase();
 
-  console.log(`[UserPage] 🌐 Requête page publique pour: "${username}"`);
+  debug("[UserPage] Requête de page publique.");
 
   // Rediriger si l'URL contient des majuscules
   if (username !== user) {
-    console.log(
-      `[UserPage] 🔀 Redirection majuscule -> minuscule: "${username}" -> "/${user}"`,
-    );
+    debug("[UserPage] Redirection vers une URL normalisée.");
     redirect(`/${user}`);
   }
 
   // Récupérer l'utilisateur depuis Supabase
-  console.log(
-    `[UserPage] 🔍 Recherche de l'utilisateur "${user}" dans public.users...`,
-  );
+  debug("[UserPage] Recherche du profil public.");
   const { data: userData, error: userError } = await supabase
     .from("users")
     .select("*")
@@ -35,16 +37,11 @@ export default async function UserPage({ params }: PageProps) {
     .single();
 
   if (userError || !userData) {
-    console.warn(
-      `[UserPage] ⚠️ Utilisateur "${user}" non trouvé en base -> affichage 404.`,
-      userError?.message,
-    );
+    debug("[UserPage] Profil public introuvable.");
     notFound();
   }
 
-  console.log(
-    `[UserPage] ✅ Utilisateur trouvé (id: "${userData.id}", nom: "${userData.name}"). Chargement des liens...`,
-  );
+  debug("[UserPage] Profil public trouvé.");
 
   // Récupérer les liens de l'utilisateur
   const { data: links, error: linksError } = await supabase
@@ -54,14 +51,9 @@ export default async function UserPage({ params }: PageProps) {
     .order("order", { ascending: true });
 
   if (linksError) {
-    console.error(
-      `[UserPage] ❌ Erreur chargement liens pour "${user}":`,
-      linksError.message,
-    );
+    console.error("[UserPage] Échec du chargement des liens publics.");
   } else {
-    console.log(
-      `[UserPage] ✅ ${links?.length || 0} lien(s) chargé(s) pour "${user}".`,
-    );
+    debug("[UserPage] Liens publics chargés.");
   }
 
   const userWithLinks = {

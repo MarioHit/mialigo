@@ -5,6 +5,12 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
+function debug(message: string) {
+  if (process.env.NODE_ENV !== "production") {
+    console.log(message);
+  }
+}
+
 function LoginForm() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -16,22 +22,20 @@ function LoginForm() {
   useEffect(() => {
     const errorParam = searchParams.get("error");
     if (errorParam) {
-      console.warn(`[Login] ⚠️ Paramètre d'erreur URL reçu: "${errorParam}"`);
+      console.warn("[Login] Erreur signalée par le parcours de connexion.");
       setError(errorParam);
     }
   }, [searchParams]);
 
   useEffect(() => {
     const checkUser = async () => {
-      console.log(`[Login] 🔍 Vérification de la session active...`);
+      debug("[Login] Vérification de la session active.");
       const { data } = await supabaseClient.auth.getSession();
       if (data.session) {
-        console.log(
-          `[Login] ✅ Session existante détectée pour ${data.session.user.email} -> redirection /dashboard`,
-        );
+        debug("[Login] Session existante détectée.");
         router.push("/dashboard");
       } else {
-        console.log(`[Login] Aucune session active.`);
+        debug("[Login] Aucune session active.");
       }
     };
     checkUser();
@@ -44,15 +48,11 @@ function LoginForm() {
     setMessage("");
 
     const cleanEmail = email.trim();
-    console.log(
-      `[Login] 🚀 Demande de lien magique pour l'email: "${cleanEmail}"`,
-    );
+    debug("[Login] Demande de lien de connexion.");
 
     try {
       const redirectTo = `${window.location.origin}/auth/callback?next=/dashboard`;
-      console.log(
-        `[Login] Appel Supabase signInWithOtp (shouldCreateUser: false, redirectTo: ${redirectTo})...`,
-      );
+      debug("[Login] Envoi de la demande de connexion.");
 
       const { error: otpError } = await supabaseClient.auth.signInWithOtp({
         email: cleanEmail,
@@ -63,10 +63,7 @@ function LoginForm() {
       });
 
       if (otpError) {
-        console.warn(
-          `[Login] ⚠️ Erreur Supabase signInWithOtp:`,
-          otpError.message,
-        );
+        console.warn("[Login] Échec de l'envoi du lien de connexion.");
         if (
           otpError.message.includes("Signups not allowed") ||
           otpError.message.toLowerCase().includes("user not found")
@@ -78,15 +75,13 @@ function LoginForm() {
         throw otpError;
       }
 
-      console.log(
-        `[Login] ✅ Magic link de connexion envoyé avec succès à "${cleanEmail}"`,
-      );
+      debug("[Login] Lien de connexion envoyé.");
       setMessage(
         "🎉 Lien de connexion envoyé ! Cliquez sur le lien dans votre boîte email (ouvrez-le depuis n'importe quel navigateur ou appareil).",
       );
       setEmail("");
     } catch (err: any) {
-      console.error(`[Login] ❌ Échec envoi magic link:`, err);
+      console.error("[Login] Échec de l'envoi du lien de connexion.");
       setError(err.message || "Une erreur est survenue.");
     } finally {
       setLoading(false);

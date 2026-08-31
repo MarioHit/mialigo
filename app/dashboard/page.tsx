@@ -7,6 +7,12 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import SocialNetworkPicker from "./social-network-picker";
 
+function debug(message: string) {
+  if (process.env.NODE_ENV !== "production") {
+    console.log(message);
+  }
+}
+
 interface UserProfile {
   id: string;
   email: string;
@@ -55,24 +61,18 @@ export default function DashboardPage() {
   }, []);
 
   const checkUser = async () => {
-    console.log(`[Dashboard] 🔍 Vérification de la session active...`);
+    debug("[Dashboard] Vérification de la session active.");
     const {
       data: { session },
     } = await supabaseClient.auth.getSession();
 
     if (!session) {
-      console.warn(
-        `[Dashboard] ⚠️ Aucune session active -> Redirection vers /login`,
-      );
+      debug("[Dashboard] Aucune session active.");
       router.push("/login");
       return;
     }
 
-    console.log(`[Dashboard] ✅ Session active trouvée:`, {
-      userId: session.user.id,
-      email: session.user.email,
-      metadata: session.user.user_metadata,
-    });
+    debug("[Dashboard] Session active trouvée.");
 
     setUser(session.user);
     await loadProfile(session.user.id, session.user);
@@ -81,9 +81,7 @@ export default function DashboardPage() {
   };
 
   const loadProfile = async (userId: string, currentUser?: any) => {
-    console.log(
-      `[Dashboard] 📥 Chargement du profil public.users pour userId: "${userId}"...`,
-    );
+    debug("[Dashboard] Chargement du profil.");
     const { data, error } = await supabaseClient
       .from("users")
       .select("*")
@@ -91,22 +89,17 @@ export default function DashboardPage() {
       .maybeSingle();
 
     if (error) {
-      console.error(
-        `[Dashboard] ❌ Erreur lors du chargement du profil:`,
-        error.message,
-      );
+      console.error("[Dashboard] Échec du chargement du profil.");
     }
 
     if (data) {
-      console.log(`[Dashboard] ✅ Profil chargé avec succès:`, data);
+      debug("[Dashboard] Profil chargé.");
       setProfile(data);
       setUsername(data.username || "");
       setName(data.name || "");
       setBio(data.bio || "");
     } else {
-      console.warn(
-        `[Dashboard] ⚠️ Aucun profil trouvé dans public.users pour cet utilisateur. Utilisation des métadonnées fallback.`,
-      );
+      console.warn("[Dashboard] Aucun profil associé à la session.");
       const activeUser = currentUser || user;
       const fallbackUsername = (
         activeUser?.user_metadata?.username ||
@@ -121,9 +114,7 @@ export default function DashboardPage() {
   };
 
   const loadLinks = async (userId: string) => {
-    console.log(
-      `[Dashboard] 📥 Chargement des liens pour userId: "${userId}"...`,
-    );
+    debug("[Dashboard] Chargement des liens.");
     const { data, error } = await supabaseClient
       .from("links")
       .select("*")
@@ -131,9 +122,9 @@ export default function DashboardPage() {
       .order("order", { ascending: true });
 
     if (error) {
-      console.error(`[Dashboard] ❌ Erreur chargement liens:`, error.message);
+      console.error("[Dashboard] Échec du chargement des liens.");
     } else {
-      console.log(`[Dashboard] ✅ ${data?.length || 0} lien(s) chargé(s).`);
+      debug("[Dashboard] Liens chargés.");
       if (data) setLinks(data);
     }
   };
@@ -146,13 +137,7 @@ export default function DashboardPage() {
     const cleanName = name.trim();
     const cleanBio = bio.trim();
 
-    console.log(`[Dashboard] 💾 Sauvegarde du profil...`, {
-      id: user.id,
-      email: user.email,
-      username: cleanUsername,
-      name: cleanName,
-      bio: cleanBio,
-    });
+    debug("[Dashboard] Sauvegarde du profil.");
 
     const { error } = await supabaseClient.from("users").upsert({
       id: user.id,
@@ -164,10 +149,10 @@ export default function DashboardPage() {
     });
 
     if (error) {
-      console.error(`[Dashboard] ❌ Erreur sauvegarde profil:`, error.message);
+      console.error("[Dashboard] Échec de la sauvegarde du profil.");
       alert("Erreur lors de la sauvegarde : " + error.message);
     } else {
-      console.log(`[Dashboard] ✅ Profil sauvegardé / mis à jour avec succès.`);
+      debug("[Dashboard] Profil sauvegardé.");
       alert("✅ Profil mis à jour !");
       await loadProfile(user.id);
     }
@@ -186,13 +171,7 @@ export default function DashboardPage() {
     const nextOrder =
       links.length > 0 ? Math.max(...links.map((l) => l.order)) + 1 : 1;
 
-    console.log(`[Dashboard] ➕ Ajout d'un nouveau lien...`, {
-      user_id: user.id,
-      title: newLink.title,
-      url: newLink.url,
-      icon: newLink.icon,
-      order: nextOrder,
-    });
+    debug("[Dashboard] Ajout d'un lien.");
 
     const { error } = await supabaseClient.from("links").insert({
       user_id: user.id,
@@ -203,10 +182,10 @@ export default function DashboardPage() {
     });
 
     if (error) {
-      console.error(`[Dashboard] ❌ Erreur ajout lien:`, error.message);
+      console.error("[Dashboard] Échec de l'ajout du lien.");
       alert("Erreur : " + error.message);
     } else {
-      console.log(`[Dashboard] ✅ Lien ajouté avec succès.`);
+      debug("[Dashboard] Lien ajouté.");
       setNewLink({ title: "", url: "", icon: defaultNetworkIcon });
       await loadLinks(user.id);
     }
@@ -215,17 +194,17 @@ export default function DashboardPage() {
   const handleDeleteLink = async (linkId: string) => {
     if (!confirm("Supprimer ce lien ?")) return;
 
-    console.log(`[Dashboard] 🗑️ Suppression du lien ID: "${linkId}"...`);
+    debug("[Dashboard] Suppression d'un lien.");
     const { error } = await supabaseClient
       .from("links")
       .delete()
       .eq("id", linkId);
 
     if (error) {
-      console.error(`[Dashboard] ❌ Erreur suppression lien:`, error.message);
+      console.error("[Dashboard] Échec de la suppression du lien.");
       alert("Erreur : " + error.message);
     } else {
-      console.log(`[Dashboard] ✅ Lien supprimé avec succès.`);
+      debug("[Dashboard] Lien supprimé.");
       await loadLinks(user.id);
     }
   };
@@ -248,10 +227,7 @@ export default function DashboardPage() {
     e.preventDefault();
     setSavingLinkId(linkId);
 
-    console.log(
-      `[Dashboard] 💾 Mise à jour du lien ID: "${linkId}"...`,
-      editedLink,
-    );
+    debug("[Dashboard] Mise à jour d'un lien.");
     const { error } = await supabaseClient
       .from("links")
       .update({
@@ -262,10 +238,10 @@ export default function DashboardPage() {
       .eq("id", linkId);
 
     if (error) {
-      console.error(`[Dashboard] ❌ Erreur mise à jour lien:`, error.message);
+      console.error("[Dashboard] Échec de la mise à jour du lien.");
       alert("Erreur : " + error.message);
     } else {
-      console.log(`[Dashboard] ✅ Lien mis à jour avec succès.`);
+      debug("[Dashboard] Lien mis à jour.");
       await loadLinks(user.id);
       handleCancelEdit();
     }
@@ -274,7 +250,7 @@ export default function DashboardPage() {
   };
 
   const handleLogout = async () => {
-    console.log(`[Dashboard] 🚪 Déconnexion de l'utilisateur...`);
+    debug("[Dashboard] Déconnexion.");
     await supabaseClient.auth.signOut();
     router.push("/");
   };

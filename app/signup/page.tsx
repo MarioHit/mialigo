@@ -5,6 +5,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+function debug(message: string) {
+  if (process.env.NODE_ENV !== "production") {
+    console.log(message);
+  }
+}
+
 export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -31,9 +37,7 @@ export default function SignupPage() {
     const cleanUsername = username.trim().toLowerCase();
     if (!cleanUsername || cleanUsername.length < 3) {
       if (cleanUsername.length > 0 && cleanUsername.length < 3) {
-        console.log(
-          `[Signup] Pseudo trop court (< 3 caractères): "${cleanUsername}"`,
-        );
+        debug("[Signup] Pseudo trop court.");
       }
       setUsernameStatus("idle");
       return;
@@ -41,9 +45,7 @@ export default function SignupPage() {
 
     const timer = setTimeout(async () => {
       setUsernameStatus("checking");
-      console.log(
-        `[Signup] 🔍 Vérification de la disponibilité du pseudo: "${cleanUsername}"`,
-      );
+      debug("[Signup] Vérification de la disponibilité du pseudo.");
       try {
         const { data, error } = await supabaseClient
           .from("users")
@@ -52,25 +54,20 @@ export default function SignupPage() {
           .maybeSingle();
 
         if (error) {
-          console.error(
-            `[Signup] ❌ Erreur lors de la vérification du pseudo "${cleanUsername}":`,
-            error.message,
-          );
+          console.error("[Signup] Échec de la vérification du pseudo.");
           setUsernameStatus("idle");
           return;
         }
 
         if (data) {
-          console.warn(
-            `[Signup] ⚠️ Pseudo "${cleanUsername}" DÉJÀ PRIS en base de données.`,
-          );
+          debug("[Signup] Pseudo indisponible.");
           setUsernameStatus("taken");
         } else {
-          console.log(`[Signup] ✅ Pseudo "${cleanUsername}" DISPONIBLE.`);
+          debug("[Signup] Pseudo disponible.");
           setUsernameStatus("available");
         }
       } catch (err: any) {
-        console.error(`[Signup] ❌ Exception vérification pseudo:`, err);
+        console.error("[Signup] Échec de la vérification du pseudo.");
         setUsernameStatus("idle");
       }
     }, 400);
@@ -92,22 +89,17 @@ export default function SignupPage() {
     const cleanName = name.trim() || cleanUsername;
     const cleanEmail = email.trim();
 
-    console.log(`[Signup] 🚀 Tentative d'inscription:`, {
-      email: cleanEmail,
-      username: cleanUsername,
-      name: cleanName,
-      usernameStatus,
-    });
+    debug("[Signup] Tentative de création de compte.");
 
     if (cleanUsername.length < 3) {
       setError("Le nom d'utilisateur doit contenir au moins 3 caractères.");
-      console.warn(`[Signup] Échec validation: pseudo trop court.`);
+      debug("[Signup] Échec de validation du pseudo.");
       return;
     }
 
     if (usernameStatus === "taken") {
       setError("Ce nom d'utilisateur est déjà réservé.");
-      console.warn(`[Signup] Échec validation: pseudo déjà réservé.`);
+      debug("[Signup] Échec de validation du pseudo.");
       return;
     }
 
@@ -115,9 +107,7 @@ export default function SignupPage() {
 
     try {
       const redirectTo = `${window.location.origin}/auth/callback?next=/dashboard`;
-      console.log(
-        `[Signup] Envoi du magic link via Supabase signInWithOtp (redirectTo: ${redirectTo})...`,
-      );
+      debug("[Signup] Envoi de la demande de création de compte.");
 
       const { error: signupError } = await supabaseClient.auth.signInWithOtp({
         email: cleanEmail,
@@ -133,15 +123,10 @@ export default function SignupPage() {
 
       if (signupError) throw signupError;
 
-      console.log(
-        `[Signup] ✅ Magic link d'inscription envoyé avec succès à: "${cleanEmail}"`,
-      );
+      debug("[Signup] Lien de confirmation envoyé.");
       setMessage("E-mail envoyé. Ouvrez le lien reçu pour activer votre page.");
     } catch (err: any) {
-      console.error(
-        `[Signup] ❌ Erreur lors de l'envoi du magic link d'inscription:`,
-        err,
-      );
+      console.error("[Signup] Échec de l'envoi du lien de confirmation.");
       setError(err.message || "Erreur lors de l'inscription.");
     } finally {
       setLoading(false);
