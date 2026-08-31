@@ -136,9 +136,7 @@ export default function SignupPage() {
       console.log(
         `[Signup] ✅ Magic link d'inscription envoyé avec succès à: "${cleanEmail}"`,
       );
-      setMessage(
-        `🎉 Lien de confirmation envoyé à ${cleanEmail} ! Cliquez sur le lien dans votre email pour activer votre page (vous pouvez l'ouvrir depuis n'importe quel navigateur ou smartphone).`,
-      );
+      setMessage("E-mail envoyé. Ouvrez le lien reçu pour activer votre page.");
     } catch (err: any) {
       console.error(
         `[Signup] ❌ Erreur lors de l'envoi du magic link d'inscription:`,

@@ -111,10 +111,11 @@ function LoginForm() {
         {/* Carte de connexion */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
           <h2 className="text-2xl font-semibold mb-2 text-center text-gray-900 dark:text-white">
-            Connexion
+            Créer un compte ou se connecter
           </h2>
           <p className="text-xs text-center text-gray-500 dark:text-gray-400 mb-6">
-            Recevez un lien magique sécurisé par email
+            Saisissez votre adresse e-mail. Nous vous enverrons un lien pour
+            accéder à votre compte.
           </p>
 
           <form onSubmit={handleMagicLink} className="space-y-4">
@@ -141,7 +142,7 @@ function LoginForm() {
               disabled={loading}
               className="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-lg hover:from-indigo-700 hover:to-purple-700 focus:ring-4 focus:ring-indigo-300 dark:focus:ring-indigo-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? "Envoi du lien..." : "✨ Recevoir le lien magique"}
+              {loading ? "Envoi du lien..." : "Recevoir mon lien de connexion"}
             </button>
           </form>
 
@@ -160,7 +161,7 @@ function LoginForm() {
             </div>
           )}
 
-          {/* Info Magic Link */}
+          {/* Information de connexion */}
           <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
             <p className="text-xs text-blue-800 dark:text-blue-200">
               🔐 <strong>Sans mot de passe :</strong> Cliquez sur le lien reçu

@@ -16,7 +16,7 @@ export default function PrivacyPage() {
         compte :
       </p>
       <ul>
-        <li>l'adresse email utilisée pour la connexion par lien magique ;</li>
+        <li>l'adresse e-mail utilisée pour la connexion par lien reçu ;</li>
         <li>le nom d'utilisateur et le nom affiché ;</li>
         <li>la biographie et les liens ajoutés à la page publique ;</li>
         <li>les icônes choisies pour ces liens.</li>
