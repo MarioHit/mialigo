@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import ConfirmDialogProvider from "./confirm-dialog-provider";
 import "./globals.css";
 import ThemeToggle from "./theme-toggle";
+import ToastProvider from "./toast-provider";
 
 export const metadata: Metadata = {
   title: "Mialigo - Tous vos liens au même endroit",
@@ -33,7 +35,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body className="min-h-full flex flex-col">
         <ThemeToggle />
-        {children}
+        <ToastProvider>
+          <ConfirmDialogProvider>{children}</ConfirmDialogProvider>
+        </ToastProvider>
       </body>
     </html>
   );

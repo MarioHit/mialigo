@@ -1,5 +1,7 @@
 "use client";
 
+import { useConfirm } from "@/app/confirm-dialog-provider";
+import { useToast } from "@/app/toast-provider";
 import { defaultNetworkIcon } from "@/lib/social-networks";
 import { supabaseClient } from "@/lib/supabase-auth";
 import Link from "next/link";
@@ -42,7 +44,11 @@ export default function DashboardPage() {
     url: "",
     icon: "",
   });
+  const [draggingLinkId, setDraggingLinkId] = useState<string | null>(null);
+  const [dragOverLinkId, setDragOverLinkId] = useState<string | null>(null);
   const router = useRouter();
+  const showToast = useToast();
+  const confirmDialog = useConfirm();
 
   // Form states
   const [username, setUsername] = useState("");
@@ -150,10 +156,10 @@ export default function DashboardPage() {
 
     if (error) {
       console.error("[Dashboard] Échec de la sauvegarde du profil.");
-      alert("Erreur lors de la sauvegarde : " + error.message);
+      showToast("Erreur lors de la sauvegarde : " + error.message, "error");
     } else {
       debug("[Dashboard] Profil sauvegardé.");
-      alert("✅ Profil mis à jour !");
+      showToast("Profil mis à jour !", "success");
       await loadProfile(user.id);
     }
 
@@ -164,7 +170,7 @@ export default function DashboardPage() {
     e.preventDefault();
 
     if (!newLink.title || !newLink.url) {
-      alert("Veuillez remplir tous les champs");
+      showToast("Veuillez remplir tous les champs", "error");
       return;
     }
 
@@ -183,7 +189,7 @@ export default function DashboardPage() {
 
     if (error) {
       console.error("[Dashboard] Échec de l'ajout du lien.");
-      alert("Erreur : " + error.message);
+      showToast("Erreur : " + error.message, "error");
     } else {
       debug("[Dashboard] Lien ajouté.");
       setNewLink({ title: "", url: "", icon: defaultNetworkIcon });
@@ -192,7 +198,12 @@ export default function DashboardPage() {
   };
 
   const handleDeleteLink = async (linkId: string) => {
-    if (!confirm("Supprimer ce lien ?")) return;
+    const confirmed = await confirmDialog({
+      title: "Supprimer ce lien ?",
+      message: "Cette action est définitive.",
+      confirmLabel: "Supprimer",
+    });
+    if (!confirmed) return;
 
     debug("[Dashboard] Suppression d'un lien.");
     const { error } = await supabaseClient
@@ -202,9 +213,10 @@ export default function DashboardPage() {
 
     if (error) {
       console.error("[Dashboard] Échec de la suppression du lien.");
-      alert("Erreur : " + error.message);
+      showToast("Erreur : " + error.message, "error");
     } else {
       debug("[Dashboard] Lien supprimé.");
+      showToast("Lien supprimé.", "success");
       await loadLinks(user.id);
     }
   };
@@ -239,14 +251,68 @@ export default function DashboardPage() {
 
     if (error) {
       console.error("[Dashboard] Échec de la mise à jour du lien.");
-      alert("Erreur : " + error.message);
+      showToast("Erreur : " + error.message, "error");
     } else {
       debug("[Dashboard] Lien mis à jour.");
+      showToast("Lien mis à jour.", "success");
       await loadLinks(user.id);
       handleCancelEdit();
     }
 
     setSavingLinkId(null);
+  };
+
+  const handleDragStart = (linkId: string) => {
+    setDraggingLinkId(linkId);
+  };
+
+  const handleDragOver = (e: React.DragEvent, linkId: string) => {
+    e.preventDefault();
+    if (linkId !== dragOverLinkId) setDragOverLinkId(linkId);
+  };
+
+  const handleDragEnd = () => {
+    setDraggingLinkId(null);
+    setDragOverLinkId(null);
+  };
+
+  const handleDrop = async (targetLinkId: string) => {
+    const sourceLinkId = draggingLinkId;
+    handleDragEnd();
+
+    if (!sourceLinkId || sourceLinkId === targetLinkId) return;
+
+    const sourceIndex = links.findIndex((link) => link.id === sourceLinkId);
+    const targetIndex = links.findIndex((link) => link.id === targetLinkId);
+    if (sourceIndex === -1 || targetIndex === -1) return;
+
+    const reordered = [...links];
+    const [movedLink] = reordered.splice(sourceIndex, 1);
+    reordered.splice(targetIndex, 0, movedLink);
+    const updatedLinks = reordered.map((link, index) => ({
+      ...link,
+      order: index + 1,
+    }));
+
+    debug("[Dashboard] Réorganisation des liens.");
+    setLinks(updatedLinks);
+
+    const { error } = await supabaseClient.from("links").upsert(
+      updatedLinks.map((link) => ({
+        id: link.id,
+        user_id: user.id,
+        title: link.title,
+        url: link.url,
+        icon: link.icon,
+        order: link.order,
+      })),
+    );
+
+    if (error) {
+      console.error("[Dashboard] Échec de la réorganisation des liens.");
+      showToast("Erreur lors de la réorganisation : " + error.message, "error");
+      await loadLinks(user.id);
+    }
   };
 
   const handleLogout = async () => {
@@ -377,7 +443,18 @@ export default function DashboardPage() {
               links.map((link) => (
                 <div
                   key={link.id}
-                  className="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 border rounded-lg dark:border-gray-600"
+                  draggable={editingLinkId !== link.id}
+                  onDragStart={() => handleDragStart(link.id)}
+                  onDragOver={(e) => handleDragOver(e, link.id)}
+                  onDrop={() => handleDrop(link.id)}
+                  onDragEnd={handleDragEnd}
+                  className={`flex items-start gap-3 sm:gap-4 p-3 sm:p-4 border rounded-lg dark:border-gray-600 transition-opacity ${
+                    draggingLinkId === link.id ? "opacity-40" : ""
+                  } ${
+                    dragOverLinkId === link.id && draggingLinkId !== link.id
+                      ? "border-indigo-500 border-2"
+                      : ""
+                  }`}
                 >
                   {editingLinkId === link.id ? (
                     <form
@@ -439,6 +516,11 @@ export default function DashboardPage() {
                     </form>
                   ) : (
                     <>
+                      <i
+                        className="fa-solid fa-grip-vertical shrink-0 mt-1 cursor-grab text-gray-400 active:cursor-grabbing"
+                        aria-hidden="true"
+                        title="Glisser pour réordonner"
+                      ></i>
                       <i
                         className={`${link.icon} shrink-0 text-xl w-6 text-center mt-0.5`}
                       ></i>
