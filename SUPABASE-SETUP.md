@@ -42,7 +42,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=votre-cle-ici
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://abcdefghijklmno.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=votre-cle-anon
 ```
 
 ### 4. Créer les Tables dans Supabase

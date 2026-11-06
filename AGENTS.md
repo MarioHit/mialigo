@@ -1,10 +1,13 @@
+## Git rules
+
+These rules live outside the `nextjs-agent-rules` block below on purpose: `next dev` rewrites everything between its markers.
+
+- You may create work branches (start them from `origin/pre-prod`), commit on them, and push them (`git push -u origin <branch>`).
+- `main` and `pre-prod` change only through merged pull requests: never commit on them and never push to them directly, even if explicitly requested in a later message.
+- Never use `git push --force` (including `-f` and `--force-with-lease`), `git reset --hard`, or `--no-verify` (commit or push).
+- Pull requests target `pre-prod`.
+
 <!-- BEGIN:nextjs-agent-rules -->
-
-## Git permissions
-
-- ON branch main You may run read-only Git commands such as `git status`, `git diff`, `git log`, and `git branch`.
-- Never run  `git push --force`, `git reset --hard`.
-- Do not create commits or push changes,on main  even if explicitly requested in a later message.
 
 # This is NOT the Next.js you know
 
