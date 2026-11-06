@@ -16,7 +16,6 @@ function debug(message: string) {
 
 interface UserProfile {
   id: string;
-  email: string;
   username: string;
   name: string;
   bio: string;
@@ -85,7 +84,9 @@ export default function DashboardPage() {
     debug("[Dashboard] Chargement du profil.");
     const { data, error } = await supabaseClient
       .from("users")
-      .select("*")
+      // Colonnes explicites : `email` n'est pas lisible via l'API (droits par colonne).
+      // L'email de l'utilisateur connecté vient de la session (user.email).
+      .select("id, username, name, bio")
       .eq("id", userId)
       .maybeSingle();
 
@@ -151,14 +152,20 @@ export default function DashboardPage() {
 
     debug("[Dashboard] Sauvegarde du profil.");
 
-    const { error } = await supabaseClient.from("users").upsert({
-      id: user.id,
-      email: user.email,
+    const fields = {
       username: cleanUsername,
       name: cleanName,
       bio: cleanBio,
       updated_at: new Date().toISOString(),
-    });
+    };
+
+    // update si le profil existe, insert sinon (secours si le trigger n'a pas créé le profil).
+    // Pas d'upsert : il exigerait le droit de LIRE email, retiré aux rôles de l'API.
+    const { error } = profile
+      ? await supabaseClient.from("users").update(fields).eq("id", user.id)
+      : await supabaseClient
+          .from("users")
+          .insert({ id: user.id, email: user.email, ...fields });
 
     if (error) {
       console.error("[Dashboard] Échec de la sauvegarde du profil.");

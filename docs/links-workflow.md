@@ -8,7 +8,7 @@ Ce document décrit le cycle de vie des données (création, mise à jour, suppr
 
 1. **Mise à jour du profil :**
    - L'utilisateur met à jour son `username`, `name` ou `bio`.
-   - La requête utilise `upsert` avec vérification RLS (`auth.uid() = id`).
+   - La requête utilise `update` (ou `insert` si le profil est absent) avec vérification RLS (`auth.uid() = id`). Pas d'`upsert` : il exigerait de lire la colonne `email`, non exposée via l'API.
 2. **Ajout d'un nouveau lien :**
    - L'utilisateur sélectionne un titre, une URL et une icône de réseau social.
    - Insertion dans `public.links` avec calcul automatique de l'ordre d'affichage.
@@ -28,7 +28,7 @@ sequenceDiagram
 
     Note over User, SupaDB: Cas 1 : Sauvegarde / Modification du Profil
     User->>Browser: Modifie username / name / bio + Clic "Enregistrer"
-    Browser->>SupaDB: UPSERT INTO public.users (id, username, name, bio)
+    Browser->>SupaDB: UPDATE public.users SET username, name, bio WHERE id = user.id
     Note over SupaDB: RLS Check: auth.uid() == id
     SupaDB-->>Browser: 200 OK (Profil mis à jour)
     Browser-->>User: Notification "Profil mis à jour"
