@@ -1,5 +1,6 @@
 "use client";
 
+import { isReservedUsername } from "@/lib/reserved-usernames";
 import { defaultNetworkIcon } from "@/lib/social-networks";
 import { supabaseClient } from "@/lib/supabase-auth";
 import Link from "next/link";
@@ -136,6 +137,17 @@ export default function DashboardPage() {
     const cleanUsername = username.toLowerCase().trim();
     const cleanName = name.trim();
     const cleanBio = bio.trim();
+
+    // Un profil existant peut conserver son pseudo, mais on ne peut pas en choisir un réservé.
+    if (
+      cleanUsername !== profile?.username &&
+      isReservedUsername(cleanUsername)
+    ) {
+      debug("[Dashboard] Pseudo réservé refusé.");
+      alert("Ce nom d'utilisateur est réservé, choisissez-en un autre.");
+      setSaving(false);
+      return;
+    }
 
     debug("[Dashboard] Sauvegarde du profil.");
 

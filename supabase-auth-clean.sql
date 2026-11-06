@@ -41,6 +41,14 @@ DECLARE
   candidate TEXT;
   display_name TEXT;
   attempt INT := 1;
+  -- ⚠️ Même liste que lib/reserved-usernames.ts : garder les deux synchronisées.
+  reserved TEXT[] := ARRAY[
+    'auth', 'cgu', 'confidentialite', 'contact', 'dashboard', 'login',
+    'mentions-legales', 'signup', 'suppression-compte', '_next', 'api', 'aide',
+    'help', 'tarifs', 'pricing', 'blog', 'settings', 'parametres',
+    'logout', 'register', 'inscription', 'connexion', 'admin', 'administrateur',
+    'mialigo', 'support', 'root', 'staff'
+  ];
 BEGIN
   base_username := regexp_replace(
     LOWER(COALESCE(NULLIF(TRIM(meta->>'username'), ''), SPLIT_PART(NEW.email, '@', 1))),
@@ -52,6 +60,11 @@ BEGIN
 
   display_name := COALESCE(NULLIF(TRIM(meta->>'name'), ''), base_username);
   candidate := base_username;
+  -- Pseudo réservé : traité comme déjà pris → suffixe -2
+  IF base_username = ANY(reserved) THEN
+    attempt := 2;
+    candidate := base_username || '-2';
+  END IF;
 
   LOOP
     BEGIN
