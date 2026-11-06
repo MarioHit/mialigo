@@ -43,7 +43,10 @@ BEGIN
   );
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
+
+-- Fonction de trigger uniquement : pas d'appel via /rest/v1/rpc
+REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM PUBLIC, anon, authenticated;
 
 -- Attacher le trigger
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
@@ -94,14 +97,14 @@ CREATE POLICY "Users can delete own links"
   USING (auth.uid() = user_id);
 
 -- 8. Fonction pour vérifier la disponibilité d'un username
-CREATE OR REPLACE FUNCTION is_username_available(desired_username TEXT)
+CREATE OR REPLACE FUNCTION public.is_username_available(desired_username TEXT)
 RETURNS BOOLEAN AS $$
 BEGIN
   RETURN NOT EXISTS (
-    SELECT 1 FROM users WHERE LOWER(username) = LOWER(desired_username)
+    SELECT 1 FROM public.users WHERE LOWER(username) = LOWER(desired_username)
   );
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = '';
 
 -- 9. Index pour optimiser les recherches
 CREATE INDEX idx_users_username ON users(LOWER(username));

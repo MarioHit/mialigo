@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Exports du Supabase Security Advisor (ne pas commiter)
+docs/advisor.json
