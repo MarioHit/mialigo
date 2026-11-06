@@ -1,116 +1,61 @@
-# 🎯 Projet Finalisé - Guide de Déploiement
+# 🚀 Guide de Déploiement — Mialigo
 
-## ✅ Ce qui a été fait
+Mialigo est déployé sur **Vercel** en rendu côté serveur (SSR), avec **Supabase** pour l'authentification et la base de données. Le domaine `www.mialigo.com` est géré chez OVH et pointe vers Vercel.
 
-### 1. **Migration HTML → Next.js**
+> L'ancien déploiement statique sur GitHub Pages (`output: "export"`, dossier `out/`, workflow GitHub Actions) a été abandonné : les pages utilisateurs dynamiques (`/<username>`) et la route `/auth/callback` nécessitent un serveur.
 
-- ✅ Conversion complète de `index.html` vers `page.tsx`
-- ✅ Intégration de Tailwind CSS
-- ✅ Dark/Light mode avec persistance
-- ✅ Optimisation des performances
+## 📚 Documents associés
 
-### 2. **Configuration**
+| Document                                               | Contenu                                                              |
+| ------------------------------------------------------ | -------------------------------------------------------------------- |
+| [`VERCEL-DEPLOYMENT.md`](VERCEL-DEPLOYMENT.md)         | Mise en place initiale : import du projet Vercel, domaine, DNS OVH   |
+| [`DEPLOYMENT-CHECKLIST.md`](DEPLOYMENT-CHECKLIST.md)   | Vérifications avant/après chaque déploiement (env, Supabase, DNS)    |
+| [`SUPABASE-SETUP.md`](SUPABASE-SETUP.md)               | Configuration du projet Supabase                                     |
+| [`MAGIC-LINK-SETUP.md`](MAGIC-LINK-SETUP.md)           | Configuration du magic link et du template d'email                   |
 
-- ✅ Métadonnées SEO dans `layout.tsx`
-- ✅ Next.js configuré pour export statique
-- ✅ FontAwesome chargé dans le `<head>`
-- ✅ Variables CSS pour le thème
+## ⚙️ Configuration
 
-### 3. **Déploiement GitHub Pages avec Domaine Personnalisé**
+### Vercel
 
-- ✅ Workflow GitHub Actions créé (`.github/workflows/deploy.yml`)
-- ✅ Configuration Next.js avec `basePath: ""` (domaine personnalisé)
-- ✅ Fichier `.nojekyll` dans `public/`
-- ✅ CNAME configuré avec `www.mialigo.com`
-- ✅ Structure déplacée à la racine (plus de sous-dossier)
+- `vercel.json` : framework `nextjs`, build `npm run build`, sortie `.next`
+- `next.config.ts` : pas d'`output: "export"` (SSR natif), `images.unoptimized: true`
+- Variables d'environnement (Settings → Environment Variables, pour Production, Preview et Development) :
+  - `NEXT_PUBLIC_SUPABASE_URL`
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
-## 🚀 Prochaines Étapes
+### Supabase
 
-### Étape 1 : Tester localement
+- Schéma : exécuter [`supabase-auth-clean.sql`](supabase-auth-clean.sql) dans le SQL Editor. ⚠️ Ce script supprime et recrée les tables `users` et `links`.
+- Authentication → URL Configuration :
+  - **Site URL** : `https://www.mialigo.com`
+  - **Redirect URLs** : les liens magiques redirigent vers `<origine>/auth/callback?next=/dashboard`, donc chaque origine utilisée (localhost, production, previews `*.vercel.app`) doit y être autorisée.
 
-```bash
-cd mialigo
-npm run build
-```
+### Domaine
 
-✅ Vérifiez que le dossier `out/` est créé avec succès
+- Vercel (Settings → Domains) : `www.mialigo.com`
+- OVH (Zone DNS) : CNAME `www` → `cname.vercel-dns.com`
 
-### Étape 2 : Commit & Push
+## 🔄 Déployer
 
-```bash
-git add .
-git commit -m "✨ Migration vers Next.js avec dark mode"
-git push origin init_next
-```
+1. Vérifier le build en local (reproduit les erreurs de build Vercel) :
 
-### Étape 3 : Merge vers main
+   ```bash
+   npm run build
+   npm run lint
+   ```
 
-```bash
-git checkout main
-git merge init_next
-git push origin main
-```
+2. Pousser la branche sur GitHub et ouvrir une Pull Request : Vercel crée un **déploiement de preview** avec sa propre URL.
+3. Merger dans la branche de production : Vercel redéploie automatiquement la production en ~2 minutes.
+4. Dérouler les vérifications de la section « Après déploiement » de [`DEPLOYMENT-CHECKLIST.md`](DEPLOYMENT-CHECKLIST.md).
 
-### Étape 4 : Activer GitHub Pages
+## 🐛 Dépannage
 
-1. Aller sur GitHub : `Settings` → `Pages`
-2. Source : **GitHub Actions**
-3. Le déploiement se fera automatiquement
+| Symptôme                                                    | Cause probable                                                                  |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Erreur de build `supabaseUrl is required`                   | Variables d'environnement absentes dans Vercel pour cet environnement           |
+| Le magic link redirige vers `localhost:3000`                | Site URL ou Redirect URLs Supabase mal configurées                              |
+| « Le lien de connexion est invalide ou a expiré » sur `/login` | Lien déjà utilisé ou expiré, ou URL de callback non autorisée dans Supabase   |
+| `/<username>` affiche une 404 pour un utilisateur existant  | Profil absent de `public.users` ou policy RLS de lecture publique manquante     |
+| Le domaine ne répond pas                                    | Propagation DNS en cours (5 à 30 min) ou CNAME OVH incorrect                    |
 
-### Étape 5 : Vérifier le déploiement
-
-- Aller dans l'onglet **Actions** sur GitHub
-- Vérifier que le workflow "Deploy to GitHub Pages" s'exécute
-- Site live : `https://mariohit.github.io/mialigo/`
-
-## 📝 Fichiers Importants
-
-| Fichier                        | Description                       |
-| ------------------------------ | --------------------------------- |
-| `app/page.tsx`                 | Page principale avec les liens    |
-| `app/layout.tsx`               | Layout avec métadonnées SEO       |
-| `app/globals.css`              | Styles et variables de thème      |
-| `next.config.ts`               | Config Next.js (basePath, export) |
-| `.github/workflows/deploy.yml` | CI/CD pour GitHub Pages           |
-
-## 🎨 Personnalisation Future
-
-### Changer les liens
-
-Éditez `app/page.tsx`, section `config.links`
-
-### Changer les couleurs
-
-Éditez `app/globals.css`, sections `:root` et `.dark-mode`
-
-### Ajouter des liens
-
-Ajoutez simplement dans l'array `links` dans `page.tsx`
-
-## 🐛 Troubleshooting
-
-### Le site ne charge pas les styles
-
-- Vérifiez que le basePath est correct dans `next.config.ts`
-- Assurez-vous que GitHub Pages est configuré sur "GitHub Actions"
-
-### Les icônes ne s'affichent pas
-
-- FontAwesome est chargé via CDN dans `layout.tsx`
-- Vérifiez la connexion internet
-
-### Le thème ne persiste pas
-
-- Vérifiez que localStorage est activé dans le navigateur
-- Le code utilise `useEffect` pour sauvegarder automatiquement
-
-## 🎉 Félicitations
-
-Votre site est maintenant :
-
-- ⚡ Ultra-rapide (statique)
-- 🎨 Moderne avec dark mode
-- 📱 Responsive
-- 🚀 Prêt pour le déploiement
-
-**Prochain build sur `git push` → Déploiement automatique !**
+Logs : onglet **Logs** du projet Vercel (les logs `debug()` ne s'affichent qu'en développement ; seuls `console.error` / `console.warn` apparaissent en production).

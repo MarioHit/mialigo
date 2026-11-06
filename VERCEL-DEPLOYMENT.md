@@ -30,8 +30,8 @@
 1. Dans la page d'import, descendez jusqu'à **"Environment Variables"**
 2. Ajoutez :
    ```
-   NEXT_PUBLIC_SUPABASE_URL = https://dhfgudmfmpriiskksgbi.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... (votre clé complète)
+   NEXT_PUBLIC_SUPABASE_URL = https://<votre-projet>.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY = <votre-cle-anon>
    ```
 3. Cliquez sur **"Deploy"**
 

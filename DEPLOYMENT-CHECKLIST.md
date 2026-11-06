@@ -15,10 +15,12 @@ Symptôme si oublié : erreur de build `supabaseUrl is required`.
 
 - [ ] **Site URL** = `https://www.mialigo.com`
 - [ ] **Redirect URLs** contient toutes ces lignes :
-  - `http://localhost:3000/dashboard`
-  - `https://www.mialigo.com/dashboard`
-  - `https://mialigo.vercel.app/dashboard`
-  - `https://*.vercel.app/dashboard` (wildcard pour les previews, URL dynamique à chaque déploiement)
+  - `http://localhost:3000/auth/callback`
+  - `https://www.mialigo.com/auth/callback`
+  - `https://mialigo.vercel.app/auth/callback`
+  - `https://*.vercel.app/auth/callback` (wildcard pour les previews, URL dynamique à chaque déploiement)
+
+  Les pages `/login` et `/signup` envoient le magic link vers `<origine>/auth/callback?next=/dashboard` : c'est cette route serveur qui crée la session puis redirige vers `/dashboard`. Si Supabase refuse l'URL à cause du paramètre `?next=`, utiliser le suffixe `/auth/callback**`.
 
 Symptôme si mal configuré : le magic link redirige vers `localhost:3000` même en preview/prod.
 
