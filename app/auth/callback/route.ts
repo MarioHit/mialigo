@@ -1,3 +1,4 @@
+import { isReservedUsername } from "@/lib/reserved-usernames";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -82,9 +83,13 @@ export async function GET(request: NextRequest) {
         debug("[Auth/Callback] Création du profil absent.");
         const meta = authenticatedUser.user_metadata || {};
         const emailPrefix = authenticatedUser.email?.split("@")[0] || "user";
-        const newUsername = (meta.username || emailPrefix)
+        const cleanedUsername = (meta.username || emailPrefix)
           .toLowerCase()
           .replace(/[^a-z0-9_-]/g, "");
+        // Même règle que le trigger handle_new_user : un pseudo réservé reçoit un suffixe.
+        const newUsername = isReservedUsername(cleanedUsername)
+          ? `${cleanedUsername}-2`
+          : cleanedUsername;
         const newName = meta.name || newUsername;
 
         const { error: insertError } = await supabase.from("users").upsert({

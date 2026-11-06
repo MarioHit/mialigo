@@ -1,77 +1,78 @@
-# Mario - Personal Link Page
+# Mialigo — All your links in one place
 
 > Building in public 🚀
 
-A modern, responsive link-in-bio page built with Next.js 16, featuring dark/light mode toggle and smooth animations.
+Mialigo is a link-in-bio service: anyone can sign up, claim a page at `mialigo.com/<username>`, and manage their links from a dashboard. Live at **https://www.mialigo.com**.
 
 ## ✨ Features
 
-- 🌓 **Dark/Light Mode** with localStorage persistence
-- 🔗 **Social Links**: Instagram, YouTube, TikTok
-- 🎨 **Smooth Animations** on hover
-- 📱 **Fully Responsive** with Tailwind CSS
-- ⚡ **Next.js 16** with App Router
-- 🎯 **TypeScript** for type safety
-- 🚀 **Static Export** for GitHub Pages
+- 🔐 **Passwordless auth** — sign up and log in with a magic link (Supabase Auth)
+- 🧑 **Public profile pages** — server-rendered at `/<username>`, uppercase URLs redirect to lowercase
+- 🛠️ **Dashboard** — edit username, name and bio; add, edit and delete links
+- 🔗 **Social network picker** — Font Awesome icons for Instagram, YouTube, TikTok, GitHub and more
+- 🌓 **Dark/Light mode** with localStorage persistence
+- 📄 **Legal pages** — terms, privacy, legal notice, contact, account deletion
 
-## 🚀 Quick Start
-
-```bash
-npm install
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+See [`docs/features.md`](docs/features.md) for the full feature list and roadmap, and the `docs/*-workflow.md` files for sequence diagrams of the signup, login and link-management flows.
 
 ## 📦 Tech Stack
 
-- **Next.js** 16.3.3
-- **React** 19.2.8
+- **Next.js** 16 (App Router, SSR)
+- **React** 19
+- **Supabase** — Auth + PostgreSQL with Row Level Security
 - **Tailwind CSS** 4
 - **TypeScript** 5
-- **Font Awesome** 6.4.0
+- **Font Awesome** 6.4
+- Hosted on **Vercel**
 
-## 🛠️ Build & Deploy
+## 🚀 Quick Start
+
+1. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+2. Create `.env.local` with your Supabase project credentials:
+
+   ```bash
+   NEXT_PUBLIC_SUPABASE_URL=https://<your-project>.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
+   ```
+
+3. Set up the database by running [`supabase-auth-clean.sql`](supabase-auth-clean.sql) in the Supabase SQL editor. ⚠️ It drops and recreates the `users` and `links` tables, so don't run it on a database with data you want to keep. See [`SUPABASE-SETUP.md`](SUPABASE-SETUP.md) and [`MAGIC-LINK-SETUP.md`](MAGIC-LINK-SETUP.md) for auth and email template configuration.
+
+4. Start the dev server:
+
+   ```bash
+   npm run dev
+   ```
+
+   Open [http://localhost:3000](http://localhost:3000).
+
+## 🛠️ Scripts
 
 ```bash
-# Build for production (creates static export in 'out' folder)
-npm run build
-
-# Deploy to GitHub Pages via GitHub Actions (automatic on push to init_next)
-# Live at: https://www.mialigo.com
+npm run dev     # development server
+npm run build   # production build
+npm run start   # serve the production build
+npm run lint    # ESLint
 ```
 
-## 📝 Customization
+## 🌐 Deployment (Vercel)
 
-Edit `app/page.tsx` to customize:
+The app is deployed on Vercel with server-side rendering (configured in `vercel.json`).
 
-- Name and bio
-- Social media links
-- Font Awesome icons
+- Vercel builds and deploys automatically on every push to the production branch; other branches get preview URLs.
+- Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in the Vercel project's **Settings → Environment Variables**.
+- The custom domain `www.mialigo.com` is managed in Vercel (**Settings → Domains**), with DNS at OVH pointing `www` to `cname.vercel-dns.com`.
+- Add your production URL to the Supabase Auth redirect URLs so magic links land on `/auth/callback`.
 
-Edit `app/globals.css` to change:
-
-- Color scheme
-- Dark mode colors
-- Transitions
-
-## 🌐 Deployment
-
-This project is configured for GitHub Pages with custom domain:
-
-1. Push to `init_next` branch
-2. GitHub Actions automatically builds and deploys
-3. Live at: **https://www.mialigo.com**
-
-### Custom Domain Configuration
-
-- Custom domain: `www.mialigo.com`
-- CNAME file in `public/` folder
-- No basePath needed (configured in `next.config.ts`)
+Step-by-step instructions, including OVH DNS setup and troubleshooting, are in [`VERCEL-DEPLOYMENT.md`](VERCEL-DEPLOYMENT.md).
 
 ## 📄 License
 
-MIT License - feel free to use this for your own link page!
+MIT License — feel free to use this for your own link page!
 
 ---
 

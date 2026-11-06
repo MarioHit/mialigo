@@ -15,12 +15,17 @@ Symptôme si oublié : erreur de build `supabaseUrl is required`.
 
 - [ ] **Site URL** = `https://www.mialigo.com`
 - [ ] **Redirect URLs** contient toutes ces lignes :
-  - `http://localhost:3000/dashboard`
-  - `https://www.mialigo.com/dashboard`
-  - `https://mialigo.vercel.app/dashboard`
-  - `https://*.vercel.app/dashboard` (wildcard pour les previews, URL dynamique à chaque déploiement)
+  - `http://localhost:3000/auth/callback`
+  - `https://www.mialigo.com/auth/callback`
+  - `https://pp.mialigo.com/**` (préprod — format vérifié et fonctionnel ; attention au **point** entre `pp` et `mialigo`)
+  - `https://mialigo.vercel.app/auth/callback`
+  - `https://*.vercel.app/auth/callback` (wildcard pour les previews, URL dynamique à chaque déploiement)
 
-Symptôme si mal configuré : le magic link redirige vers `localhost:3000` même en preview/prod.
+  Les pages `/login` et `/signup` envoient le magic link vers `<origine>/auth/callback?next=/dashboard` : c'est cette route serveur qui crée la session puis redirige vers `/dashboard`. Si Supabase refuse l'URL à cause du paramètre `?next=`, utiliser le suffixe `/auth/callback**`.
+
+Symptôme si mal configuré : le magic link redirige vers la **Site URL** (`www.mialigo.com`, ou `localhost:3000` si c'est la Site URL) au lieu de l'environnement d'origine — Supabase remplace toute URL non autorisée par la Site URL. Après correction, redemander un nouveau lien : un lien déjà reçu garde l'ancienne adresse.
+
+Préprod `pp.mialigo.com` : la protection Vercel (Settings → Deployment Protection) est active. Ouvrir le magic link dans un navigateur connecté à Vercel, sinon il s'arrête sur la page de connexion Vercel.
 
 ## 3. DNS OVH
 

@@ -1,5 +1,6 @@
 ﻿"use client";
 
+import { isReservedUsername } from "@/lib/reserved-usernames";
 import { supabaseClient } from "@/lib/supabase-auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -40,6 +41,12 @@ export default function SignupPage() {
         debug("[Signup] Pseudo trop court.");
       }
       setUsernameStatus("idle");
+      return;
+    }
+
+    if (isReservedUsername(cleanUsername)) {
+      debug("[Signup] Pseudo réservé.");
+      setUsernameStatus("taken");
       return;
     }
 
@@ -97,7 +104,7 @@ export default function SignupPage() {
       return;
     }
 
-    if (usernameStatus === "taken") {
+    if (usernameStatus === "taken" || isReservedUsername(cleanUsername)) {
       setError("Ce nom d'utilisateur est déjà réservé.");
       debug("[Signup] Échec de validation du pseudo.");
       return;
