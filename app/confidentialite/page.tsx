@@ -2,6 +2,7 @@ import LegalPage from "@/app/legal-page";
 
 export const metadata = {
   title: "Politique de confidentialité - Mialigo",
+  alternates: { canonical: "/confidentialite" },
 };
 
 export default function PrivacyPage() {

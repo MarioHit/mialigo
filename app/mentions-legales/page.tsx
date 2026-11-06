@@ -2,6 +2,7 @@ import LegalPage from "@/app/legal-page";
 
 export const metadata = {
   title: "Mentions légales - Mialigo",
+  alternates: { canonical: "/mentions-legales" },
 };
 
 export default function LegalNoticePage() {

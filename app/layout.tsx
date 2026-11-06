@@ -1,11 +1,15 @@
+import { defaultDescription, isIndexable, siteName, siteUrl } from "@/lib/site";
 import type { Metadata } from "next";
 import "./globals.css";
 import ThemeToggle from "./theme-toggle";
 
 export const metadata: Metadata = {
+  // Base des URL relatives (canonique, Open Graph) : toujours le domaine de production.
+  metadataBase: new URL(siteUrl),
   title: "Mialigo - Tous vos liens au même endroit",
-  description:
-    "Créez votre page personnalisée et partagez tous vos liens au même endroit avec Mialigo.",
+  description: defaultDescription,
+  // Préprod, previews et local ne doivent jamais être indexés.
+  robots: isIndexable ? undefined : { index: false, follow: false },
   keywords: [
     "Mialigo",
     "page de liens",
@@ -16,9 +20,13 @@ export const metadata: Metadata = {
   authors: [{ name: "Mialigo" }],
   openGraph: {
     title: "Mialigo - Tous vos liens au même endroit",
-    description:
-      "Créez votre page personnalisée et partagez tous vos liens au même endroit avec Mialigo.",
+    description: defaultDescription,
     type: "website",
+    siteName,
+    locale: "fr_FR",
+  },
+  twitter: {
+    card: "summary",
   },
 };
 
