@@ -2,6 +2,7 @@ import LegalPage from "@/app/legal-page";
 
 export const metadata = {
   title: "Contact - Mialigo",
+  alternates: { canonical: "/contact" },
 };
 
 export default function ContactPage() {
