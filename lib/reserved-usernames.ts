@@ -2,8 +2,9 @@
 // (Next.js sert la page statique avant app/[username]), une route future,
 // ou pourraient passer pour un compte officiel.
 //
-// ⚠️ Liste dupliquée dans le trigger SQL handle_new_user
-// (supabase-fix-trigger-username.sql / supabase-auth-clean.sql) : garder les deux synchronisées.
+// ⚠️ Liste dupliquée dans la fonction SQL public.is_reserved_username
+// (supabase-reserved-usernames.sql / supabase-auth-clean.sql), qui bloque aussi côté base :
+// garder les deux synchronisées.
 // Toute nouvelle page à la racine de app/ doit être ajoutée ici.
 export const reservedUsernames = new Set([
   // Routes existantes

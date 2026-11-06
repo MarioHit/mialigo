@@ -29,10 +29,62 @@ CREATE TABLE links (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- 3b. Pseudos réservés (⚠️ à garder synchronisés avec lib/reserved-usernames.ts)
+--     (Même définition que supabase-reserved-usernames.sql)
+CREATE OR REPLACE FUNCTION public.is_reserved_username(candidate TEXT)
+RETURNS BOOLEAN
+LANGUAGE sql
+IMMUTABLE
+SET search_path = ''
+AS $$
+  SELECT LOWER(TRIM(candidate)) = ANY (ARRAY[
+    -- Routes existantes
+    'auth', 'cgu', 'confidentialite', 'contact', 'dashboard', 'login',
+    'mentions-legales', 'signup', 'suppression-compte',
+    -- Routes techniques Next.js / futures
+    '_next', 'api', 'aide', 'help', 'tarifs', 'pricing', 'blog', 'settings',
+    'parametres', 'logout', 'register', 'inscription', 'connexion',
+    -- Comptes pouvant passer pour officiels
+    'admin', 'administrateur', 'mialigo', 'support', 'root', 'staff'
+  ]);
+$$;
+
+-- Refuse un INSERT ou un changement de pseudo vers un nom réservé (même via l'API directe).
+-- Un pseudo réservé déjà attribué peut être conservé.
+CREATE OR REPLACE FUNCTION public.guard_reserved_username()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY INVOKER
+SET search_path = ''
+AS $$
+BEGIN
+  IF NOT public.is_reserved_username(NEW.username) THEN
+    RETURN NEW;
+  END IF;
+
+  IF (TG_OP = 'UPDATE' AND NEW.username = OLD.username)
+     OR (TG_OP = 'INSERT' AND EXISTS (
+       SELECT 1 FROM public.users u WHERE u.id = NEW.id AND u.username = NEW.username
+     )) THEN
+    RETURN NEW;
+  END IF;
+
+  RAISE EXCEPTION 'Ce nom d''utilisateur est réservé, choisissez-en un autre.'
+    USING ERRCODE = 'check_violation';
+END;
+$$;
+
+REVOKE EXECUTE ON FUNCTION public.guard_reserved_username() FROM PUBLIC, anon, authenticated;
+
+CREATE TRIGGER users_reserved_username_guard
+  BEFORE INSERT OR UPDATE OF username ON public.users
+  FOR EACH ROW
+  EXECUTE FUNCTION public.guard_reserved_username();
+
 -- 4. Trigger pour créer automatiquement un profil après inscription
 --    Pseudo/nom choisis sur /signup (user metadata), sinon préfixe de l'email.
---    Pseudo déjà pris → suffixe -2, -3… ; ne bloque jamais l'inscription.
---    (Même définition que supabase-fix-trigger-username.sql)
+--    Pseudo réservé ou déjà pris → suffixe -2, -3… ; ne bloque jamais l'inscription.
+--    (Même définition que supabase-reserved-usernames.sql)
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -41,14 +93,6 @@ DECLARE
   candidate TEXT;
   display_name TEXT;
   attempt INT := 1;
-  -- ⚠️ Même liste que lib/reserved-usernames.ts : garder les deux synchronisées.
-  reserved TEXT[] := ARRAY[
-    'auth', 'cgu', 'confidentialite', 'contact', 'dashboard', 'login',
-    'mentions-legales', 'signup', 'suppression-compte', '_next', 'api', 'aide',
-    'help', 'tarifs', 'pricing', 'blog', 'settings', 'parametres',
-    'logout', 'register', 'inscription', 'connexion', 'admin', 'administrateur',
-    'mialigo', 'support', 'root', 'staff'
-  ];
 BEGIN
   base_username := regexp_replace(
     LOWER(COALESCE(NULLIF(TRIM(meta->>'username'), ''), SPLIT_PART(NEW.email, '@', 1))),
@@ -61,7 +105,7 @@ BEGIN
   display_name := COALESCE(NULLIF(TRIM(meta->>'name'), ''), base_username);
   candidate := base_username;
   -- Pseudo réservé : traité comme déjà pris → suffixe -2
-  IF base_username = ANY(reserved) THEN
+  IF public.is_reserved_username(base_username) THEN
     attempt := 2;
     candidate := base_username || '-2';
   END IF;
