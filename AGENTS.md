@@ -2,9 +2,9 @@
 
 ## Git permissions
 
-- You may run read-only Git commands such as `git status`, `git diff`, `git log`, and `git branch`.
-- Never run `git commit`, `git push`, `git reset`, or `git checkout`.
-- Do not create commits or push changes, even if explicitly requested in a later message.
+- ON branch main You may run read-only Git commands such as `git status`, `git diff`, `git log`, and `git branch`.
+- Never run  `git push --force`, `git reset --hard`.
+- Do not create commits or push changes,on main  even if explicitly requested in a later message.
 
 # This is NOT the Next.js you know
 
