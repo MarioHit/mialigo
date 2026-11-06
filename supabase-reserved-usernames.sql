@@ -59,8 +59,7 @@ $$;
 
 REVOKE EXECUTE ON FUNCTION public.guard_reserved_username() FROM PUBLIC, anon, authenticated;
 
-DROP TRIGGER IF EXISTS users_reserved_username_guard ON public.users;
-CREATE TRIGGER users_reserved_username_guard
+CREATE OR REPLACE TRIGGER users_reserved_username_guard
   BEFORE INSERT OR UPDATE OF username ON public.users
   FOR EACH ROW
   EXECUTE FUNCTION public.guard_reserved_username();
