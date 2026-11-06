@@ -30,18 +30,47 @@ CREATE TABLE links (
 );
 
 -- 4. Trigger pour créer automatiquement un profil après inscription
+--    Pseudo/nom choisis sur /signup (user metadata), sinon préfixe de l'email.
+--    Pseudo déjà pris → suffixe -2, -3… ; ne bloque jamais l'inscription.
+--    (Même définition que supabase-fix-trigger-username.sql)
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
+DECLARE
+  meta JSONB := COALESCE(NEW.raw_user_meta_data, '{}'::jsonb);
+  base_username TEXT;
+  candidate TEXT;
+  display_name TEXT;
+  attempt INT := 1;
 BEGIN
-  INSERT INTO public.users (id, email, username, name, bio)
-  VALUES (
-    NEW.id,
-    NEW.email,
-    LOWER(SPLIT_PART(NEW.email, '@', 1)), -- Username par défaut = partie avant @
-    SPLIT_PART(NEW.email, '@', 1), -- Nom par défaut
-    'Bienvenue sur ma page !' -- Bio par défaut
+  base_username := regexp_replace(
+    LOWER(COALESCE(NULLIF(TRIM(meta->>'username'), ''), SPLIT_PART(NEW.email, '@', 1))),
+    '[^a-z0-9_-]', '', 'g'
   );
-  RETURN NEW;
+  IF LENGTH(base_username) < 3 THEN
+    base_username := 'user';
+  END IF;
+
+  display_name := COALESCE(NULLIF(TRIM(meta->>'name'), ''), base_username);
+  candidate := base_username;
+
+  LOOP
+    BEGIN
+      INSERT INTO public.users (id, email, username, name, bio)
+      VALUES (NEW.id, NEW.email, candidate, display_name, 'Bienvenue sur ma page !')
+      ON CONFLICT (id) DO NOTHING;
+      RETURN NEW;
+    EXCEPTION WHEN unique_violation THEN
+      attempt := attempt + 1;
+      IF attempt <= 10 THEN
+        candidate := base_username || '-' || attempt;
+      ELSIF attempt = 11 THEN
+        candidate := base_username || '-' || LEFT(REPLACE(NEW.id::text, '-', ''), 8);
+      ELSE
+        RAISE WARNING '[handle_new_user] Profil non créé (pseudo ou email en conflit).';
+        RETURN NEW;
+      END IF;
+    END;
+  END LOOP;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
 
