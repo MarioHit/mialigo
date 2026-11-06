@@ -1,5 +1,8 @@
 import { supabase } from "@/lib/supabase";
+import { siteName } from "@/lib/site";
+import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
+import { cache } from "react";
 //import UserPageClient from "./user-page-client";
 import UserPageClient from "@/app/[username]/user-page-client";
 
@@ -16,6 +19,48 @@ interface PageProps {
   params: Promise<{ username: string }>;
 }
 
+// Partagé entre generateMetadata et la page : une seule requête Supabase par visite.
+const getProfile = cache(async (username: string) => {
+  const { data, error } = await supabase
+    .from("users")
+    .select("*")
+    .eq("username", username)
+    .single();
+
+  return error ? null : data;
+});
+
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { username } = await params;
+  const user = username.toLowerCase();
+  const profile = await getProfile(user);
+
+  if (!profile) {
+    return { title: `Page introuvable - ${siteName}`, robots: { index: false } };
+  }
+
+  const title = `${profile.name} - ${siteName}`;
+  const description =
+    profile.bio?.trim() || `Retrouvez tous les liens de ${profile.name} sur ${siteName}.`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical: `/${user}` },
+    openGraph: {
+      title,
+      description,
+      url: `/${user}`,
+      type: "profile",
+      siteName,
+      locale: "fr_FR",
+    },
+    twitter: { card: "summary", title, description },
+  };
+}
+
 export default async function UserPage({ params }: PageProps) {
   const { username } = await params;
   const user = username.toLowerCase();
@@ -30,13 +75,9 @@ export default async function UserPage({ params }: PageProps) {
 
   // Récupérer l'utilisateur depuis Supabase
   debug("[UserPage] Recherche du profil public.");
-  const { data: userData, error: userError } = await supabase
-    .from("users")
-    .select("*")
-    .eq("username", user)
-    .single();
+  const userData = await getProfile(user);
 
-  if (userError || !userData) {
+  if (!userData) {
     debug("[UserPage] Profil public introuvable.");
     notFound();
   }

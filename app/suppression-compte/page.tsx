@@ -2,6 +2,7 @@ import LegalPage from "@/app/legal-page";
 
 export const metadata = {
   title: "Suppression du compte - Mialigo",
+  alternates: { canonical: "/suppression-compte" },
 };
 
 export default function DeleteAccountPage() {

@@ -2,6 +2,7 @@ import LegalPage from "@/app/legal-page";
 
 export const metadata = {
   title: "Conditions générales d'utilisation - Mialigo",
+  alternates: { canonical: "/cgu" },
 };
 
 export default function TermsPage() {
