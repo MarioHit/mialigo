@@ -21,9 +21,10 @@ interface PageProps {
 
 // Partagé entre generateMetadata et la page : une seule requête Supabase par visite.
 const getProfile = cache(async (username: string) => {
+  // Colonnes explicites : `email` n'est pas lisible publiquement (droits par colonne).
   const { data, error } = await supabase
     .from("users")
-    .select("*")
+    .select("id, username, name, bio")
     .eq("username", username)
     .single();
 

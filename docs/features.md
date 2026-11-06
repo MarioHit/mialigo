@@ -25,7 +25,7 @@ Ce document répertorie l'ensemble des fonctionnalités du projet Mialigo, leur 
 - **Séparation `/signup` et `/login` :** parcours utilisateur dédié pour garantir la réservation du pseudo avant la création du compte.
 - **Support Cross-Browser du Magic Link :** route serveur `app/auth/callback/route.ts` permettant d'ouvrir le lien reçu par email depuis n'importe quel navigateur ou smartphone.
 - **Journalisation détaillée (Console Logs) :** ajout de logs tagués (`[Signup]`, `[Login]`, `[Auth/Callback]`, `[Dashboard]`, `[UserPage]`) pour suivre en temps réel chaque étape du flux.
-- **Auto-guérison du profil Dashboard :** mécanisme de pré-remplissage et d'`upsert` sécurisé si le trigger de base de données n'avait pas encore créé le profil.
+- **Auto-guérison du profil Dashboard :** mécanisme de pré-remplissage et d'`insert` sécurisé si le trigger de base de données n'avait pas encore créé le profil.
 
 ### Version 1.1.0 — Migration Vercel & Supabase
 

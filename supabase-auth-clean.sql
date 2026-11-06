@@ -162,6 +162,14 @@ CREATE POLICY "Users can insert own profile"
   ON users FOR INSERT
   WITH CHECK (auth.uid() = id);
 
+-- La RLS filtre des lignes, pas des colonnes : email ne doit pas être lisible via l'API.
+-- (Même définition que supabase-fix-email-exposure.sql)
+-- ⚠️ Toute nouvelle colonne de users doit être ajoutée à ce GRANT.
+-- ⚠️ Conséquence : pas d'upsert sur users depuis l'app (il exige de lire email) → insert / update.
+REVOKE SELECT ON public.users FROM PUBLIC, anon, authenticated;
+GRANT SELECT (id, username, name, bio, created_at, updated_at)
+  ON public.users TO anon, authenticated;
+
 -- 7. Politiques RLS pour links
 
 -- Tout le monde peut voir les liens publics

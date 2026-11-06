@@ -92,7 +92,9 @@ export async function GET(request: NextRequest) {
           : cleanedUsername;
         const newName = meta.name || newUsername;
 
-        const { error: insertError } = await supabase.from("users").upsert({
+        // insert (et non upsert) : un upsert demande le droit de LIRE email,
+        // retiré aux rôles de l'API (supabase-fix-email-exposure.sql).
+        const { error: insertError } = await supabase.from("users").insert({
           id: authenticatedUser.id,
           email: authenticatedUser.email,
           username: newUsername,

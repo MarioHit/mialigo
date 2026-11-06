@@ -34,7 +34,9 @@ Production runs SSR on Vercel (`vercel.json`); there is no GitHub Actions workfl
 
 ### Data model
 
-`supabase-auth-clean.sql` is the current schema (destructive: drops and recreates tables). `public.users.id` references `auth.users(id)`; a `handle_new_user()` trigger creates the profile on signup. `public.links` has `user_id`, `title`, `url`, `icon` (Font Awesome class string) and a quoted `"order"` column. `supabase-schema.sql` is the older pre-auth schema.
+`supabase-auth-clean.sql` is the current schema (destructive: drops and recreates tables — never run it on prod; prod changes ship as separate non-destructive `supabase-*.sql` scripts, mirrored into the clean schema).
+
+`public.users` uses **column-level SELECT grants** (`supabase-fix-email-exposure.sql`): RLS lets everyone read every row, so `email` is hidden by not granting it to `anon`/`authenticated`. Consequences: always `select("id, username, …")` with explicit columns (never `select("*")`), never `.upsert()` on `users` (ON CONFLICT DO UPDATE needs read access to `email`) — use `.insert()` / `.update()` — and every new `users` column needs its own `GRANT SELECT (col) ON public.users TO anon, authenticated`. `public.users.id` references `auth.users(id)`; a `handle_new_user()` trigger creates the profile on signup. `public.links` has `user_id`, `title`, `url`, `icon` (Font Awesome class string) and a quoted `"order"` column. `supabase-schema.sql` is the older pre-auth schema.
 
 ### Routing and pages
 
