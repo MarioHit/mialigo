@@ -1,0 +1,3 @@
+# Faux positifs vérifiés le 2026-11-06 : en-tête JWT générique + '...' dans des exemples de doc (pas une clé).
+8edaf7b6ac39b3bf1fab81af2d5bd1a9a9650a77:VERCEL-DEPLOYMENT.md:generic-api-key:34
+43c8b0916ad79bdd11fcbcfaaa4da3ebc8d1c922:SUPABASE-SETUP.md:generic-api-key:45

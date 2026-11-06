@@ -9,8 +9,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run dev` — dev server on http://localhost:3000
 - `npm run build` — production build (also the only type-check gate besides `npx tsc --noEmit`)
 - `npm run lint` — ESLint 9 flat config (`eslint.config.mjs`, `eslint-config-next`)
+- `npm run check-env` — creates `.env.local` from `.env.example` if missing and lists (names only) the variables still unset
 
-There is no test suite. Requires `.env.local` with `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+Node 24.x (`engines` in `package.json`, same major as Vercel; installed via nvm on the VPS). There is no test suite. Requires `.env.local` with `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+
+### Secrets
+
+- Never read, print or edit `.env*` files (only `.env.example`, which holds placeholder values); `.claude/settings.json` denies it. Use `npm run check-env` to know what is missing.
+- A global gitleaks `pre-commit` hook blocks commits containing secrets, and `.github/workflows/gitleaks.yml` scans every PR. Verified false positives go in `.gitleaksignore`; never bypass with `--no-verify`.
 
 ## What this is
 
