@@ -6,6 +6,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-07
+
 ### Modifié
 
 - Les apostrophes des pages légales et de plusieurs messages s'affichent avec la typographie française (’), et les liens entre ces pages s'ouvrent sans recharger le site. ([#29])
@@ -13,6 +15,7 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 ### Interne
 
 - La qualité du code est vérifiée automatiquement à chaque modification proposée. ([#29])
+- Une mise en production ne peut plus partir sans son numéro de version. ([#72])
 
 ## [0.1.2] - 2026-11-07
 
@@ -42,7 +45,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 - Pages légales : conditions générales d'utilisation, politique de confidentialité, mentions légales, contact et suppression de compte.
 - Les adresses email des utilisateurs ne sont jamais visibles publiquement.
 
-[Unreleased]: https://github.com/MarioHit/mialigo/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/MarioHit/mialigo/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/MarioHit/mialigo/compare/v0.1.2...v0.2.0
 [0.1.2]: https://github.com/MarioHit/mialigo/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/MarioHit/mialigo/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/MarioHit/mialigo/tree/v0.1.0
@@ -50,3 +54,4 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 [#57]: https://github.com/MarioHit/mialigo/issues/57
 [#63]: https://github.com/MarioHit/mialigo/issues/63
 [#66]: https://github.com/MarioHit/mialigo/issues/66
+[#72]: https://github.com/MarioHit/mialigo/issues/72
