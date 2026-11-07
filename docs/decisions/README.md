@@ -19,3 +19,4 @@ Un ADR « Acceptée » n'est plus modifié sur le fond. Pour changer de décisio
 | [0002](0002-nvm-node-24.md) | nvm et Node 24 sur le VPS, plutôt que Docker (pour l'instant) | Acceptée | 2026-11-06 |
 | [0003](0003-env-local.md) | `.env.local` comme fichier d'environnement local | Acceptée | 2026-11-06 |
 | [0004](0004-regles-git-pr-pre-prod.md) | Règles Git : PR obligatoire vers `pre-prod` | Acceptée | 2026-11-06 |
+| [0005](0005-apres-merge-pre-prod.md) | Après un merge vers `pre-prod` : PR vers `main` et issue « In review » | Acceptée | 2026-11-07 |
