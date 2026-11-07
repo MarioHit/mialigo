@@ -6,6 +6,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-07
+
 ### Modifié
 
 - Le tableau de bord est organisé en onglets : « Profil » pour le pseudo, le nom et la bio, « Liens » pour gérer ses liens. ([#17])
@@ -49,7 +51,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 - Pages légales : conditions générales d'utilisation, politique de confidentialité, mentions légales, contact et suppression de compte.
 - Les adresses email des utilisateurs ne sont jamais visibles publiquement.
 
-[Unreleased]: https://github.com/MarioHit/mialigo/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/MarioHit/mialigo/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/MarioHit/mialigo/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/MarioHit/mialigo/compare/v0.1.2...v0.2.0
 [0.1.2]: https://github.com/MarioHit/mialigo/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/MarioHit/mialigo/compare/v0.1.0...v0.1.1
