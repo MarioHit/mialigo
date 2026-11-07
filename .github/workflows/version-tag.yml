@@ -2,9 +2,9 @@
 # lit la version du package.json et crée le tag annoté vX.Y.Z sur ce commit
 # s'il n'existe pas encore (ADR-0011).
 #
-# Si le tag existe déjà (mise en prod sans PR de version), rien n'est fait :
-# un tag publié n'est jamais déplacé. La PR de version de rattrapage apportera
-# le nouveau numéro, et son merge vers main créera le tag.
+# Si le tag existe déjà (PR mergée sans changement de version, cf. ADR-0015),
+# rien n'est fait : un tag publié n'est jamais déplacé. La PR suivante apportera
+# le nouveau numéro, et son arrivée sur main créera le tag.
 name: Tag de version
 
 on:

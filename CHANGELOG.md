@@ -2,9 +2,13 @@
 
 Toutes les évolutions notables de Mialigo sont consignées dans ce fichier, écrites pour les utilisateurs du service.
 
-Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le projet respecte le [versionnage sémantique](https://semver.org/lang/fr/). Chaque version correspond à une mise en production : même numéro dans `package.json`, tag Git `vX.Y.Z` sur le merge vers `main`. Les catégories sont celles de Keep a Changelog (Ajouté, Modifié, Obsolète, Supprimé, Corrigé, Sécurité), plus « Interne » pour les changements sans effet visible sur le site (voir [ADR-0010](docs/decisions/0010-versionnage-semver-tags.md)).
+Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le projet respecte le [versionnage sémantique](https://semver.org/lang/fr/). Chaque version correspond à une mise en production : même numéro dans `package.json`, tag Git `vX.Y.Z` sur le merge vers `main`. Chaque modification inscrit sa ligne directement dans la section de la prochaine version, la plus haute du fichier tant qu'elle n'est pas en production. Les catégories sont celles de Keep a Changelog (Ajouté, Modifié, Obsolète, Supprimé, Corrigé, Sécurité), plus « Interne » pour les changements sans effet visible sur le site (voir [ADR-0010](docs/decisions/0010-versionnage-semver-tags.md) et [ADR-0015](docs/decisions/0015-version-par-pr.md)).
 
-## [Unreleased]
+## [0.3.1] - 2026-11-07
+
+### Interne
+
+- Chaque modification met elle-même à jour le numéro de la prochaine version : plus d'étape séparée avant une mise en production. ([#78])
 
 ## [0.3.0] - 2026-11-07
 
@@ -51,7 +55,7 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 - Pages légales : conditions générales d'utilisation, politique de confidentialité, mentions légales, contact et suppression de compte.
 - Les adresses email des utilisateurs ne sont jamais visibles publiquement.
 
-[Unreleased]: https://github.com/MarioHit/mialigo/compare/v0.3.0...HEAD
+[0.3.1]: https://github.com/MarioHit/mialigo/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/MarioHit/mialigo/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/MarioHit/mialigo/compare/v0.1.2...v0.2.0
 [0.1.2]: https://github.com/MarioHit/mialigo/compare/v0.1.1...v0.1.2
@@ -63,3 +67,4 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 [#63]: https://github.com/MarioHit/mialigo/issues/63
 [#66]: https://github.com/MarioHit/mialigo/issues/66
 [#72]: https://github.com/MarioHit/mialigo/issues/72
+[#78]: https://github.com/MarioHit/mialigo/issues/78
