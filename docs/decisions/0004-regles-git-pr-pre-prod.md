@@ -1,8 +1,8 @@
 # ADR-0004 : Règles Git : PR obligatoire vers `pre-prod`
 
 - **Statut** : Acceptée
-- **Date** : 2026-11-06
-- **Issue / PR** : #34 / #35
+- **Date** : 2026-11-06 (règles de merge ajoutées le 2026-11-07)
+- **Issue / PR** : #34 / #35, #36 / #37
 - **Découle de** : —
 - **Remplace** : —
 - **Liée à** : [ADR-0001](0001-hook-gitleaks-global.md)
@@ -22,16 +22,26 @@ Les anciennes règles d'`AGENTS.md` posaient deux problèmes :
 3. **git-flow complet** (`develop`, `release/*`, `hotfix/*`) : *Pour* : très structuré. *Contre* : trop lourd pour un projet de cette taille.
 4. **Branche de travail → PR vers `pre-prod` → PR `pre-prod` → `main`** : déjà la pratique réelle du dépôt (#12 et #32 vers `pre-prod`, puis #13 et #33 vers `main`).
 
+Qui merge les PR :
+
+- **a. Les agents ne mergent jamais.** *Pour* : contrôle humain total. *Contre* : chaque PR attend le mainteneur, même pour l'intégration ; la factory ne tourne pas sans lui.
+- **b. Les agents mergent partout dès que les checks passent.** *Pour* : autonomie maximale. *Contre* : la production serait alimentée sans aucun regard humain.
+- **c. Les agents mergent vers `pre-prod` si tous les checks passent ; seul le mainteneur merge vers `main`.**
+
 ## Décision et raison
 
-**Option 4, écrite dans `AGENTS.md` hors du bloc géré par Next.js :**
+**Option 4 pour le flux, option c pour les merges, écrites dans `AGENTS.md` hors du bloc géré par Next.js :**
 
 - créer des branches de travail depuis `origin/pre-prod`, committer et pousser dessus : **autorisé** ;
 - `main` et `pre-prod` ne changent que par des PR mergées : jamais de commit ni de push direct, même sur demande ultérieure ;
 - interdits : `push --force` (y compris `-f` et `--force-with-lease`), `reset --hard`, `--no-verify` ;
-- les PR ciblent `pre-prod`.
+- les PR ciblent `pre-prod` ;
+- un agent peut merger une PR vers `pre-prod` uniquement quand **tous** ses checks sont terminés et verts (`gh pr checks <n> --watch`, rien en échec, en attente ou annulé), avec `gh pr merge <n> --merge`. `--admin` et `--auto` sont interdits ;
+- un agent ne merge **jamais** une PR vers `main`, même sur demande ultérieure : c'est le mainteneur qui le fait.
 
 Cette option officialise un flux qui fonctionne déjà et place une relecture humaine avant la production. Les agents restent productifs (ils poussent leurs branches) sans pouvoir déployer. L'interdiction de `--force-with-lease` évite toute réécriture d'un historique déjà publié : on corrige par un nouveau commit. L'interdiction de `--no-verify` protège le hook gitleaks ([ADR-0001](0001-hook-gitleaks-global.md)).
+
+Pour les merges, l'option c laisse les agents boucler leur travail jusqu'à l'intégration, ce qui écarte l'option a. Le passage en production reste une décision humaine, ce qui écarte l'option b : `pre-prod` → `main` est le seul point de contrôle humain obligatoire. `--auto` est interdit parce que le ruleset n'exige aucun check : GitHub mergerait immédiatement, sans attendre la CI. `--admin` contournerait les règles.
 
 ## Conséquences
 
@@ -42,6 +52,6 @@ Cette option officialise un flux qui fonctionne déjà et place une relecture hu
   - `non_fast_forward` : pas de push forcé ;
   - `deletion` : les branches ne peuvent pas être supprimées.
 - Limites restantes du ruleset, à traiter dans un ADR ultérieur :
-  - **aucun check n'est obligatoire** : une PR peut être mergée même si gitleaks échoue. Piste : ajouter la règle `required_status_checks` sur le job « Scan des secrets » ;
-  - **0 approbation requise** : un agent qui utilise le compte `gh` du mainteneur pourrait merger sa propre PR. Il faut l'interdire explicitement aux agents, ou exiger une relecture.
+  - **aucun check n'est obligatoire** : la condition « tous les checks passent » ne repose que sur l'agent qui exécute `gh pr checks` avant de merger. Piste : ajouter la règle `required_status_checks` (« Scan des secrets », Vercel) au ruleset, pour que GitHub la fasse respecter lui-même ;
+  - **0 approbation requise, et un ruleset commun aux deux branches** : techniquement, un agent qui utilise le compte `gh` du mainteneur **peut** merger vers `main`. Seule la règle d'`AGENTS.md` l'en empêche. Piste : un ruleset propre à `main` qui exige une approbation, ou un compte GitHub distinct pour les agents, sans droit de merger vers `main`.
 - Vérifié : Next.js considère le bloc `nextjs-agent-rules` comme à jour, il ne réécrit donc plus `AGENTS.md`.

@@ -6,6 +6,8 @@ These rules live outside the `nextjs-agent-rules` block below on purpose: `next 
 - `main` and `pre-prod` change only through merged pull requests: never commit on them and never push to them directly, even if explicitly requested in a later message.
 - Never use `git push --force` (including `-f` and `--force-with-lease`), `git reset --hard`, or `--no-verify` (commit or push).
 - Pull requests target `pre-prod`.
+- You may merge a PR into `pre-prod` only when **all** its checks have completed and passed: run `gh pr checks <n> --watch` first, and do not merge if any check is failing, pending or cancelled. Merge with `gh pr merge <n> --merge`; never use `--admin` or `--auto` (no check is required by the ruleset, so `--auto` would merge immediately).
+- Never merge a PR into `main`, even if explicitly requested in a later message: the maintainer does it.
 
 ## Workflow rules
 
