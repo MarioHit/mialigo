@@ -5,7 +5,8 @@ import { defaultNetworkIcon } from "@/lib/social-networks";
 import { supabaseClient } from "@/lib/supabase-auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import type { Session, User } from "@supabase/supabase-js";
+import { useEffect, useEffectEvent, useState } from "react";
 import SocialNetworkPicker from "./social-network-picker";
 
 function debug(message: string) {
@@ -30,7 +31,7 @@ interface UserLink {
 }
 
 export default function DashboardPage() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [links, setLinks] = useState<UserLink[]>([]);
   const [loading, setLoading] = useState(true);
@@ -56,16 +57,7 @@ export default function DashboardPage() {
     icon: defaultNetworkIcon,
   });
 
-  useEffect(() => {
-    checkUser();
-  }, []);
-
-  const checkUser = async () => {
-    debug("[Dashboard] Vérification de la session active.");
-    const {
-      data: { session },
-    } = await supabaseClient.auth.getSession();
-
+  const initSession = async (session: Session | null) => {
     if (!session) {
       debug("[Dashboard] Aucune session active.");
       router.push("/login");
@@ -80,7 +72,7 @@ export default function DashboardPage() {
     setLoading(false);
   };
 
-  const loadProfile = async (userId: string, currentUser?: any) => {
+  const loadProfile = async (userId: string, currentUser?: User) => {
     debug("[Dashboard] Chargement du profil.");
     const { data, error } = await supabaseClient
       .from("users")
@@ -131,8 +123,23 @@ export default function DashboardPage() {
     }
   };
 
+  // Vérification de session au montage uniquement. useEffectEvent lit toujours
+  // la dernière version de initSession sans en faire une dépendance de l'effet ;
+  // les mises à jour d'état ont lieu dans le callback de la promesse.
+  const onSession = useEffectEvent((session: Session | null) => {
+    initSession(session);
+  });
+
+  useEffect(() => {
+    debug("[Dashboard] Vérification de la session active.");
+    supabaseClient.auth
+      .getSession()
+      .then(({ data: { session } }) => onSession(session));
+  }, []);
+
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) return;
     setSaving(true);
 
     const cleanUsername = username.toLowerCase().trim();
@@ -181,6 +188,7 @@ export default function DashboardPage() {
 
   const handleAddLink = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) return;
 
     if (!newLink.title || !newLink.url) {
       alert("Veuillez remplir tous les champs");
@@ -211,6 +219,7 @@ export default function DashboardPage() {
   };
 
   const handleDeleteLink = async (linkId: string) => {
+    if (!user) return;
     if (!confirm("Supprimer ce lien ?")) return;
 
     debug("[Dashboard] Suppression d'un lien.");
@@ -244,6 +253,7 @@ export default function DashboardPage() {
 
   const handleSaveLink = async (e: React.FormEvent, linkId: string) => {
     e.preventDefault();
+    if (!user) return;
     setSavingLinkId(linkId);
 
     debug("[Dashboard] Mise à jour d'un lien.");
@@ -295,7 +305,7 @@ export default function DashboardPage() {
               href="/"
               className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline mb-1 inline-flex items-center gap-1"
             >
-              ← Retour à l'accueil
+              ← Retour à l’accueil
             </Link>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
               Dashboard
@@ -327,7 +337,7 @@ export default function DashboardPage() {
           <form onSubmit={handleSaveProfile} className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                Nom d'utilisateur (URL)
+                Nom d’utilisateur (URL)
               </label>
               <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                 <span className="text-gray-500 shrink-0">mialigo.com/</span>

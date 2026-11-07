@@ -1,0 +1,33 @@
+# Lint : `npm run lint` (ESLint, eslint-config-next) sur chaque PR et sur les
+# pushes vers pre-prod et main (ADR-0012).
+name: Lint
+
+on:
+  pull_request:
+  push:
+    branches: [pre-prod, main]
+
+permissions:
+  contents: read
+
+# Un nouveau push sur la même PR annule le run précédent.
+concurrency:
+  group: lint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run lint

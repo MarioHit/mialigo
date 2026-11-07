@@ -6,6 +6,14 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Unreleased]
 
+### Modifié
+
+- Les apostrophes des pages légales et de plusieurs messages s'affichent avec la typographie française (’), et les liens entre ces pages s'ouvrent sans recharger le site. ([#29])
+
+### Interne
+
+- La qualité du code est vérifiée automatiquement à chaque modification proposée. ([#29])
+
 ## [0.1.2] - 2026-11-07
 
 ### Interne
@@ -38,6 +46,7 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 [0.1.2]: https://github.com/MarioHit/mialigo/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/MarioHit/mialigo/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/MarioHit/mialigo/tree/v0.1.0
+[#29]: https://github.com/MarioHit/mialigo/issues/29
 [#57]: https://github.com/MarioHit/mialigo/issues/57
 [#63]: https://github.com/MarioHit/mialigo/issues/63
 [#66]: https://github.com/MarioHit/mialigo/issues/66

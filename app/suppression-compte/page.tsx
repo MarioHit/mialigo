@@ -16,7 +16,7 @@ export default function DeleteAccountPage() {
         <li>
           Envoie un email à <strong>contact-1@mailigo.com</strong>.
         </li>
-        <li>Utilise l'adresse email associée à ton compte Mialigo.</li>
+        <li>Utilise l’adresse email associée à ton compte Mialigo.</li>
         <li>
           Indique clairement que tu demandes la suppression de ton compte.
         </li>

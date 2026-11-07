@@ -1,4 +1,5 @@
 import LegalPage from "@/app/legal-page";
+import Link from "next/link";
 
 export const metadata = {
   title: "Contact - Mialigo",
@@ -12,7 +13,7 @@ export default function ContactPage() {
       intro="Une question, un problème ou une demande concernant une page Mialigo ?"
     >
       <h2>Nous contacter</h2>
-      <p>Écris-nous à l'adresse suivante :</p>
+      <p>Écris-nous à l’adresse suivante :</p>
       <p>
         <a
           href="mailto:contact-1@mailigo.com"
@@ -25,14 +26,14 @@ export default function ContactPage() {
       <h2>Demande de suppression</h2>
       <p>
         Pour supprimer ton compte et tes données, indique dans ton message
-        l'adresse email associée au compte. Consulte aussi la page
-        <a href="/suppression-compte"> Suppression du compte</a>.
+        l’adresse email associée au compte. Consulte aussi la page
+        <Link href="/suppression-compte"> Suppression du compte</Link>.
       </p>
 
       <h2>Signalement</h2>
       <p>
         Pour signaler un lien ou une page qui enfreint les règles de Mialigo,
-        joins l'adresse de la page et explique précisément le motif du
+        joins l’adresse de la page et explique précisément le motif du
         signalement.
       </p>
     </LegalPage>

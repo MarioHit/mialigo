@@ -15,15 +15,15 @@ function LoginForm() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
   const router = useRouter();
   const searchParams = useSearchParams();
+  // Erreur transmise par /auth/callback (?error=…) : valeur initiale de l'état,
+  // effacée comme les autres erreurs au prochain envoi du formulaire.
+  const [error, setError] = useState(() => searchParams.get("error") ?? "");
 
   useEffect(() => {
-    const errorParam = searchParams.get("error");
-    if (errorParam) {
+    if (searchParams.get("error")) {
       console.warn("[Login] Erreur signalée par le parcours de connexion.");
-      setError(errorParam);
     }
   }, [searchParams]);
 
@@ -80,9 +80,9 @@ function LoginForm() {
         "🎉 Lien de connexion envoyé ! Cliquez sur le lien dans votre boîte email (ouvrez-le depuis n'importe quel navigateur ou appareil).",
       );
       setEmail("");
-    } catch (err: any) {
+    } catch (err) {
       console.error("[Login] Échec de l'envoi du lien de connexion.");
-      setError(err.message || "Une erreur est survenue.");
+      setError((err instanceof Error && err.message) || "Une erreur est survenue.");
     } finally {
       setLoading(false);
     }
@@ -182,7 +182,7 @@ function LoginForm() {
             href="/"
             className="text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
           >
-            ← Retour à l'accueil
+            ← Retour à l’accueil
           </Link>
         </div>
       </div>

@@ -15,7 +15,7 @@ export default function LegalPage({ title, intro, children }: LegalPageProps) {
           href="/"
           className="text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400"
         >
-          ← Retour à l'accueil
+          ← Retour à l’accueil
         </Link>
         <header className="mt-8 border-b border-gray-200 pb-6 dark:border-gray-700">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
