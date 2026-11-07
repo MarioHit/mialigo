@@ -11,6 +11,8 @@ export interface User {
   username: string;
   name: string;
   bio: string;
+  avatar_url: string | null;
+  banner_url: string | null;
   created_at: string;
 }
 
