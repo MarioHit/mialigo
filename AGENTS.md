@@ -30,6 +30,8 @@ See `docs/decisions/0010-versionnage-semver-tags.md`.
   3. sets the version with `npm version X.Y.Z --no-git-tag-version` (updates `package.json` and `package-lock.json`).
 
   A version PR adds no line of its own to `Unreleased`: its job is to turn `Unreleased` into the new version section.
+
+  Until the version PR is merged, `release-pr.yml` keeps the release PR in **draft** (same version in `package.json` on `pre-prod` and `main`, see `docs/decisions/0014-garde-fou-version.md`) and turns it back to ready once the version changes. A release PR in draft means: open the version PR. Never mark it ready by hand.
 - Never create the version tag by hand: on every push to `main`, the workflow `.github/workflows/version-tag.yml` reads the version from `package.json` and creates the annotated tag `vX.Y.Z` if it does not exist yet (see `docs/decisions/0011-tag-version-automatique.md`). After a release, check that it succeeded: `gh run list --workflow version-tag.yml --limit 1`, then `git ls-remote --tags origin vX.Y.Z`. Never move, delete or force-push an existing tag.
 
 <!-- BEGIN:nextjs-agent-rules -->
