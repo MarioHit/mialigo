@@ -8,6 +8,9 @@ These rules live outside the `nextjs-agent-rules` block below on purpose: `next 
 - Pull requests target `pre-prod`.
 - You may merge a PR into `pre-prod` only when **all** its checks have completed and passed: run `gh pr checks <n> --watch` first, and do not merge if any check is failing, pending or cancelled. Merge with `gh pr merge <n> --merge`; never use `--admin` or `--auto` (the ruleset only requires `Scan des secrets`, so `--auto` would merge without waiting for the other checks, such as Vercel).
 - Never merge a PR into `main`, even if explicitly requested in a later message: the maintainer does it.
+- Right after merging a PR into `pre-prod` (see `docs/decisions/0005-apres-merge-pre-prod.md`):
+  1. **Release PR**: look for an open PR `pre-prod` → `main` (`gh pr list --base main --head pre-prod --state open`). If there is none, create it (`gh pr create --base main --head pre-prod`). In both cases, its description must list every PR it ships and one `Closes #<issue>` line per issue (the `Closes` of PRs merged into `pre-prod` do not reliably close issues once they reach `main`). Update the description with `gh pr edit` when the PR already exists.
+  2. **Project status**: move the issue to **In review** in the GitHub Project « Mialigo » (`gh project item-list 17 --owner MarioHit` to find the item, then `gh project item-edit --project-id PVT_kwHOAOWs6c4BqaRS --id <item> --field-id PVTSSF_lAHOAOWs6c4BqaRSzhoxh2k --single-select-option-id df73e18b`). Done is set by GitHub when the issue closes on `main`.
 
 ## Workflow rules
 
