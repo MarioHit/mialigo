@@ -26,3 +26,4 @@ Un ADR « Acceptée » n'est plus modifié sur le fond. Pour changer de décisio
 | [0009](0009-changelog-keep-a-changelog.md) | Un `CHANGELOG.md` au format Keep a Changelog, alimenté par chaque PR | Remplacée par 0010 | 2026-11-07 |
 | [0010](0010-versionnage-semver-tags.md) | Versions SemVer, `package.json` et tag Git à chaque mise en prod | Acceptée, en partie remplacée par 0011 | 2026-11-07 |
 | [0011](0011-tag-version-automatique.md) | Le tag de version est posé par GitHub Actions à chaque push sur `main` | Acceptée | 2026-11-07 |
+| [0012](0012-lint-dans-les-pr.md) | `npm run lint` dans un workflow GitHub Actions sur chaque PR | Acceptée | 2026-11-07 |

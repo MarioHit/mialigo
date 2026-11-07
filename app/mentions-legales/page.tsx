@@ -34,7 +34,7 @@ export default function LegalNoticePage() {
 
       <h2>Contact</h2>
       <p>
-        Pour toute question concernant le site, contactez l'éditeur à l'adresse
+        Pour toute question concernant le site, contactez l’éditeur à l’adresse
         indiquée ci-dessus.
       </p>
     </LegalPage>

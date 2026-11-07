@@ -12,17 +12,32 @@ function debug(message: string) {
   }
 }
 
+type UsernameStatus = "idle" | "checking" | "available" | "taken";
+
 export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
-  const [usernameStatus, setUsernameStatus] = useState<
-    "idle" | "checking" | "available" | "taken"
-  >("idle");
+  // Résultat de la dernière vérification en base, associé au pseudo vérifié.
+  const [checkResult, setCheckResult] = useState<{
+    username: string;
+    status: UsernameStatus;
+  }>({ username: "", status: "idle" });
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const router = useRouter();
+
+  // Statut dérivé du pseudo saisi : pas de setState synchrone dans un effet.
+  const cleanUsernameInput = username.trim().toLowerCase();
+  const usernameStatus: UsernameStatus =
+    cleanUsernameInput.length < 3
+      ? "idle"
+      : isReservedUsername(cleanUsernameInput)
+        ? "taken"
+        : checkResult.username === cleanUsernameInput
+          ? checkResult.status
+          : "checking";
 
   useEffect(() => {
     const checkUser = async () => {
@@ -36,22 +51,22 @@ export default function SignupPage() {
 
   useEffect(() => {
     const cleanUsername = username.trim().toLowerCase();
-    if (!cleanUsername || cleanUsername.length < 3) {
-      if (cleanUsername.length > 0 && cleanUsername.length < 3) {
+    if (cleanUsername.length < 3) {
+      if (cleanUsername.length > 0) {
         debug("[Signup] Pseudo trop court.");
       }
-      setUsernameStatus("idle");
       return;
     }
 
     if (isReservedUsername(cleanUsername)) {
       debug("[Signup] Pseudo réservé.");
-      setUsernameStatus("taken");
       return;
     }
 
+    const setUsernameStatus = (status: UsernameStatus) =>
+      setCheckResult({ username: cleanUsername, status });
+
     const timer = setTimeout(async () => {
-      setUsernameStatus("checking");
       debug("[Signup] Vérification de la disponibilité du pseudo.");
       try {
         const { data, error } = await supabaseClient
@@ -73,7 +88,7 @@ export default function SignupPage() {
           debug("[Signup] Pseudo disponible.");
           setUsernameStatus("available");
         }
-      } catch (err: any) {
+      } catch {
         console.error("[Signup] Échec de la vérification du pseudo.");
         setUsernameStatus("idle");
       }
@@ -132,9 +147,11 @@ export default function SignupPage() {
 
       debug("[Signup] Lien de confirmation envoyé.");
       setMessage("E-mail envoyé. Ouvrez le lien reçu pour activer votre page.");
-    } catch (err: any) {
+    } catch (err) {
       console.error("[Signup] Échec de l'envoi du lien de confirmation.");
-      setError(err.message || "Erreur lors de l'inscription.");
+      setError(
+        (err instanceof Error && err.message) || "Erreur lors de l'inscription.",
+      );
     } finally {
       setLoading(false);
     }
@@ -299,7 +316,7 @@ export default function SignupPage() {
             href="/"
             className="text-sm text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
           >
-            ← Retour à l'accueil
+            ← Retour à l’accueil
           </Link>
         </div>
       </div>
