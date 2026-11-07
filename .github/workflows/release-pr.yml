@@ -1,7 +1,6 @@
 # PR de mise en prod : à chaque PR mergée dans pre-prod (par un agent ou par
 # le mainteneur), crée la PR pre-prod → main ou la complète si elle est déjà
 # ouverte, en y recopiant la description de la PR mergée (ADR-0008).
-# Puis la laisse en brouillon tant que la PR de version manque (ADR-0014).
 #
 # Le jeton intégré suffit : le check obligatoire « Scan des secrets » de la PR
 # créée vient du run gitleaks lancé par le push sur pre-prod (même commit).
@@ -80,37 +79,3 @@ jobs:
           ---
 
           ${section}"
-
-      # Garde-fou (ADR-0014) : tant que la PR de version n'est pas mergée dans
-      # pre-prod (même version dans package.json sur pre-prod et sur main), la
-      # PR de mise en prod reste en brouillon et ne peut pas être mergée. Elle
-      # redevient prête au merge de la PR de version (ce workflow repasse).
-      - name: Garde-fou de version
-        run: |
-          set -euo pipefail
-
-          pr=$(gh pr list --base main --head pre-prod --state open --json number --jq '.[0].number // empty')
-          if [ -z "$pr" ]; then
-            echo "Aucune PR de mise en prod ouverte."
-            exit 0
-          fi
-
-          version_of() {
-            gh api "repos/${GH_REPO}/contents/package.json?ref=$1" --jq .content | base64 -d | jq -r .version
-          }
-          next=$(version_of pre-prod)
-          current=$(version_of main)
-          draft=$(gh pr view "$pr" --json isDraft --jq .isDraft)
-
-          if [ "$next" = "$current" ]; then
-            echo "::warning::package.json est en ${current} sur pre-prod comme sur main : PR de version manquante."
-            if [ "$draft" = "false" ]; then
-              gh pr ready "$pr" --undo
-              gh pr comment "$pr" --body "⏸️ PR passée en **brouillon** : \`package.json\` est encore en \`${current}\` sur \`pre-prod\`, comme sur \`main\`. Il manque la PR de version (\`Unreleased\` → \`[X.Y.Z] - date\`, \`npm version X.Y.Z --no-git-tag-version\`, cf. ADR-0010). Elle repassera automatiquement en « prête » quand la PR de version sera mergée dans \`pre-prod\`."
-            fi
-          elif [ "$draft" = "true" ]; then
-            gh pr ready "$pr"
-            gh pr comment "$pr" --body "✅ PR de version mergée (\`${current}\` → \`${next}\`) : la mise en prod est prête. Le tag \`v${next}\` sera créé au merge sur \`main\`."
-          else
-            echo "Version ${current} → ${next} : rien à faire."
-          fi

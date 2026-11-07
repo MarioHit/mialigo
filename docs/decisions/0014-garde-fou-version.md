@@ -1,6 +1,6 @@
 # ADR-0014 : La PR de mise en prod reste en brouillon tant que la version n'a pas changé
 
-- **Statut** : Acceptée
+- **Statut** : Remplacée par [ADR-0015](0015-version-par-pr.md)
 - **Date** : 2026-11-07
 - **Issue / PR** : #72
 - **Découle de** : [ADR-0010](0010-versionnage-semver-tags.md)
