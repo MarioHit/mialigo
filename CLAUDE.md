@@ -22,7 +22,7 @@ Node 24.x (`engines` in `package.json`, same major as Vercel; installed via nvm 
 
 Mialigo is a multi-user "link in bio" service (`mialigo.com/<username>`): passwordless magic-link signup/login, a dashboard to edit profile and links, and public SSR profile pages. Stack: Next.js 16 App Router, React 19, Tailwind CSS 4, Supabase (Auth + Postgres with RLS). UI text, code comments and log messages are in French.
 
-Production runs SSR on Vercel (`vercel.json`); there is no GitHub Actions workflow and no static export. Deployment docs: `DEPLOYMENT.md` (overview), `VERCEL-DEPLOYMENT.md` (initial setup), `DEPLOYMENT-CHECKLIST.md`. `docs/features.md` and the `docs/*-workflow.md` files (with sequence diagrams) are the up-to-date description of features and flows.
+Production runs SSR on Vercel (`vercel.json`); the only GitHub Actions workflow is `.github/workflows/gitleaks.yml` (secret scan), and there is no static export. Deployment docs: `DEPLOYMENT.md` (overview), `VERCEL-DEPLOYMENT.md` (initial setup), `DEPLOYMENT-CHECKLIST.md`. `docs/features.md` and the `docs/*-workflow.md` files (with sequence diagrams) are the up-to-date description of features and flows. `docs/decisions/` holds the ADRs (why things are done this way, and which options were rejected): read them before revisiting a past choice.
 
 ## Architecture
 
