@@ -17,8 +17,18 @@ These rules live outside the `nextjs-agent-rules` block below on purpose: `next 
 - Every piece of work starts from a GitHub issue. If none exists, create it first. Name the branch `<type>/<issue>-<slug>` (e.g. `docs/36-adr`) and put `Closes #<issue>` in the PR description.
 - As soon as you start working on an issue (before creating its branch), move it to **In progress** in the GitHub Project « Mialigo » (see `docs/decisions/0007-in-progress-debut-travail.md`): find the item with `gh project item-list 17 --owner MarioHit` (if the issue is missing, add it with `gh project item-add 17 --owner MarioHit --url <issue-url>`), then `gh project item-edit --project-id PVT_kwHOAOWs6c4BqaRS --id <item> --field-id PVTSSF_lAHOAOWs6c4BqaRSzhoxh2k --single-select-option-id 47fc9ee4`. Full cycle: Backlog → In progress (work starts) → In review (merged into `pre-prod`) → Done (closed on `main`).
 - Every significant technical choice, and every option deliberately set aside, gets an ADR in `docs/decisions/`: copy `0000-modele.md` to the next number, list the options considered, and add it to the index in `docs/decisions/README.md`. The PR description cites the ADRs it adds or supersedes. Never rewrite an accepted ADR to change its decision: write a new one that supersedes it.
-- Every PR adds at least one line to `CHANGELOG.md` (see `docs/decisions/0009-changelog-keep-a-changelog.md`), under `## [Non publié]` and the right category: `Ajouté`, `Modifié`, `Obsolète`, `Supprimé`, `Corrigé`, `Sécurité`, or `Interne` for changes with no visible effect on the site. Write it in French **for the user**: what changes for them, in plain words, without file names, code or jargon. End it with `([#<pr>])` and add the matching `[#<pr>]: https://github.com/MarioHit/mialigo/pull/<pr>` link at the bottom of the file; the PR number is only known after `gh pr create`, so add or fix it right after and push.
-- Before adding your line, if a release PR (`pre-prod` → `main`) was merged since the newest dated section of `CHANGELOG.md` (`gh pr list --base main --head pre-prod --state merged --limit 5`), first move the lines of the PRs it shipped from `## [Non publié]` into a `## [YYYY-MM-DD]` section (its merge date; reuse the section if that date already exists), newest first, with a `[YYYY-MM-DD]: <release PR url>` link at the bottom.
+
+## Changelog and versions
+
+See `docs/decisions/0010-versionnage-semver-tags.md`.
+
+- Every PR adds at least one line to `CHANGELOG.md`, under `## [Unreleased]` and the right category: `Ajouté`, `Modifié`, `Obsolète`, `Supprimé`, `Corrigé`, `Sécurité`, or `Interne` for changes with no visible effect on the site. Write it in French **for the user**: what changes for them, in plain words, without file names, code or jargon. End it with the issue number, `([#<issue>])`, and add the matching `[#<issue>]: https://github.com/MarioHit/mialigo/issues/<issue>` link at the bottom of the file.
+- Every production release gets a [semantic version](https://semver.org/). While the version is `0.x`: bump MINOR if `Unreleased` has at least one `Ajouté`, `Modifié`, `Supprimé` or `Obsolète` line, otherwise PATCH. Moving to `1.0.0` is the maintainer's decision.
+- **Before** the maintainer merges the release PR (`pre-prod` → `main`), open a version PR to `pre-prod` (its own issue, branch `release/<issue>-v<X.Y.Z>`) that:
+  1. renames `## [Unreleased]` to `## [X.Y.Z] - YYYY-MM-DD` (the planned release date) and adds an empty `## [Unreleased]` above it;
+  2. updates the links at the bottom: `[Unreleased]: https://github.com/MarioHit/mialigo/compare/vX.Y.Z...HEAD` and `[X.Y.Z]: https://github.com/MarioHit/mialigo/compare/v<previous>...vX.Y.Z`;
+  3. sets the version with `npm version X.Y.Z --no-git-tag-version` (updates `package.json` and `package-lock.json`).
+- **Right after** the maintainer merges the release PR into `main`, tag the merge commit and push the tag: `git fetch origin`, then `git tag -a vX.Y.Z <merge commit> -m "vX.Y.Z"` and `git push origin vX.Y.Z`. Check first that the version in `package.json` on `main` is `X.Y.Z`. Never move, delete or force-push an existing tag.
 
 <!-- BEGIN:nextjs-agent-rules -->
 
