@@ -1,6 +1,6 @@
 # ADR-0009 : Un CHANGELOG.md au format Keep a Changelog, alimenté par chaque PR
 
-- **Statut** : Acceptée
+- **Statut** : Remplacée par [ADR-0010](0010-versionnage-semver-tags.md)
 - **Date** : 2026-11-07
 - **Issue / PR** : #54
 - **Découle de** : —
