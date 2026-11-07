@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - `npm run dev` — dev server on http://localhost:3000
 - `npm run build` — production build (also the only type-check gate besides `npx tsc --noEmit`)
-- `npm run lint` — ESLint 9 flat config (`eslint.config.mjs`, `eslint-config-next`)
+- `npm run lint` — ESLint 9 flat config (`eslint.config.mjs`, `eslint-config-next`); runs on every PR (`.github/workflows/lint.yml`) and must stay at zero errors (`next build` no longer lints)
 - `npm run check-env` — creates `.env.local` from `.env.example` if missing and lists (names only) the variables still unset
 
 Node 24.x (`engines` in `package.json`, same major as Vercel; installed via nvm on the VPS). There is no test suite. Requires `.env.local` with `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
@@ -22,7 +22,7 @@ Node 24.x (`engines` in `package.json`, same major as Vercel; installed via nvm 
 
 Mialigo is a multi-user "link in bio" service (`mialigo.com/<username>`): passwordless magic-link signup/login, a dashboard to edit profile and links, and public SSR profile pages. Stack: Next.js 16 App Router, React 19, Tailwind CSS 4, Supabase (Auth + Postgres with RLS). UI text, code comments and log messages are in French.
 
-Production runs SSR on Vercel (`vercel.json`); the GitHub Actions workflows are `.github/workflows/gitleaks.yml` (secret scan) and `.github/workflows/release-pr.yml` (opens/updates the `pre-prod` → `main` release PR after each merge into `pre-prod`), and there is no static export. Deployment docs: `DEPLOYMENT.md` (overview), `VERCEL-DEPLOYMENT.md` (initial setup), `DEPLOYMENT-CHECKLIST.md`. `docs/features.md` and the `docs/*-workflow.md` files (with sequence diagrams) are the up-to-date description of features and flows. `docs/decisions/` holds the ADRs (why things are done this way, and which options were rejected): read them before revisiting a past choice.
+Production runs SSR on Vercel (`vercel.json`); the GitHub Actions workflows are `.github/workflows/gitleaks.yml` (secret scan), `.github/workflows/lint.yml` (`npm run lint`), `.github/workflows/release-pr.yml` (opens/updates the `pre-prod` → `main` release PR after each merge into `pre-prod`) and `.github/workflows/version-tag.yml` (creates the `vX.Y.Z` tag from `package.json` on each push to `main`), and there is no static export. Deployment docs: `DEPLOYMENT.md` (overview), `VERCEL-DEPLOYMENT.md` (initial setup), `DEPLOYMENT-CHECKLIST.md`. `docs/features.md` and the `docs/*-workflow.md` files (with sequence diagrams) are the up-to-date description of features and flows. `docs/decisions/` holds the ADRs (why things are done this way, and which options were rejected): read them before revisiting a past choice.
 
 ## Architecture
 
