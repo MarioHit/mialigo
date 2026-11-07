@@ -1,0 +1,46 @@
+# Tag de version : à chaque push sur main (merge de la PR de mise en prod),
+# lit la version du package.json et crée le tag annoté vX.Y.Z sur ce commit
+# s'il n'existe pas encore (ADR-0011).
+#
+# Si le tag existe déjà (mise en prod sans PR de version), rien n'est fait :
+# un tag publié n'est jamais déplacé. La PR de version de rattrapage apportera
+# le nouveau numéro, et son merge vers main créera le tag.
+name: Tag de version
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: version-tag
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    name: Tag de version
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Créer le tag vX.Y.Z s'il n'existe pas
+        run: |
+          set -euo pipefail
+          version=$(node -p "require('./package.json').version")
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Version invalide dans package.json : $version"
+            exit 1
+          fi
+          tag="v$version"
+          if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null; then
+            echo "Le tag $tag existe déjà : rien à faire."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$tag" "$GITHUB_SHA" -m "$tag"
+          git push origin "refs/tags/$tag"
+          echo "Tag $tag créé sur $GITHUB_SHA."

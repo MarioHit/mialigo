@@ -30,7 +30,7 @@ See `docs/decisions/0010-versionnage-semver-tags.md`.
   3. sets the version with `npm version X.Y.Z --no-git-tag-version` (updates `package.json` and `package-lock.json`).
 
   A version PR adds no line of its own to `Unreleased`: its job is to turn `Unreleased` into the new version section.
-- **Right after** the maintainer merges the release PR into `main`, tag the merge commit and push the tag: `git fetch origin`, then `git tag -a vX.Y.Z <merge commit> -m "vX.Y.Z"` and `git push origin vX.Y.Z`. Check first that the version in `package.json` on `main` is `X.Y.Z`. Never move, delete or force-push an existing tag.
+- Never create the version tag by hand: on every push to `main`, the workflow `.github/workflows/version-tag.yml` reads the version from `package.json` and creates the annotated tag `vX.Y.Z` if it does not exist yet (see `docs/decisions/0011-tag-version-automatique.md`). After a release, check that it succeeded: `gh run list --workflow version-tag.yml --limit 1`, then `git ls-remote --tags origin vX.Y.Z`. Never move, delete or force-push an existing tag.
 
 <!-- BEGIN:nextjs-agent-rules -->
 
