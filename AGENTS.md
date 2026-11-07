@@ -20,18 +20,14 @@ These rules live outside the `nextjs-agent-rules` block below on purpose: `next 
 
 ## Changelog and versions
 
-See `docs/decisions/0010-versionnage-semver-tags.md`.
+See `docs/decisions/0010-versionnage-semver-tags.md` and `docs/decisions/0015-version-par-pr.md`. There is no separate version PR: every PR updates the version itself.
 
-- Every PR except version PRs (see below) adds at least one line to `CHANGELOG.md`, under `## [Unreleased]` and the right category: `Ajouté`, `Modifié`, `Obsolète`, `Supprimé`, `Corrigé`, `Sécurité`, or `Interne` for changes with no visible effect on the site. Write it in French **for the user**: what changes for them, in plain words, without file names, code or jargon. End it with the issue number, `([#<issue>])`, and add the matching `[#<issue>]: https://github.com/MarioHit/mialigo/issues/<issue>` link at the bottom of the file.
-- Every production release gets a [semantic version](https://semver.org/). While the version is `0.x`: bump MINOR if `Unreleased` has at least one `Ajouté`, `Modifié`, `Supprimé` or `Obsolète` line, otherwise PATCH. Moving to `1.0.0` is the maintainer's decision.
-- **Before** the maintainer merges the release PR (`pre-prod` → `main`), open a version PR to `pre-prod` (its own issue, branch `release/<issue>-v<X.Y.Z>`) that:
-  1. renames `## [Unreleased]` to `## [X.Y.Z] - YYYY-MM-DD` (the planned release date) and adds an empty `## [Unreleased]` above it;
-  2. updates the links at the bottom: `[Unreleased]: https://github.com/MarioHit/mialigo/compare/vX.Y.Z...HEAD` and `[X.Y.Z]: https://github.com/MarioHit/mialigo/compare/v<previous>...vX.Y.Z`;
-  3. sets the version with `npm version X.Y.Z --no-git-tag-version` (updates `package.json` and `package-lock.json`).
-
-  A version PR adds no line of its own to `Unreleased`: its job is to turn `Unreleased` into the new version section.
-
-  Until the version PR is merged, `release-pr.yml` keeps the release PR in **draft** (same version in `package.json` on `pre-prod` and `main`, see `docs/decisions/0014-garde-fou-version.md`) and turns it back to ready once the version changes. A release PR in draft means: open the version PR. Never mark it ready by hand.
+- Every PR adds at least one line to `CHANGELOG.md`, in the right category: `Ajouté`, `Modifié`, `Obsolète`, `Supprimé`, `Corrigé`, `Sécurité`, or `Interne` for changes with no visible effect on the site. Write it in French **for the user**: what changes for them, in plain words, without file names, code or jargon. End it with the issue number, `([#<issue>])`, and add the matching `[#<issue>]: https://github.com/MarioHit/mialigo/issues/<issue>` link at the bottom of the file.
+- Every PR also sets the [semantic version](https://semver.org/) of the next release. Compare the version in `package.json` on `main` (in production: `git show origin/main:package.json`) with the one on your branch (from `pre-prod`). While the version is `0.x`, your PR needs a MINOR bump if its line is `Ajouté`, `Modifié`, `Supprimé` or `Obsolète`, otherwise a PATCH bump. Moving to `1.0.0` is the maintainer's decision.
+  1. **Same version as `main`** (nothing pending): bump from the `main` version, add a new `## [X.Y.Z] - YYYY-MM-DD` section (today's date) at the top of the changelog with your line, and the link `[X.Y.Z]: https://github.com/MarioHit/mialigo/compare/v<main version>...vX.Y.Z` at the bottom.
+  2. **Already ahead of `main`** (another PR started the next version): add your line to that top section and set its date to today. If your PR needs MINOR and the pending version is only a PATCH of `main`, raise it to the next MINOR (`0.3.1` → `0.4.0`): rename the section and its link.
+  3. Set `package.json` and `package-lock.json` with `npm version X.Y.Z --no-git-tag-version` whenever the version changes.
+  4. If `pre-prod` moved while your PR was open (conflict on `package.json` or `CHANGELOG.md`), merge `origin/pre-prod` into your branch and redo steps 1–3 from the new state.
 - Never create the version tag by hand: on every push to `main`, the workflow `.github/workflows/version-tag.yml` reads the version from `package.json` and creates the annotated tag `vX.Y.Z` if it does not exist yet (see `docs/decisions/0011-tag-version-automatique.md`). After a release, check that it succeeded: `gh run list --workflow version-tag.yml --limit 1`, then `git ls-remote --tags origin vX.Y.Z`. Never move, delete or force-push an existing tag.
 
 <!-- BEGIN:nextjs-agent-rules -->
