@@ -36,7 +36,7 @@ Production runs SSR on Vercel (`vercel.json`); the GitHub Actions workflows are 
 
 - `/signup` checks username availability against `public.users`, then calls `signInWithOtp` with `username`/`name` in user metadata. `/login` calls `signInWithOtp` with `shouldCreateUser: false`.
 - Email links land on `app/auth/callback/route.ts`, which handles both `token_hash`+`type` (`verifyOtp`, works cross-device/browser) and PKCE `code` (`exchangeCodeForSession`), then upserts a `public.users` row if missing (fallback in case the DB trigger hasn't run) and redirects to `next` (default `/dashboard`). The email template config is in `docs/mail-template-login.md` / `MAGIC-LINK-SETUP.md`.
-- There is no middleware/proxy: `/dashboard` is a client component that checks `getSession()` and `router.push("/login")` itself. Authorization for writes relies entirely on Supabase RLS (`auth.uid() = id` / `= user_id`).
+- There is no middleware/proxy: the dashboard layout renders the client component `app/dashboard/dashboard-shell.tsx`, which checks `getSession()` and `router.push("/login")` itself, loads the profile and shares `user` / `profile` / `reloadProfile()` with the sub-pages through `useDashboard()`. `/dashboard` redirects to `/dashboard/profil`; links are edited on `/dashboard/blocs`. Authorization for writes relies entirely on Supabase RLS (`auth.uid() = id` / `= user_id`).
 
 ### Data model
 

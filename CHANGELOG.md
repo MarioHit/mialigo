@@ -6,6 +6,10 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Unreleased]
 
+### Modifié
+
+- Le tableau de bord est organisé en onglets : « Profil » pour le pseudo, le nom et la bio, « Liens » pour gérer ses liens. ([#17])
+
 ## [0.2.0] - 2026-11-07
 
 ### Modifié
@@ -50,6 +54,7 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 [0.1.2]: https://github.com/MarioHit/mialigo/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/MarioHit/mialigo/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/MarioHit/mialigo/tree/v0.1.0
+[#17]: https://github.com/MarioHit/mialigo/issues/17
 [#29]: https://github.com/MarioHit/mialigo/issues/29
 [#57]: https://github.com/MarioHit/mialigo/issues/57
 [#63]: https://github.com/MarioHit/mialigo/issues/63

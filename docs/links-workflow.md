@@ -2,6 +2,13 @@
 
 Ce document décrit le cycle de vie des données (création, mise à jour, suppression de liens et édition du profil) depuis l'interface d'administration `/dashboard`.
 
+Organisation du dashboard :
+
+- `/dashboard` redirige vers `/dashboard/profil` (c'est l'URL d'arrivée du magic link).
+- `app/dashboard/layout.tsx` enveloppe toutes les sous-pages dans `DashboardShell` (`app/dashboard/dashboard-shell.tsx`, composant client) : vérification de session (sinon `/login`), chargement du profil, en-tête (« Voir ma page », déconnexion) et onglets. Les sous-pages lisent `user`, `profile` et `reloadProfile()` avec `useDashboard()`.
+- `/dashboard/profil` (`app/dashboard/profil/page.tsx`) : pseudo, nom affiché, bio.
+- `/dashboard/blocs` (`app/dashboard/blocs/page.tsx`) : liste, ajout, modification et suppression des liens.
+
 ---
 
 ## 1. Description des actions
