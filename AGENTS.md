@@ -15,6 +15,7 @@ These rules live outside the `nextjs-agent-rules` block below on purpose: `next 
 ## Workflow rules
 
 - Every piece of work starts from a GitHub issue. If none exists, create it first. Name the branch `<type>/<issue>-<slug>` (e.g. `docs/36-adr`) and put `Closes #<issue>` in the PR description.
+- As soon as you start working on an issue (before creating its branch), move it to **In progress** in the GitHub Project « Mialigo » (see `docs/decisions/0007-in-progress-debut-travail.md`): find the item with `gh project item-list 17 --owner MarioHit` (if the issue is missing, add it with `gh project item-add 17 --owner MarioHit --url <issue-url>`), then `gh project item-edit --project-id PVT_kwHOAOWs6c4BqaRS --id <item> --field-id PVTSSF_lAHOAOWs6c4BqaRSzhoxh2k --single-select-option-id 47fc9ee4`. Full cycle: Backlog → In progress (work starts) → In review (merged into `pre-prod`) → Done (closed on `main`).
 - Every significant technical choice, and every option deliberately set aside, gets an ADR in `docs/decisions/`: copy `0000-modele.md` to the next number, list the options considered, and add it to the index in `docs/decisions/README.md`. The PR description cites the ADRs it adds or supersedes. Never rewrite an accepted ADR to change its decision: write a new one that supersedes it.
 
 <!-- BEGIN:nextjs-agent-rules -->

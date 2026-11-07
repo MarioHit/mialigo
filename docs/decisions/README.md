@@ -21,3 +21,4 @@ Un ADR « Acceptée » n'est plus modifié sur le fond. Pour changer de décisio
 | [0004](0004-regles-git-pr-pre-prod.md) | Règles Git : PR obligatoire vers `pre-prod` | Acceptée | 2026-11-06 |
 | [0005](0005-apres-merge-pre-prod.md) | Après un merge vers `pre-prod` : PR vers `main` et issue « In review » | Acceptée | 2026-11-07 |
 | [0006](0006-merge-commit-seulement.md) | Seul le merge commit est autorisé sur `main` et `pre-prod` | Acceptée | 2026-11-07 |
+| [0007](0007-in-progress-debut-travail.md) | L'issue passe à « In progress » dès le début du travail | Acceptée | 2026-11-07 |
