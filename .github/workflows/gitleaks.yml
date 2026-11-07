@@ -1,0 +1,32 @@
+# Détection de secrets : gitleaks sur chaque pull request et sur les pushs
+# vers les branches de déploiement. Les faux positifs vérifiés sont listés
+# dans .gitleaksignore à la racine du dépôt.
+name: gitleaks
+
+on:
+  pull_request:
+  push:
+    branches: [main, pre-prod]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write # commentaires gitleaks sur les lignes en cause
+
+concurrency:
+  group: gitleaks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gitleaks:
+    name: Scan des secrets
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
