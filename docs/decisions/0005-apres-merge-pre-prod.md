@@ -1,6 +1,6 @@
 # ADR-0005 : Après un merge vers `pre-prod` : PR vers `main` et issue « In review »
 
-- **Statut** : Acceptée
+- **Statut** : Acceptée, en partie remplacée par [ADR-0008](0008-pr-mise-en-prod-automatique.md) (la PR de mise en prod est créée par GitHub Actions)
 - **Date** : 2026-11-07
 - **Issue / PR** : #41
 - **Découle de** : [ADR-0004](0004-regles-git-pr-pre-prod.md)
