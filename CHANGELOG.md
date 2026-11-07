@@ -6,6 +6,10 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Unreleased]
 
+### Interne
+
+- Les règles de rédaction de ce journal sont précisées pour les mises en production. ([#63])
+
 ## [0.1.1] - 2026-11-07
 
 ### Interne
@@ -31,3 +35,4 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 [0.1.1]: https://github.com/MarioHit/mialigo/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/MarioHit/mialigo/tree/v0.1.0
 [#57]: https://github.com/MarioHit/mialigo/issues/57
+[#63]: https://github.com/MarioHit/mialigo/issues/63
