@@ -22,12 +22,14 @@ These rules live outside the `nextjs-agent-rules` block below on purpose: `next 
 
 See `docs/decisions/0010-versionnage-semver-tags.md`.
 
-- Every PR adds at least one line to `CHANGELOG.md`, under `## [Unreleased]` and the right category: `Ajouté`, `Modifié`, `Obsolète`, `Supprimé`, `Corrigé`, `Sécurité`, or `Interne` for changes with no visible effect on the site. Write it in French **for the user**: what changes for them, in plain words, without file names, code or jargon. End it with the issue number, `([#<issue>])`, and add the matching `[#<issue>]: https://github.com/MarioHit/mialigo/issues/<issue>` link at the bottom of the file.
+- Every PR except version PRs (see below) adds at least one line to `CHANGELOG.md`, under `## [Unreleased]` and the right category: `Ajouté`, `Modifié`, `Obsolète`, `Supprimé`, `Corrigé`, `Sécurité`, or `Interne` for changes with no visible effect on the site. Write it in French **for the user**: what changes for them, in plain words, without file names, code or jargon. End it with the issue number, `([#<issue>])`, and add the matching `[#<issue>]: https://github.com/MarioHit/mialigo/issues/<issue>` link at the bottom of the file.
 - Every production release gets a [semantic version](https://semver.org/). While the version is `0.x`: bump MINOR if `Unreleased` has at least one `Ajouté`, `Modifié`, `Supprimé` or `Obsolète` line, otherwise PATCH. Moving to `1.0.0` is the maintainer's decision.
 - **Before** the maintainer merges the release PR (`pre-prod` → `main`), open a version PR to `pre-prod` (its own issue, branch `release/<issue>-v<X.Y.Z>`) that:
   1. renames `## [Unreleased]` to `## [X.Y.Z] - YYYY-MM-DD` (the planned release date) and adds an empty `## [Unreleased]` above it;
   2. updates the links at the bottom: `[Unreleased]: https://github.com/MarioHit/mialigo/compare/vX.Y.Z...HEAD` and `[X.Y.Z]: https://github.com/MarioHit/mialigo/compare/v<previous>...vX.Y.Z`;
   3. sets the version with `npm version X.Y.Z --no-git-tag-version` (updates `package.json` and `package-lock.json`).
+
+  A version PR adds no line of its own to `Unreleased`: its job is to turn `Unreleased` into the new version section.
 - **Right after** the maintainer merges the release PR into `main`, tag the merge commit and push the tag: `git fetch origin`, then `git tag -a vX.Y.Z <merge commit> -m "vX.Y.Z"` and `git push origin vX.Y.Z`. Check first that the version in `package.json` on `main` is `X.Y.Z`. Never move, delete or force-push an existing tag.
 
 <!-- BEGIN:nextjs-agent-rules -->
