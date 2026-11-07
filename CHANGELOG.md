@@ -6,6 +6,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-07
+
 ### Interne
 
 - Chaque mise en production porte désormais un numéro de version, repris dans ce journal. ([#57])
@@ -25,6 +27,7 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 - Pages légales : conditions générales d'utilisation, politique de confidentialité, mentions légales, contact et suppression de compte.
 - Les adresses email des utilisateurs ne sont jamais visibles publiquement.
 
-[Unreleased]: https://github.com/MarioHit/mialigo/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/MarioHit/mialigo/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/MarioHit/mialigo/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/MarioHit/mialigo/tree/v0.1.0
 [#57]: https://github.com/MarioHit/mialigo/issues/57
