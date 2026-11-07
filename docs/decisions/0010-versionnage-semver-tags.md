@@ -1,6 +1,6 @@
 # ADR-0010 : Versions SemVer, `package.json` et tag Git à chaque mise en prod
 
-- **Statut** : Acceptée
+- **Statut** : Acceptée, en partie remplacée par [ADR-0011](0011-tag-version-automatique.md) (pose du tag)
 - **Date** : 2026-11-07
 - **Issue / PR** : #57
 - **Découle de** : —

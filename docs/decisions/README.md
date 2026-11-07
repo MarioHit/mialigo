@@ -24,4 +24,5 @@ Un ADR « Acceptée » n'est plus modifié sur le fond. Pour changer de décisio
 | [0007](0007-in-progress-debut-travail.md) | L'issue passe à « In progress » dès le début du travail | Acceptée | 2026-11-07 |
 | [0008](0008-pr-mise-en-prod-automatique.md) | La PR de mise en prod est créée par GitHub Actions | Acceptée | 2026-11-07 |
 | [0009](0009-changelog-keep-a-changelog.md) | Un `CHANGELOG.md` au format Keep a Changelog, alimenté par chaque PR | Remplacée par 0010 | 2026-11-07 |
-| [0010](0010-versionnage-semver-tags.md) | Versions SemVer, `package.json` et tag Git à chaque mise en prod | Acceptée | 2026-11-07 |
+| [0010](0010-versionnage-semver-tags.md) | Versions SemVer, `package.json` et tag Git à chaque mise en prod | Acceptée, en partie remplacée par 0011 | 2026-11-07 |
+| [0011](0011-tag-version-automatique.md) | Le tag de version est posé par GitHub Actions à chaque push sur `main` | Acceptée | 2026-11-07 |
