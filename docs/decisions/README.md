@@ -19,6 +19,7 @@ Un ADR « Acceptée » n'est plus modifié sur le fond. Pour changer de décisio
 | [0002](0002-nvm-node-24.md) | nvm et Node 24 sur le VPS, plutôt que Docker (pour l'instant) | Acceptée | 2026-11-06 |
 | [0003](0003-env-local.md) | `.env.local` comme fichier d'environnement local | Acceptée | 2026-11-06 |
 | [0004](0004-regles-git-pr-pre-prod.md) | Règles Git : PR obligatoire vers `pre-prod` | Acceptée | 2026-11-06 |
-| [0005](0005-apres-merge-pre-prod.md) | Après un merge vers `pre-prod` : PR vers `main` et issue « In review » | Acceptée | 2026-11-07 |
+| [0005](0005-apres-merge-pre-prod.md) | Après un merge vers `pre-prod` : PR vers `main` et issue « In review » | Acceptée, en partie remplacée par 0008 | 2026-11-07 |
 | [0006](0006-merge-commit-seulement.md) | Seul le merge commit est autorisé sur `main` et `pre-prod` | Acceptée | 2026-11-07 |
 | [0007](0007-in-progress-debut-travail.md) | L'issue passe à « In progress » dès le début du travail | Acceptée | 2026-11-07 |
+| [0008](0008-pr-mise-en-prod-automatique.md) | La PR de mise en prod est créée par GitHub Actions | Acceptée | 2026-11-07 |

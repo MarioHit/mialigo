@@ -1,0 +1,81 @@
+# PR de mise en prod : à chaque PR mergée dans pre-prod (par un agent ou par
+# le mainteneur), crée la PR pre-prod → main ou la complète si elle est déjà
+# ouverte, en y recopiant la description de la PR mergée (ADR-0008).
+#
+# Le jeton intégré suffit : le check obligatoire « Scan des secrets » de la PR
+# créée vient du run gitleaks lancé par le push sur pre-prod (même commit).
+# Réglage du dépôt requis : « Allow GitHub Actions to create and approve pull
+# requests » (Settings → Actions → General).
+name: PR de mise en prod
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [pre-prod]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+# Deux merges rapprochés ne doivent pas créer deux PR ni s'écraser la description.
+concurrency:
+  group: release-pr
+  cancel-in-progress: false
+
+jobs:
+  release-pr:
+    name: PR de mise en prod
+    # Seulement les PR mergées (pas celles fermées sans merge), et pas une
+    # éventuelle synchronisation main → pre-prod.
+    if: github.event.pull_request.merged == true && github.event.pull_request.head.ref != 'main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+      # Passés par l'environnement, jamais interpolés dans le script : le titre
+      # et la description sont du texte libre.
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      PR_TITLE: ${{ github.event.pull_request.title }}
+      PR_BODY: ${{ github.event.pull_request.body }}
+    steps:
+      - name: Créer ou compléter la PR pre-prod → main
+        run: |
+          set -euo pipefail
+
+          marker="<!-- release-pr:${PR_NUMBER} -->"
+          section="${marker}
+          ## #${PR_NUMBER} — ${PR_TITLE}
+
+          ${PR_BODY:-_(PR sans description)_}"
+
+          existing=$(gh pr list --base main --head pre-prod --state open --json number --jq '.[0].number // empty')
+
+          if [ -z "$existing" ]; then
+            header="PR de mise en production, créée automatiquement après le merge de #${PR_NUMBER} dans \`pre-prod\` (workflow \`release-pr.yml\`). Chaque PR mergée dans \`pre-prod\` y ajoute sa description.
+
+          ⚠️ Merger avec **Create a merge commit** (seule méthode autorisée, ADR-0006).
+
+          ---"
+            gh pr create --base main --head pre-prod \
+              --title "🚀 Mise en prod : ${PR_TITLE} (#${PR_NUMBER})" \
+              --body "${header}
+
+          ${section}"
+            exit 0
+          fi
+
+          current=$(gh pr view "$existing" --json body --jq .body)
+          if grep -qF -- "$marker" <<<"$current"; then
+            echo "#${PR_NUMBER} figure déjà dans la PR #${existing}."
+            exit 0
+          fi
+
+          title=$(gh pr view "$existing" --json title --jq .title)
+          gh pr edit "$existing" \
+            --title "${title} + #${PR_NUMBER}" \
+            --body "${current}
+
+          ---
+
+          ${section}"
