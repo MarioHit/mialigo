@@ -78,6 +78,199 @@ body {
   border-radius: min(var(--block-radius, 9999px), 1.75rem);
 }
 
+/* ============================================================
+   Dispositions nid d'abeille et bulles (#98, data-page-layout) :
+   les mêmes <li class="block-cell"> que la grille, redisposés.
+   Trame en quinconce : 3 puis 2 (6 colonnes, chaque bloc en couvre
+   2, les 4e et 5e de chaque groupe de 5 décalés d'une colonne) ou
+   2 puis 1 (4 colonnes, le 3e de chaque groupe de 3 décalé). Pas
+   vertical = 0,866 × pas horizontal, pour que les formes
+   s'emboîtent. Tous les blocs ont la même taille : taille et
+   position du bloc sont ignorées (elles restent en base).
+   Règles hors @layer : elles l'emportent sur les utilitaires Tailwind.
+   ============================================================ */
+.block-shape-border,
+.block-shape-fill {
+  display: none;
+}
+.page-theme[data-page-layout="honeycomb"] .block-nav,
+.page-theme[data-page-layout="bubbles"] .block-nav {
+  container-type: inline-size;
+}
+.page-theme[data-page-layout="honeycomb"] .block-grid,
+.page-theme[data-page-layout="bubbles"] .block-grid {
+  --cell-gap: 0.5rem;
+  --pitch: calc(100cqw / 3);
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-auto-rows: calc(var(--pitch) * 0.866);
+  gap: 0;
+  justify-items: center;
+  align-items: start;
+}
+.page-theme[data-page-density="roomy"] .block-grid {
+  --pitch: calc(100cqw / 2);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+/* La dernière rangée dépasse de sa ligne (forme plus haute que le pas). */
+.page-theme[data-page-layout="honeycomb"] .block-grid {
+  padding-bottom: calc(var(--pitch) * 0.3);
+}
+.page-theme[data-page-layout="bubbles"] .block-grid {
+  padding-bottom: calc(var(--pitch) * 0.14);
+}
+.page-theme[data-page-layout="honeycomb"] .block-grid > .block-cell,
+.page-theme[data-page-layout="bubbles"] .block-grid > .block-cell {
+  grid-column: span 2;
+  grid-row: auto;
+  justify-self: center;
+  width: calc(var(--pitch) - var(--cell-gap));
+  height: auto;
+}
+.page-theme[data-page-layout="honeycomb"]:not([data-page-density="roomy"])
+  .block-grid
+  > .block-cell:nth-child(5n + 4),
+.page-theme[data-page-layout="bubbles"]:not([data-page-density="roomy"])
+  .block-grid
+  > .block-cell:nth-child(5n + 4) {
+  grid-column: 2 / span 2;
+}
+.page-theme[data-page-layout="honeycomb"]:not([data-page-density="roomy"])
+  .block-grid
+  > .block-cell:nth-child(5n + 5),
+.page-theme[data-page-layout="bubbles"]:not([data-page-density="roomy"])
+  .block-grid
+  > .block-cell:nth-child(5n + 5) {
+  grid-column: 4 / span 2;
+}
+.page-theme[data-page-layout="honeycomb"][data-page-density="roomy"]
+  .block-grid
+  > .block-cell:nth-child(3n),
+.page-theme[data-page-layout="bubbles"][data-page-density="roomy"]
+  .block-grid
+  > .block-cell:nth-child(3n) {
+  grid-column: 2 / span 2;
+}
+.page-theme[data-page-layout="honeycomb"] .block-cell {
+  aspect-ratio: 1 / 1.1547;
+}
+.page-theme[data-page-layout="bubbles"] .block-cell {
+  aspect-ratio: 1;
+}
+
+/* Carte : icône au-dessus, titre centré sur 2 lignes au plus. */
+.page-theme[data-page-layout="honeycomb"] .block-cell .block-card,
+.page-theme[data-page-layout="bubbles"] .block-cell .block-card {
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  padding: 0 14%;
+  font-size: 0.8rem;
+  line-height: 1.2;
+}
+.page-theme[data-page-density="roomy"] .block-cell .block-card {
+  font-size: 0.95rem;
+}
+.page-theme[data-page-layout="honeycomb"] .block-cell .block-icon,
+.page-theme[data-page-layout="bubbles"] .block-cell .block-icon {
+  position: relative;
+  width: auto;
+  margin: 0 0 0.35rem;
+  font-size: 1.4rem;
+}
+.page-theme[data-page-density="roomy"] .block-cell .block-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+.page-theme[data-page-layout="honeycomb"] .block-cell .block-title,
+.page-theme[data-page-layout="bubbles"] .block-cell .block-title {
+  position: relative;
+  width: 100%;
+  white-space: normal;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow-wrap: anywhere;
+}
+
+/* Bulles : cercles (border-radius : bordure et ombres gardées). */
+.page-theme[data-page-layout="bubbles"] .block-cell .block-card {
+  border-radius: 50%;
+  padding: 0 16%;
+}
+.page-theme[data-page-layout="bubbles"] .block-cell {
+  border-radius: 50%;
+}
+
+/* Nid d'abeille : hexagone pointe en haut. Un clip-path couperait la bordure
+   et les ombres de la carte : elle devient transparente, et deux couches
+   découpées, de même boîte, dessinent l'une la bordure (un anneau : hexagone
+   évidé, règle evenodd), l'autre le fond à l'intérieur de l'anneau. Rien ne se
+   superpose : un fond transparent (Minimal, Néon, Verre) le reste.
+   Hexagone intérieur décalé de --hex-b perpendiculairement aux côtés : les
+   pointes haute et basse bougent de 1,1547 × b, les autres de (b ; 0,577 × b). */
+.page-theme[data-page-layout="honeycomb"] .block-cell .block-card {
+  --hex-b: var(--shape-border-w, 1px);
+  --hex-inner:
+    50% calc(var(--hex-b) * 1.1547),
+    calc(100% - var(--hex-b)) calc(25% + var(--hex-b) * 0.577),
+    calc(100% - var(--hex-b)) calc(75% - var(--hex-b) * 0.577),
+    50% calc(100% - var(--hex-b) * 1.1547),
+    var(--hex-b) calc(75% - var(--hex-b) * 0.577),
+    var(--hex-b) calc(25% + var(--hex-b) * 0.577);
+  position: relative;
+  isolation: isolate;
+  border-radius: 0;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.page-theme[data-page-layout="honeycomb"] .block-cell .block-shape-border,
+.page-theme[data-page-layout="honeycomb"] .block-cell .block-shape-fill {
+  display: block;
+  position: absolute;
+  /* La carte a une bordure transparente : les couches la couvrent aussi. */
+  inset: calc(-1 * var(--card-border-w, 1px));
+  pointer-events: none;
+  z-index: -1;
+  transition: background-color 0.2s ease;
+}
+.page-theme[data-page-layout="honeycomb"] .block-cell .block-shape-border {
+  clip-path: polygon(
+    evenodd,
+    50% 0,
+    100% 25%,
+    100% 75%,
+    50% 100%,
+    0 75%,
+    0 25%,
+    50% 0,
+    var(--hex-inner),
+    50% calc(var(--hex-b) * 1.1547)
+  );
+  background: var(--link-border);
+}
+.page-theme[data-page-layout="honeycomb"] .block-cell .block-shape-fill {
+  clip-path: polygon(var(--hex-inner));
+  background: var(--link-bg);
+}
+.page-theme[data-page-layout="honeycomb"]
+  .block-cell
+  .block-card:hover
+  .block-shape-border {
+  background: var(--accent, #6366f1);
+}
+.page-theme[data-page-layout="honeycomb"]
+  .block-cell
+  .block-card:hover
+  .block-shape-fill {
+  background: var(--link-hover);
+}
+
 /* Minimal : noir et blanc, cartes à simple contour. */
 .page-theme[data-page-style="minimal"] {
   --bg-color: #ffffff;
@@ -195,4 +388,39 @@ body {
 }
 .dark-mode .theme-toggle .fa-moon {
   display: none;
+}
+
+/* Nid d'abeille (#98) et styles : bordure 2 px en Minimal, flou du Verre sur
+   la couche de fond découpée, lueur Néon qui suit l'hexagone (drop-shadow). */
+.page-theme[data-page-style="minimal"] {
+  --shape-border-w: 2px;
+  --card-border-w: 2px;
+}
+.page-theme[data-page-style="glass"][data-page-layout="honeycomb"]
+  .block-cell
+  .block-card {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.page-theme[data-page-style="glass"][data-page-layout="honeycomb"]
+  .block-cell
+  .block-shape-fill {
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+.page-theme[data-page-style="neon"][data-page-layout="honeycomb"]
+  .block-cell
+  .block-card {
+  box-shadow: none;
+  filter: drop-shadow(
+    0 0 6px color-mix(in srgb, var(--accent) 60%, transparent)
+  );
+}
+.page-theme[data-page-style="neon"][data-page-layout="honeycomb"]
+  .block-cell
+  .block-card:hover {
+  box-shadow: none;
+  filter: drop-shadow(
+    0 0 12px color-mix(in srgb, var(--accent) 85%, transparent)
+  );
 }

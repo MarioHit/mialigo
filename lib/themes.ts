@@ -1,6 +1,8 @@
-// Thèmes de page (#19) : style, couleur d'accent et arrondis, stockés dans
-// users.theme. Listes à garder synchronisées avec la contrainte users_theme_check
-// (supabase-themes.sql). Le rendu est en CSS (app/globals.css, [data-page-style]).
+// Thèmes de page (#19) : style, couleur d'accent et arrondis, plus la
+// disposition des blocs (#98), stockés dans users.theme. Listes à garder
+// synchronisées avec la contrainte users_theme_check (supabase-themes.sql, puis
+// supabase-page-layout.sql). Le rendu est en CSS (app/globals.css,
+// [data-page-style], [data-page-layout], [data-page-density]).
 
 import type { CSSProperties } from "react";
 
@@ -10,11 +12,21 @@ export type ThemeStyle = (typeof THEME_STYLES)[number];
 export const THEME_RADII = ["none", "soft", "strong", "pill"] as const;
 export type ThemeRadius = (typeof THEME_RADII)[number];
 
+/** Disposition des blocs (#98) : grille, nid d'abeille (hexagones) ou bulles (cercles). */
+export const THEME_LAYOUTS = ["grid", "honeycomb", "bubbles"] as const;
+export type ThemeLayout = (typeof THEME_LAYOUTS)[number];
+
+/** Blocs par rangée en nid d'abeille et bulles : 3 puis 2, ou 2 puis 1 (plus grands). */
+export const THEME_DENSITIES = ["compact", "roomy"] as const;
+export type ThemeDensity = (typeof THEME_DENSITIES)[number];
+
 export interface PageTheme {
   style: ThemeStyle;
   /** Couleur d'accent, au format #rrggbb. */
   accent: string;
   radius: ThemeRadius;
+  layout: ThemeLayout;
+  density: ThemeDensity;
 }
 
 /** Thème appliqué quand users.theme est NULL : l'apparence d'avant les thèmes. */
@@ -22,11 +34,34 @@ export const DEFAULT_THEME: PageTheme = {
   style: "classic",
   accent: "#6366f1",
   radius: "pill",
+  layout: "grid",
+  density: "compact",
 };
 
-/** Deux thèmes identiques (style, accent, arrondi). */
+/** Deux thèmes identiques (style, accent, arrondi, disposition, densité). */
 export function sameTheme(a: PageTheme, b: PageTheme): boolean {
-  return a.style === b.style && a.accent === b.accent && a.radius === b.radius;
+  return (
+    a.style === b.style &&
+    a.accent === b.accent &&
+    a.radius === b.radius &&
+    a.layout === b.layout &&
+    a.density === b.density
+  );
+}
+
+/**
+ * Valeur à enregistrer dans users.theme : NULL pour le thème par défaut ;
+ * disposition et densité seulement si elles diffèrent du défaut (clés
+ * facultatives de la contrainte users_theme_check, supabase-page-layout.sql).
+ */
+export function serializeTheme(theme: PageTheme): Partial<PageTheme> | null {
+  if (sameTheme(theme, DEFAULT_THEME)) return null;
+  const { layout, density, ...rest } = theme;
+  return {
+    ...rest,
+    ...(layout !== DEFAULT_THEME.layout && { layout }),
+    ...(density !== DEFAULT_THEME.density && { density }),
+  };
 }
 
 export const THEME_STYLE_LABELS: Record<
@@ -56,6 +91,29 @@ export const THEME_RADIUS_LABELS: Record<ThemeRadius, string> = {
   soft: "Léger",
   strong: "Fort",
   pill: "Pilule",
+};
+
+export const THEME_LAYOUT_LABELS: Record<
+  ThemeLayout,
+  { label: string; description: string }
+> = {
+  grid: {
+    label: "Grille",
+    description: "Rectangles, chaque bloc a sa taille.",
+  },
+  honeycomb: {
+    label: "Nid d’abeille",
+    description: "Hexagones identiques qui s’emboîtent.",
+  },
+  bubbles: {
+    label: "Bulles",
+    description: "Cercles identiques en quinconce.",
+  },
+};
+
+export const THEME_DENSITY_LABELS: Record<ThemeDensity, string> = {
+  compact: "3 puis 2 par rangée",
+  roomy: "2 puis 1, plus grands",
 };
 
 /** Valeur CSS de --block-radius. */
@@ -104,6 +162,12 @@ export function parseTheme(value: unknown): PageTheme {
     radius: THEME_RADII.includes(raw.radius as ThemeRadius)
       ? (raw.radius as ThemeRadius)
       : DEFAULT_THEME.radius,
+    layout: THEME_LAYOUTS.includes(raw.layout as ThemeLayout)
+      ? (raw.layout as ThemeLayout)
+      : DEFAULT_THEME.layout,
+    density: THEME_DENSITIES.includes(raw.density as ThemeDensity)
+      ? (raw.density as ThemeDensity)
+      : DEFAULT_THEME.density,
   };
 }
 
@@ -166,10 +230,14 @@ export function accentContrastWarning(theme: PageTheme): string | null {
 /** Attributs du conteneur qui applique le thème (page publique, aperçu). */
 export function themeScopeProps(theme: PageTheme): {
   "data-page-style": ThemeStyle;
+  "data-page-layout": ThemeLayout;
+  "data-page-density": ThemeDensity;
   style: CSSProperties;
 } {
   return {
     "data-page-style": theme.style,
+    "data-page-layout": theme.layout,
+    "data-page-density": theme.density,
     style: {
       "--accent": theme.accent,
       "--accent-contrast": readableTextOn(theme.accent),

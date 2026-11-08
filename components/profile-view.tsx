@@ -60,7 +60,10 @@ export default function ProfileView({
         <h1 className="text-3xl font-semibold mb-2">{profile.name}</h1>
         <p className="profile-bio mb-8">{profile.bio}</p>
       </header>
-      <nav>{blocksSlot ?? <BlockList blocks={profile.blocks} />}</nav>
+      {/* block-nav : conteneur de mesure des dispositions nid d'abeille et bulles (#98). */}
+      <nav className="block-nav">
+        {blocksSlot ?? <BlockList blocks={profile.blocks} />}
+      </nav>
     </>
   );
 }
