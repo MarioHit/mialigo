@@ -19,12 +19,17 @@ L'aperçu combine les données enregistrées et les brouillons : nom et bio en c
 
 ### Ordre et tailles (grille bento)
 
-Voir [ADR-0018](decisions/0018-drag-drop-dnd-kit-grille-bento.md). La page affiche les blocs dans une grille à 2 colonnes (`BlockList`, `grid-flow-row-dense`) : `small` 1×1, `wide` 2×1 (défaut, la ligne habituelle), `large` 2×2. Dans le dashboard, déposer un lien à une nouvelle place met à jour l'aperçu tout de suite, puis enregistre tout l'ordre en une requête : `rpc("reorder_blocks", { ids })` (`SECURITY INVOKER`, filtrée sur `auth.uid()`). En cas d'échec, les blocs sont relus. Le changement de taille est un `update` de `links.size`.
+Voir [ADR-0018](decisions/0018-drag-drop-dnd-kit-grille-bento.md). La page affiche les blocs dans une grille à 2 colonnes (`BlockList`), strictement dans l'ordre choisi (pas de remplissage « dense », cf. ADR-0019) : `small` 1×1, `wide` 2×1 (défaut, la ligne habituelle), `large` 2×2. Dans le dashboard, déposer un lien à une nouvelle place met à jour l'aperçu tout de suite, puis enregistre tout l'ordre en une requête : `rpc("reorder_blocks", { ids })` (`SECURITY INVOKER`, filtrée sur `auth.uid()`). En cas d'échec, les blocs sont relus. Le changement de taille est un `update` de `links.size`.
 
 
-### Réorganiser depuis sa page publique
+### Modifier la disposition depuis sa page publique
 
-Voir [ADR-0019](decisions/0019-reorganiser-sur-la-page-publique.md). Sur `/<pseudo>`, le propriétaire (id de la session = `ownerId` transmis par `page.tsx`) voit un bouton « Réorganiser » (s'il a au moins deux blocs). Le mode charge `components/blocks/sortable-block-grid.tsx` à la demande : souris (5 px), appui long sur mobile (250 ms), clavier ; la vraie grille se réarrange pendant le glisser. « Enregistrer l'ordre » appelle `rpc("reorder_blocks", { ids })` (protégé par la RLS), puis `router.refresh()` ; « Annuler » rétablit l'ordre enregistré.
+Voir [ADR-0019](decisions/0019-reorganiser-sur-la-page-publique.md). Sur `/<pseudo>`, le propriétaire (id de la session = `ownerId` transmis par `page.tsx`) voit un bouton « Modifier la disposition ». Le mode charge `components/blocks/sortable-block-grid.tsx` à la demande :
+
+- **ordre** : souris (5 px), appui long sur mobile (250 ms), clavier ; le bloc survolé est mis en évidence et l'ordre ne change **qu'au dépôt** (réordonner au survol bouclait à l'infini avec des blocs de tailles différentes) ;
+- **taille** : barre « Petit / Large / Grand » sur chaque bloc, appliquée tout de suite à la grille.
+
+« Enregistrer » écrit les tailles modifiées (`update` de `links.size`), puis l'ordre s'il a changé (`rpc("reorder_blocks", { ids })`), protégés par la RLS, et appelle `router.refresh()` ; « Annuler » rétablit la disposition enregistrée.
 
 ---
 

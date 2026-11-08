@@ -8,7 +8,11 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ### Ajouté
 
-- Sur sa propre page, un bouton « Réorganiser » permet de déplacer ses blocs en voyant directement le résultat, aussi sur mobile (appui long puis glisser), puis d'enregistrer le nouvel ordre. ([#90])
+- Sur sa propre page, le bouton « Modifier la disposition » permet de déplacer ses blocs et de changer leur taille en voyant directement le résultat, aussi sur mobile (appui long puis glisser), puis d'enregistrer. ([#90])
+
+### Modifié
+
+- Les blocs suivent exactement l'ordre choisi : un petit bloc peut rester seul sur sa ligne. ([#90])
 
 ## [0.6.0] - 2026-11-08
 

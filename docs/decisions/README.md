@@ -32,5 +32,5 @@ Un ADR « Acceptée » n'est plus modifié sur le fond. Pour changer de décisio
 | [0015](0015-version-par-pr.md) | Chaque PR met à jour la version et le CHANGELOG elle-même | Acceptée | 2026-11-07 |
 | [0016](0016-photo-profil-banniere-storage.md) | Photo de profil et bannière dans Supabase Storage, Gravatar et GitHub copiés à l'import | Acceptée | 2026-11-07 |
 | [0017](0017-modele-blocs-registre-apercu.md) | Les liens deviennent des blocs typés, rendus par un registre et un aperçu partagé | Acceptée | 2026-11-08 |
-| [0018](0018-drag-drop-dnd-kit-grille-bento.md) | Réorganisation par drag & drop avec `@dnd-kit` et grille « bento » en CSS Grid | Acceptée | 2026-11-08 |
-| [0019](0019-reorganiser-sur-la-page-publique.md) | Réorganiser ses blocs directement sur sa page publique | Acceptée | 2026-11-08 |
+| [0018](0018-drag-drop-dnd-kit-grille-bento.md) | Réorganisation par drag & drop avec `@dnd-kit` et grille « bento » en CSS Grid | Acceptée, en partie remplacée par 0019 | 2026-11-08 |
+| [0019](0019-reorganiser-sur-la-page-publique.md) | Modifier la disposition de ses blocs (ordre et taille) directement sur sa page publique | Acceptée | 2026-11-08 |

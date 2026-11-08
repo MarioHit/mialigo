@@ -35,12 +35,13 @@ export const BLOCK_SIZE_LABELS: Record<BlockSize, string> = {
 };
 
 /**
- * Grille « bento » des blocs d'une page, dans l'ordre reçu. grid-flow-row-dense
- * comble les trous laissés par un petit bloc isolé avec le petit bloc suivant.
+ * Grille « bento » des blocs d'une page, strictement dans l'ordre reçu : un petit
+ * bloc suivi d'un bloc large reste seul sur sa ligne (pas de remplissage
+ * « dense », qui remontait le petit bloc suivant à côté, cf. ADR-0019).
  */
 export function BlockList({ blocks }: { blocks: Block[] }) {
   return (
-    <ul className="list-none p-0 grid grid-cols-2 grid-flow-row-dense auto-rows-[4.5rem] gap-4">
+    <ul className="list-none p-0 grid grid-cols-2 auto-rows-[4.5rem] gap-4">
       {blocks.map((block) => (
         <li key={block.id} className={BLOCK_SIZE_CLASSES[block.size]}>
           <BlockView block={block} />

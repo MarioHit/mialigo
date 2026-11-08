@@ -423,8 +423,9 @@ export default function BlocsPage() {
           Glissez la poignée{" "}
           <i className="fa-solid fa-grip-vertical" aria-hidden="true"></i> pour
           changer l’ordre ; la taille choisit la place du lien dans la grille de
-          votre page. Astuce : sur votre page, le bouton « Réorganiser » permet
-          de déplacer les blocs en voyant le vrai rendu.
+          votre page. Astuce : sur votre page, le bouton « Modifier la
+          disposition » permet de changer l’ordre et la taille en voyant le
+          vrai rendu.
         </p>
       )}
 

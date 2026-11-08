@@ -1,6 +1,6 @@
 # ADR-0018 : Réorganisation par drag & drop avec `@dnd-kit` et grille « bento » en CSS Grid
 
-- **Statut** : Acceptée
+- **Statut** : Acceptée, en partie remplacée par [ADR-0019](0019-reorganiser-sur-la-page-publique.md) (remplissage « dense »)
 - **Date** : 2026-11-08
 - **Issue / PR** : #18
 - **Découle de** : [ADR-0017](0017-modele-blocs-registre-apercu.md)
