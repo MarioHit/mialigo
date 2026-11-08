@@ -1,6 +1,7 @@
 import { IMAGE_SIZE } from "@/lib/avatars";
 import type { Block } from "@/lib/blocks";
 import Image from "next/image";
+import type { ReactNode } from "react";
 import { BlockList } from "./blocks/registry";
 
 export interface ProfileViewData {
@@ -18,8 +19,11 @@ export interface ProfileViewData {
 export default function ProfileView({
   profile,
   eager = false,
+  blocksSlot,
 }: {
   profile: ProfileViewData;
+  /** Remplace la grille des blocs (ex. grille triable du mode « Réorganiser »). */
+  blocksSlot?: ReactNode;
   /** Images chargées sans attendre (page publique, au-dessus de la ligne de flottaison). */
   eager?: boolean;
 }) {
@@ -56,9 +60,7 @@ export default function ProfileView({
         <h1 className="text-3xl font-semibold mb-2">{profile.name}</h1>
         <p className="profile-bio text-[#666] mb-8">{profile.bio}</p>
       </header>
-      <nav>
-        <BlockList blocks={profile.blocks} />
-      </nav>
+      <nav>{blocksSlot ?? <BlockList blocks={profile.blocks} />}</nav>
     </>
   );
 }
