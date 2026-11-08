@@ -28,6 +28,7 @@ See `docs/decisions/0010-versionnage-semver-tags.md` and `docs/decisions/0015-ve
   2. **Already ahead of `main`** (another PR started the next version): add your line to that top section and set its date to today. If your PR needs MINOR and the pending version is only a PATCH of `main`, raise it to the next MINOR (`0.3.1` → `0.4.0`): rename the section and its link.
   3. Set `package.json` and `package-lock.json` with `npm version X.Y.Z --no-git-tag-version` whenever the version changes.
   4. If `pre-prod` moved while your PR was open (conflict on `package.json` or `CHANGELOG.md`), merge `origin/pre-prod` into your branch and redo steps 1–3 from the new state.
+  5. Right before merging your PR into `pre-prod`, run `git fetch origin` and compare again with `git show origin/main:package.json`: if a release reached `main` while your PR was open (its version now equals your pending version, and its tag exists), your lines sit in a version already in production. Move them to a new section bumped from the new `main` version and redo step 3, before merging.
 - Never create the version tag by hand: on every push to `main`, the workflow `.github/workflows/version-tag.yml` reads the version from `package.json` and creates the annotated tag `vX.Y.Z` if it does not exist yet (see `docs/decisions/0011-tag-version-automatique.md`). After a release, check that it succeeded: `gh run list --workflow version-tag.yml --limit 1`, then `git ls-remote --tags origin vX.Y.Z`. Never move, delete or force-push an existing tag.
 
 <!-- BEGIN:nextjs-agent-rules -->
