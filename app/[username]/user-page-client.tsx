@@ -1,7 +1,9 @@
 "use client";
 
+import PageThemeScope from "@/components/page-theme-scope";
 import ProfileView, { type ProfileViewData } from "@/components/profile-view";
 import type { Block } from "@/lib/blocks";
+import type { PageTheme } from "@/lib/themes";
 import { supabaseClient } from "@/lib/supabase-auth";
 import type { Session } from "@supabase/supabase-js";
 import dynamic from "next/dynamic";
@@ -31,6 +33,8 @@ interface UserPageClientProps {
   userData: ProfileViewData;
   /** id du propriétaire de la page (public), pour afficher « Modifier la disposition ». */
   ownerId: string;
+  /** Thème de la page (#19), déjà validé côté serveur. */
+  theme: PageTheme;
 }
 
 const floatingButtonStyle = {
@@ -42,6 +46,7 @@ const floatingButtonStyle = {
 export default function UserPageClient({
   userData,
   ownerId,
+  theme,
 }: UserPageClientProps) {
   const [session, setSession] = useState<Session | null>(null);
   /** Disposition (ordre et tailles) en cours de modification ; null hors du mode. */
@@ -134,7 +139,10 @@ export default function UserPageClient({
     : userData;
 
   return (
-    <>
+    <PageThemeScope
+      theme={theme}
+      className="flex min-h-screen w-full flex-col items-center justify-center"
+    >
       {/* Bouton retour accueil */}
       <Link
         href="/"
@@ -241,6 +249,6 @@ export default function UserPageClient({
           )}
         </div>
       )}
-    </>
+    </PageThemeScope>
   );
 }

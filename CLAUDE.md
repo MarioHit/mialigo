@@ -49,7 +49,7 @@ Production runs SSR on Vercel (`vercel.json`); the GitHub Actions workflows are 
 - `app/[username]/page.tsx` — `force-dynamic` server component; redirects uppercase usernames to lowercase, `notFound()` if missing, then renders `user-page-client.tsx`. Static routes (`/login`, `/dashboard`, `/cgu`, …) take precedence over the dynamic segment, so a new top-level route effectively reserves that username.
 - Legal pages (`cgu`, `confidentialite`, `mentions-legales`, `contact`, `suppression-compte`) share `app/legal-page.tsx`.
 - Icons: Font Awesome 6.4 loaded from CDN in `app/layout.tsx`; links store the class string. `lib/social-networks.ts` is the catalog of networks and icon variants used by `app/dashboard/social-network-picker.tsx`.
-- Theme: `app/theme-toggle.tsx` (rendered in the root layout) persists light/dark in `localStorage`; colors are CSS variables in `app/globals.css`.
+- Theme: `app/theme-toggle.tsx` (rendered in the root layout) persists the visitor's light/dark choice in `localStorage`; colors are CSS variables in `app/globals.css`. Page themes (#19, ADR-0020): `users.theme` jsonb (`style` classic/glass/minimal/neon, `accent` #rrggbb, `radius`; CHECK `users_theme_check`, `NULL` = default) parsed by `parseTheme()` in `lib/themes.ts`, applied by `components/page-theme-scope.tsx` (`.page-theme[data-page-style]` redefining the CSS variables, `--accent`, `--block-radius`) on the public page and the dashboard preview; edited in `/dashboard/apparence`.
 
 ### Logging convention
 

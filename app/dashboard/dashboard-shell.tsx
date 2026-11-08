@@ -1,8 +1,10 @@
 "use client";
 
+import PageThemeScope from "@/components/page-theme-scope";
 import ProfileView from "@/components/profile-view";
 import { BLOCK_COLUMNS, toBlocks, type Block } from "@/lib/blocks";
 import { supabaseClient } from "@/lib/supabase-auth";
+import { parseTheme, type PageTheme } from "@/lib/themes";
 import type { Session, User } from "@supabase/supabase-js";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -28,6 +30,8 @@ export interface UserProfile {
   /** URL publique dans le bucket « avatars », null sans image. */
   avatar_url: string | null;
   banner_url: string | null;
+  /** Thème de la page, validé (thème par défaut si users.theme est NULL). */
+  theme: PageTheme;
 }
 
 /** Modifications pas encore enregistrées, montrées dans l'aperçu en direct. */
@@ -61,6 +65,7 @@ interface DashboardContextValue {
   setProfileDraft: (draft: ProfileDraft | null) => void;
   setEditDraft: (draft: BlockDraft | null) => void;
   setNewDraft: (draft: BlockDraft | null) => void;
+  setThemeDraft: (draft: PageTheme | null) => void;
 }
 
 const DashboardContext = createContext<DashboardContextValue | null>(null);
@@ -80,7 +85,7 @@ async function fetchProfile(userId: string): Promise<UserProfile | null> {
     .from("users")
     // Colonnes explicites : `email` n'est pas lisible via l'API (droits par colonne).
     // L'email de l'utilisateur connecté vient de la session (user.email).
-    .select("id, username, name, bio, avatar_url, banner_url")
+    .select("id, username, name, bio, avatar_url, banner_url, theme")
     .eq("id", userId)
     .maybeSingle();
 
@@ -93,7 +98,7 @@ async function fetchProfile(userId: string): Promise<UserProfile | null> {
   } else {
     console.warn("[Dashboard] Aucun profil associé à la session.");
   }
-  return data;
+  return data ? { ...data, theme: parseTheme(data.theme) } : null;
 }
 
 async function fetchBlocks(userId: string): Promise<Block[] | null> {
@@ -146,6 +151,7 @@ function previewBlocks(
 const tabs = [
   { href: "/dashboard/profil", label: "Profil" },
   { href: "/dashboard/blocs", label: "Liens" },
+  { href: "/dashboard/apparence", label: "Apparence" },
 ];
 
 export default function DashboardShell({
@@ -160,6 +166,7 @@ export default function DashboardShell({
   const [profileDraft, setProfileDraft] = useState<ProfileDraft | null>(null);
   const [editDraft, setEditDraft] = useState<BlockDraft | null>(null);
   const [newDraft, setNewDraft] = useState<BlockDraft | null>(null);
+  const [themeDraft, setThemeDraft] = useState<PageTheme | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -260,6 +267,7 @@ export default function DashboardShell({
         setProfileDraft,
         setEditDraft,
         setNewDraft,
+        setThemeDraft,
       }}
     >
       <div className="min-h-screen w-full bg-gray-50 dark:bg-gray-900 px-4 py-20 sm:px-6 sm:py-8 lg:px-8">
@@ -343,13 +351,10 @@ export default function DashboardShell({
                 Aperçu en direct
               </p>
               {/* inert : l'aperçu se regarde, ses liens ne s'ouvrent pas. */}
-              <div
+              <PageThemeScope
                 inert
+                theme={themeDraft ?? profile?.theme ?? parseTheme(null)}
                 className="max-h-[75vh] overflow-y-auto rounded-3xl border border-gray-300 dark:border-gray-600 p-5 text-center shadow-inner"
-                style={{
-                  backgroundColor: "var(--bg-color)",
-                  color: "var(--text-color)",
-                }}
               >
                 <ProfileView
                   profile={{
@@ -360,7 +365,7 @@ export default function DashboardShell({
                     blocks: previewBlocks(blocks, editDraft, newDraft),
                   }}
                 />
-              </div>
+              </PageThemeScope>
             </aside>
           </div>
         </div>

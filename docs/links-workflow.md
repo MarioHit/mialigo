@@ -7,6 +7,7 @@ Organisation du dashboard :
 - `/dashboard` redirige vers `/dashboard/profil` (c'est l'URL d'arrivée du magic link).
 - `app/dashboard/layout.tsx` enveloppe toutes les sous-pages dans `DashboardShell` (`app/dashboard/dashboard-shell.tsx`, composant client) : vérification de session (sinon `/login`), chargement du profil et des blocs, en-tête (« Voir ma page », déconnexion), onglets et **aperçu en direct**. Les sous-pages lisent `user`, `profile`, `reloadProfile()`, `blocks`, `reloadBlocks()` avec `useDashboard()`, et y poussent leurs brouillons (`setProfileDraft`, `setEditDraft`, `setNewDraft`).
 - `/dashboard/profil` (`app/dashboard/profil/page.tsx`) : pseudo, nom affiché, bio, et le bloc « Photo et bannière » (`profile-images.tsx`, action serveur `actions.ts`).
+- `/dashboard/apparence` (`app/dashboard/apparence/page.tsx`) : thème de la page (style, couleur d'accent, arrondis), voir [ADR-0020](decisions/0020-themes-de-page.md) ; brouillon dans l'aperçu (`setThemeDraft`), « Enregistrer » écrit `users.theme` (`NULL` pour le thème par défaut).
 - `/dashboard/blocs` (`app/dashboard/blocs/page.tsx`) : liste, ajout, modification et suppression des liens ; réorganisation par drag & drop (`@dnd-kit`, poignée, clavier : Espace puis flèches) et choix de la taille (petit / large / grand) de chaque bloc.
 
 
