@@ -1,6 +1,10 @@
 "use client";
 
 import { BLOCK_SIZE_LABELS } from "@/components/blocks/registry";
+import {
+  blockAnnouncements,
+  blockScreenReaderInstructions,
+} from "@/lib/block-dnd";
 import { BLOCK_SIZES, type Block, type BlockSize } from "@/lib/blocks";
 import { defaultNetworkIcon } from "@/lib/social-networks";
 import { supabaseClient } from "@/lib/supabase-auth";
@@ -11,7 +15,6 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  type Announcements,
   type DragEndEvent,
 } from "@dnd-kit/core";
 import {
@@ -121,27 +124,6 @@ export default function BlocsPage() {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
-
-  const titleOf = (id: string | number) =>
-    links.find((link) => link.id === id)?.title ?? "le lien";
-  const positionOf = (id: string | number) =>
-    links.findIndex((link) => link.id === id) + 1;
-
-  // Annonces pour les lecteurs d'écran, en français.
-  const announcements: Announcements = {
-    onDragStart: ({ active }) =>
-      `${titleOf(active.id)} saisi, position ${positionOf(active.id)} sur ${links.length}.`,
-    onDragOver: ({ active, over }) =>
-      over
-        ? `${titleOf(active.id)} au-dessus de la position ${positionOf(over.id)}.`
-        : undefined,
-    onDragEnd: ({ active, over }) =>
-      over
-        ? `${titleOf(active.id)} déposé en position ${positionOf(over.id)}.`
-        : `${titleOf(active.id)} déposé.`,
-    onDragCancel: ({ active }) =>
-      `Déplacement annulé, ${titleOf(active.id)} reste à sa place.`,
-  };
 
   const handleDragEnd = async ({ active, over }: DragEndEvent) => {
     if (!over || active.id === over.id) return;
@@ -304,11 +286,8 @@ export default function BlocsPage() {
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
             accessibility={{
-              announcements,
-              screenReaderInstructions: {
-                draggable:
-                  "Pour déplacer un lien, appuyez sur Espace, utilisez les flèches haut et bas, puis Espace pour le déposer ou Échap pour annuler.",
-              },
+              announcements: blockAnnouncements(links),
+              screenReaderInstructions: blockScreenReaderInstructions,
             }}
           >
             <SortableContext
@@ -444,7 +423,8 @@ export default function BlocsPage() {
           Glissez la poignée{" "}
           <i className="fa-solid fa-grip-vertical" aria-hidden="true"></i> pour
           changer l’ordre ; la taille choisit la place du lien dans la grille de
-          votre page.
+          votre page. Astuce : sur votre page, le bouton « Réorganiser » permet
+          de déplacer les blocs en voyant le vrai rendu.
         </p>
       )}
 

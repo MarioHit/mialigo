@@ -119,5 +119,5 @@ export default async function UserPage({ params }: PageProps) {
     blocks: toBlocks(blockRows),
   };
 
-  return <UserPageClient userData={pageData} />;
+  return <UserPageClient userData={pageData} ownerId={userData.id} />;
 }

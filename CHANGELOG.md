@@ -4,6 +4,12 @@ Toutes les évolutions notables de Mialigo sont consignées dans ce fichier, éc
 
 Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le projet respecte le [versionnage sémantique](https://semver.org/lang/fr/). Chaque version correspond à une mise en production : même numéro dans `package.json`, tag Git `vX.Y.Z` sur le merge vers `main`. Chaque modification inscrit sa ligne directement dans la section de la prochaine version, la plus haute du fichier tant qu'elle n'est pas en production. Les catégories sont celles de Keep a Changelog (Ajouté, Modifié, Obsolète, Supprimé, Corrigé, Sécurité), plus « Interne » pour les changements sans effet visible sur le site (voir [ADR-0010](docs/decisions/0010-versionnage-semver-tags.md) et [ADR-0015](docs/decisions/0015-version-par-pr.md)).
 
+## [0.7.0] - 2026-11-08
+
+### Ajouté
+
+- Sur sa propre page, un bouton « Réorganiser » permet de déplacer ses blocs en voyant directement le résultat, aussi sur mobile (appui long puis glisser), puis d'enregistrer le nouvel ordre. ([#90])
+
 ## [0.6.0] - 2026-11-08
 
 ### Ajouté
@@ -79,6 +85,7 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 - Pages légales : conditions générales d'utilisation, politique de confidentialité, mentions légales, contact et suppression de compte.
 - Les adresses email des utilisateurs ne sont jamais visibles publiquement.
 
+[0.7.0]: https://github.com/MarioHit/mialigo/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/MarioHit/mialigo/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/MarioHit/mialigo/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/MarioHit/mialigo/compare/v0.3.1...v0.4.0
@@ -99,3 +106,4 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 [#72]: https://github.com/MarioHit/mialigo/issues/72
 [#78]: https://github.com/MarioHit/mialigo/issues/78
 [#85]: https://github.com/MarioHit/mialigo/issues/85
+[#90]: https://github.com/MarioHit/mialigo/issues/90
