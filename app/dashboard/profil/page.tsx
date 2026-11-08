@@ -4,6 +4,7 @@ import { isReservedUsername } from "@/lib/reserved-usernames";
 import { supabaseClient } from "@/lib/supabase-auth";
 import { useState } from "react";
 import { useDashboard } from "../dashboard-shell";
+import ProfileImages from "./profile-images";
 
 function debug(message: string) {
   if (process.env.NODE_ENV !== "production") {
@@ -87,64 +88,73 @@ export default function ProfilPage() {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
-      <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
-        Mon Profil
-      </h2>
-      <form onSubmit={handleSaveProfile} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-            Nom d’utilisateur (URL)
-          </label>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-            <span className="text-gray-500 shrink-0">mialigo.com/</span>
+    <div className="space-y-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
+        <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+          Mon Profil
+        </h2>
+        <form onSubmit={handleSaveProfile} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+              Nom d’utilisateur (URL)
+            </label>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+              <span className="text-gray-500 shrink-0">mialigo.com/</span>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) =>
+                  setUsername(
+                    e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""),
+                  )
+                }
+                className="w-full min-w-0 flex-1 px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+              Nom affiché
+            </label>
             <input
               type="text"
-              value={username}
-              onChange={(e) =>
-                setUsername(
-                  e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""),
-                )
-              }
-              className="w-full min-w-0 flex-1 px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               required
             />
           </div>
-        </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-            Nom affiché
-          </label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-            required
-          />
-        </div>
+          <div>
+            <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+              Bio
+            </label>
+            <textarea
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              rows={3}
+              className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            />
+          </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-            Bio
-          </label>
-          <textarea
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-            rows={3}
-            className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          />
-        </div>
+          <button
+            type="submit"
+            disabled={saving}
+            className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
+          >
+            {saving ? "Enregistrement..." : "💾 Enregistrer"}
+          </button>
+        </form>
+      </div>
 
-        <button
-          type="submit"
-          disabled={saving}
-          className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
-        >
-          {saving ? "Enregistrement..." : "💾 Enregistrer"}
-        </button>
-      </form>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
+        <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+          Photo et bannière
+        </h2>
+        <ProfileImages />
+      </div>
     </div>
   );
 }

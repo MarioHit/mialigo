@@ -6,7 +6,7 @@ Organisation du dashboard :
 
 - `/dashboard` redirige vers `/dashboard/profil` (c'est l'URL d'arrivée du magic link).
 - `app/dashboard/layout.tsx` enveloppe toutes les sous-pages dans `DashboardShell` (`app/dashboard/dashboard-shell.tsx`, composant client) : vérification de session (sinon `/login`), chargement du profil, en-tête (« Voir ma page », déconnexion) et onglets. Les sous-pages lisent `user`, `profile` et `reloadProfile()` avec `useDashboard()`.
-- `/dashboard/profil` (`app/dashboard/profil/page.tsx`) : pseudo, nom affiché, bio.
+- `/dashboard/profil` (`app/dashboard/profil/page.tsx`) : pseudo, nom affiché, bio, et le bloc « Photo et bannière » (`profile-images.tsx`, action serveur `actions.ts`).
 - `/dashboard/blocs` (`app/dashboard/blocs/page.tsx`) : liste, ajout, modification et suppression des liens.
 
 ---
@@ -72,3 +72,44 @@ sequenceDiagram
 - `[Dashboard] ✅ Lien ajouté avec succès.`
 - `[Dashboard] 🗑️ Suppression du lien ID: "<linkId>"`
 - `[Dashboard] 💾 Mise à jour du lien ID: "<linkId>"`
+
+---
+
+## Photo de profil et bannière
+
+Voir [ADR-0016](decisions/0016-photo-profil-banniere-storage.md). Images dans le bucket Supabase Storage public `avatars`, un dossier par utilisateur (`<id>/avatar-<horodatage>.webp`, `<id>/banner-…`), URL publiques dans `users.avatar_url` / `users.banner_url` (script `supabase-avatars.sql`).
+
+- **Envoi** : recadrage centré et redimensionnement dans le navigateur (avatar 400 × 400, bannière 1500 × 500, WebP), envoi direct au bucket, mise à jour du profil, puis suppression de l'ancien fichier.
+- **Gravatar / GitHub** : action serveur `importAvatar` ; l'email n'est lu que dans la session, l'empreinte SHA-256 n'est envoyée qu'à Gravatar, l'image est copiée dans le bucket.
+- **Suppression** : `avatar_url` / `banner_url` à `NULL`, puis suppression du fichier.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Utilisateur
+    participant Browser as Navigateur (Client)
+    participant Action as Action serveur (Vercel)
+    participant Ext as Gravatar / GitHub
+    participant Storage as Supabase Storage
+    participant SupaDB as Supabase PostgreSQL
+
+    Note over User, SupaDB: Cas 1 : Envoi d'une image
+    User->>Browser: Choisit un fichier
+    Browser->>Browser: Recadrage + redimensionnement (canvas, WebP)
+    Browser->>Storage: upload avatars/<id>/avatar-<ts>.webp
+    Note over Storage: Policy : dossier = auth.uid()
+    Browser->>SupaDB: UPDATE users SET avatar_url WHERE id = user.id
+    Browser->>Storage: remove(ancien fichier)
+
+    Note over User, SupaDB: Cas 2 : Import Gravatar ou GitHub
+    User->>Browser: « Utiliser mon Gravatar » / pseudo GitHub
+    Browser->>Action: importAvatar(source, pseudo)
+    Action->>Action: getUser() (session) ; SHA-256 de l'email pour Gravatar
+    Action->>Ext: GET image (d=404 / size=400)
+    Ext-->>Action: image ou 404
+    Action->>Storage: upload avatars/<id>/avatar-<ts>.<ext> (session utilisateur)
+    Action->>SupaDB: UPDATE users SET avatar_url
+    Action->>Storage: remove(ancien fichier)
+    Action-->>Browser: { ok, avatarUrl } ou { ok: false, error }
+```
+

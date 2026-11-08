@@ -23,6 +23,9 @@ export interface UserProfile {
   username: string;
   name: string;
   bio: string;
+  /** URL publique dans le bucket « avatars », null sans image. */
+  avatar_url: string | null;
+  banner_url: string | null;
 }
 
 interface DashboardContextValue {
@@ -50,7 +53,7 @@ async function fetchProfile(userId: string): Promise<UserProfile | null> {
     .from("users")
     // Colonnes explicites : `email` n'est pas lisible via l'API (droits par colonne).
     // L'email de l'utilisateur connecté vient de la session (user.email).
-    .select("id, username, name, bio")
+    .select("id, username, name, bio, avatar_url, banner_url")
     .eq("id", userId)
     .maybeSingle();
 

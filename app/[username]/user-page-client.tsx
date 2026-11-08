@@ -1,12 +1,16 @@
 "use client";
 
 import { supabaseClient } from "@/lib/supabase-auth";
+import { IMAGE_SIZE } from "@/lib/avatars";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 interface UserData {
   name: string;
   bio: string;
+  avatarUrl: string | null;
+  bannerUrl: string | null;
   links: Array<{ title: string; url: string; icon: string }>;
 }
 
@@ -75,6 +79,31 @@ export default function UserPageClient({ userData }: UserPageClientProps) {
 
       <main className="w-full max-w-md text-center p-5">
         <header className="mb-8">
+          {userData.bannerUrl && (
+            <div className="aspect-[3/1] w-full overflow-hidden rounded-2xl mb-4">
+              <Image
+                src={userData.bannerUrl}
+                alt=""
+                width={IMAGE_SIZE.banner.width}
+                height={IMAGE_SIZE.banner.height}
+                loading="eager"
+                className="h-full w-full object-cover"
+              />
+            </div>
+          )}
+          {userData.avatarUrl && (
+            <Image
+              src={userData.avatarUrl}
+              alt={`Photo de profil de ${userData.name}`}
+              width={IMAGE_SIZE.avatar.width}
+              height={IMAGE_SIZE.avatar.height}
+              loading="eager"
+              className={`mx-auto mb-4 h-24 w-24 rounded-full object-cover border-4 ${
+                userData.bannerUrl ? "-mt-16 relative" : ""
+              }`}
+              style={{ borderColor: "var(--bg-color)" }}
+            />
+          )}
           <h1 className="text-3xl font-semibold mb-2">{userData.name}</h1>
           <p className="profile-bio text-[#666] mb-8">{userData.bio}</p>
         </header>

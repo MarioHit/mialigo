@@ -24,7 +24,7 @@ const getProfile = cache(async (username: string) => {
   // Colonnes explicites : `email` n'est pas lisible publiquement (droits par colonne).
   const { data, error } = await supabase
     .from("users")
-    .select("id, username, name, bio")
+    .select("id, username, name, bio, avatar_url, banner_url")
     .eq("username", username)
     .single();
 
@@ -39,12 +39,16 @@ export async function generateMetadata({
   const profile = await getProfile(user);
 
   if (!profile) {
-    return { title: `Page introuvable - ${siteName}`, robots: { index: false } };
+    return {
+      title: `Page introuvable - ${siteName}`,
+      robots: { index: false },
+    };
   }
 
   const title = `${profile.name} - ${siteName}`;
   const description =
-    profile.bio?.trim() || `Retrouvez tous les liens de ${profile.name} sur ${siteName}.`;
+    profile.bio?.trim() ||
+    `Retrouvez tous les liens de ${profile.name} sur ${siteName}.`;
 
   return {
     title,
@@ -57,8 +61,16 @@ export async function generateMetadata({
       type: "profile",
       siteName,
       locale: "fr_FR",
+      ...(profile.avatar_url && {
+        images: [{ url: profile.avatar_url, alt: profile.name }],
+      }),
     },
-    twitter: { card: "summary", title, description },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+      ...(profile.avatar_url && { images: [profile.avatar_url] }),
+    },
   };
 }
 
@@ -101,6 +113,8 @@ export default async function UserPage({ params }: PageProps) {
   const userWithLinks = {
     name: userData.name,
     bio: userData.bio || "",
+    avatarUrl: userData.avatar_url,
+    bannerUrl: userData.banner_url,
     links:
       links?.map((link) => ({
         title: link.title,

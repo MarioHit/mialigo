@@ -24,8 +24,9 @@ export default function DeleteAccountPage() {
 
       <h2>Données concernées</h2>
       <p>
-        La demande concerne le compte, le profil utilisateur et les liens qui
-        lui sont associés, sous réserve des obligations légales de conservation.
+        La demande concerne le compte, le profil utilisateur, sa photo de
+        profil, sa bannière et les liens qui lui sont associés, sous réserve des
+        obligations légales de conservation.
       </p>
 
       <h2>Délai de traitement</h2>
