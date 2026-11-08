@@ -2,6 +2,7 @@ import {
   blockAlign,
   type Block,
   type BlockAlign,
+  type BlockShape,
   type BlockProps,
   type BlockSize,
   type BlockType,
@@ -63,6 +64,37 @@ export const BLOCK_ALIGN_ICONS: Record<BlockAlign, string> = {
   center: "fa-solid fa-align-center",
   end: "fa-solid fa-align-right",
 };
+
+/** Libellés des formes (#20) ; « theme » = arrondi du thème, pas de data.shape. */
+export const BLOCK_SHAPE_LABELS: Record<BlockShape | "theme", string> = {
+  theme: "Thème",
+  square: "Coins droits",
+  circle: "Rond",
+  octagon: "Octogone",
+  hexagon: "Hexagone",
+};
+
+const SWATCH_CLIP: Partial<Record<BlockShape, string>> = {
+  octagon:
+    "polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%)",
+  hexagon: "polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%)",
+};
+
+/** Vignette d'une forme, pour les menus de choix. */
+export function ShapeSwatch({ shape }: { shape: BlockShape | null }) {
+  const radius =
+    shape === "square" ? "0" : shape === "circle" ? "9999px" : "0.3rem";
+  return (
+    <span
+      aria-hidden="true"
+      className="inline-block h-4 w-6 bg-current"
+      style={{
+        borderRadius: shape && SWATCH_CLIP[shape] ? 0 : radius,
+        clipPath: shape ? SWATCH_CLIP[shape] : undefined,
+      }}
+    />
+  );
+}
 
 /** Classes de placement d'un bloc dans la grille (taille, puis position). */
 export function blockGridClass(block: Block): string {

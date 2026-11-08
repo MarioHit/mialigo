@@ -1,4 +1,9 @@
-import type { BlockProps, BlockSize } from "@/lib/blocks";
+import {
+  CLIPPED_SHAPES,
+  blockShape,
+  type BlockProps,
+  type BlockSize,
+} from "@/lib/blocks";
 
 /** Forme de la carte selon la taille du bloc dans la grille. */
 const layout: Record<BlockSize, { card: string; icon: string; title: string }> =
@@ -26,19 +31,30 @@ const layout: Record<BlockSize, { card: string; icon: string; title: string }> =
 /** Bloc « link » : carte cliquable avec icône Font Awesome et titre. */
 export default function LinkCard({ block }: BlockProps) {
   const style = layout[block.size];
+  const shape = blockShape(block);
+  const clipped = shape !== null && CLIPPED_SHAPES.includes(shape);
   return (
     <a
       href={block.url}
       className={`block-card flex h-full w-full items-center border no-underline font-medium transition-all duration-200 hover:-translate-y-0.5 ${style.card}`}
       data-size={block.size}
+      data-shape={shape ?? undefined}
       target="_blank"
       rel="noopener noreferrer"
     >
+      {/* Forme découpée (#20) : bordure et fond en deux couches, car un
+          clip-path coupe la bordure de la carte elle-même. */}
+      {clipped && (
+        <>
+          <span className="block-shape-border" aria-hidden="true"></span>
+          <span className="block-shape-fill" aria-hidden="true"></span>
+        </>
+      )}
       <i
-        className={`${block.icon} shrink-0 text-center ${style.icon}`}
+        className={`${block.icon} relative shrink-0 text-center ${style.icon}`}
         aria-hidden="true"
       ></i>
-      <span className={`min-w-0 ${style.title}`}>{block.title}</span>
+      <span className={`relative min-w-0 ${style.title}`}>{block.title}</span>
     </a>
   );
 }

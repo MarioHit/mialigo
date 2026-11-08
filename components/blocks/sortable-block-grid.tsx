@@ -10,11 +10,15 @@ import {
 } from "@/lib/block-dnd";
 import {
   BLOCK_ALIGNS,
+  BLOCK_SHAPES,
   BLOCK_SIZES,
   blockAlign,
+  blockShape,
   withAlign,
+  withShape,
   type Block,
   type BlockAlign,
+  type BlockShape,
   type BlockSize,
 } from "@/lib/blocks";
 import {
@@ -41,6 +45,8 @@ import { useMemo, useState } from "react";
 import {
   BLOCK_ALIGN_ICONS,
   BLOCK_ALIGN_LABELS,
+  BLOCK_SHAPE_LABELS,
+  ShapeSwatch,
   BLOCK_SIZE_LABELS,
   BlockView,
   blockGridClass,
@@ -73,6 +79,9 @@ function SortableTile({
   isTarget,
   onResize,
   onAlign,
+  onShape,
+  shapeMenuOpen,
+  onToggleShapeMenu,
 }: {
   block: Block;
   /** Bloc survolé : le bloc déplacé sera déposé à sa place. */
@@ -80,12 +89,18 @@ function SortableTile({
   onResize: (size: BlockSize) => void;
   /** null : retour au placement automatique. */
   onAlign: (align: BlockAlign | null) => void;
+  /** null : retour à la forme du thème. */
+  onShape: (shape: BlockShape | null) => void;
+  /** Menu des formes de ce bloc ouvert (un seul à la fois, géré par la grille). */
+  shapeMenuOpen: boolean;
+  onToggleShapeMenu: () => void;
 }) {
   const { attributes, listeners, setNodeRef, isDragging } = useSortable({
     id: block.id,
   });
   const title = block.title || "le bloc";
   const align = blockAlign(block);
+  const shape = blockShape(block);
 
   return (
     <li
@@ -104,7 +119,7 @@ function SortableTile({
         <BlockView block={block} />
       </div>
 
-      {/* Taille (et position d'un petit bloc) : posées sur le bord bas, dans l'espace entre les lignes. */}
+      {/* Taille, forme (et position d'un petit bloc) : posées sur le bord bas, dans l'espace entre les lignes. */}
       <div
         {...stopDrag}
         className="absolute -bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-1"
@@ -132,6 +147,59 @@ function SortableTile({
               </button>
             );
           })}
+        </div>
+
+        {/* Forme (#20) : bouton qui ouvre un petit menu au-dessus de la barre. */}
+        <div className="relative">
+          <button
+            type="button"
+            onClick={onToggleShapeMenu}
+            aria-expanded={shapeMenuOpen}
+            aria-label={`Forme de ${title} : ${BLOCK_SHAPE_LABELS[shape ?? "theme"]}`}
+            title="Forme du bloc"
+            className={`flex h-full cursor-pointer items-center rounded-full border px-2 py-0.5 text-[11px] shadow-sm ${
+              shape ? "bg-indigo-600 text-white" : ""
+            }`}
+            style={shape ? undefined : toolbarStyle}
+          >
+            <i className="fa-solid fa-shapes" aria-hidden="true"></i>
+          </button>
+          {shapeMenuOpen && (
+            <div
+              role="group"
+              aria-label={`Forme de ${title}`}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") onToggleShapeMenu();
+              }}
+              className="absolute bottom-full left-1/2 mb-2 flex -translate-x-1/2 gap-1 rounded-xl border p-1 shadow-lg"
+              style={toolbarStyle}
+            >
+              {([null, ...BLOCK_SHAPES] as (BlockShape | null)[]).map(
+                (value) => {
+                  const selected = shape === value;
+                  const label = BLOCK_SHAPE_LABELS[value ?? "theme"];
+                  return (
+                    <button
+                      key={value ?? "theme"}
+                      type="button"
+                      aria-pressed={selected}
+                      aria-label={`Forme de ${title} : ${label}`}
+                      title={label}
+                      onClick={() => onShape(value)}
+                      className={`flex cursor-pointer flex-col items-center gap-0.5 rounded-lg px-1.5 py-1 text-[10px] ${
+                        selected
+                          ? "bg-indigo-600 text-white"
+                          : "hover:opacity-80"
+                      }`}
+                    >
+                      <ShapeSwatch shape={value} />
+                      <span className="whitespace-nowrap">{label}</span>
+                    </button>
+                  );
+                },
+              )}
+            </div>
+          )}
         </div>
 
         {block.size === "small" && (
@@ -184,6 +252,8 @@ export default function SortableBlockGrid({
 }) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
+  /** Bloc dont le menu des formes est ouvert. */
+  const [shapeMenuId, setShapeMenuId] = useState<string | null>(null);
 
   const sensors = useSensors(
     // Souris : 5 px avant de commencer, un clic simple ne déplace rien.
@@ -211,8 +281,10 @@ export default function SortableBlockGrid({
     setOverId(null);
   };
 
-  const handleDragStart = ({ active }: DragStartEvent) =>
+  const handleDragStart = ({ active }: DragStartEvent) => {
     setActiveId(String(active.id));
+    setShapeMenuId(null);
+  };
 
   // Survol : seulement la mise en évidence de la cible, sans toucher à l'ordre.
   const handleDragOver = ({ active, over }: DragOverEvent) => {
@@ -232,6 +304,15 @@ export default function SortableBlockGrid({
     onChange(
       blocks.map((block) => (block.id === id ? { ...block, size } : block)),
     );
+
+  const handleShape = (id: string, shape: BlockShape | null) => {
+    onChange(
+      blocks.map((block) =>
+        block.id === id ? withShape(block, shape) : block,
+      ),
+    );
+    setShapeMenuId(null);
+  };
 
   const handleAlign = (id: string, align: BlockAlign | null) =>
     onChange(
@@ -263,6 +344,13 @@ export default function SortableBlockGrid({
               isTarget={block.id === overId}
               onResize={(size) => handleResize(block.id, size)}
               onAlign={(align) => handleAlign(block.id, align)}
+              onShape={(shape) => handleShape(block.id, shape)}
+              shapeMenuOpen={shapeMenuId === block.id}
+              onToggleShapeMenu={() =>
+                setShapeMenuId((current) =>
+                  current === block.id ? null : block.id,
+                )
+              }
             />
           ))}
         </ul>

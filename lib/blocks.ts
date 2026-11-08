@@ -46,12 +46,46 @@ export function blockAlign(block: Block): BlockAlign | null {
     : null;
 }
 
+/**
+ * Copie du bloc avec une clé de data modifiée (null : clé supprimée). Les
+ * autres clés sont conservées.
+ */
+export function withData(
+  block: Block,
+  key: string,
+  value: string | null,
+): Block {
+  const data = { ...block.data };
+  if (value === null) delete data[key];
+  else data[key] = value;
+  return { ...block, data };
+}
+
 /** Copie du bloc avec une nouvelle position (null : automatique). */
 export function withAlign(block: Block, align: BlockAlign | null): Block {
-  const data = { ...block.data };
-  if (align) data.align = align;
-  else delete data.align;
-  return { ...block, data };
+  return withData(block, "align", align);
+}
+
+/**
+ * Forme d'un bloc (#20), stockée dans data.shape. Sans valeur : l'arrondi du
+ * thème de la page (#19).
+ */
+export const BLOCK_SHAPES = ["square", "circle", "octagon", "hexagon"] as const;
+export type BlockShape = (typeof BLOCK_SHAPES)[number];
+
+/** Formes découpées par clip-path (double couche pour la bordure). */
+export const CLIPPED_SHAPES: readonly BlockShape[] = ["octagon", "hexagon"];
+
+/** Forme choisie ; null = forme du thème. */
+export function blockShape(block: Block): BlockShape | null {
+  const shape = block.data.shape;
+  return BLOCK_SHAPES.includes(shape as BlockShape)
+    ? (shape as BlockShape)
+    : null;
+}
+
+export function withShape(block: Block, shape: BlockShape | null): Block {
+  return withData(block, "shape", shape);
 }
 
 function isBlockType(value: unknown): value is BlockType {

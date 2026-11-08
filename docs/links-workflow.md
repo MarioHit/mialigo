@@ -29,11 +29,12 @@ Voir [ADR-0019](decisions/0019-reorganiser-sur-la-page-publique.md). Sur `/<pseu
 
 - **ordre** : souris (5 px), appui long sur mobile (250 ms), clavier ; le bloc survolé est mis en évidence et l'ordre ne change **qu'au dépôt** (réordonner au survol bouclait à l'infini avec des blocs de tailles différentes) ;
 - **taille** : barre « Petit / Large / Grand » sur chaque bloc, appliquée tout de suite à la grille ;
+- **forme** (#20, [ADR-0021](decisions/0021-forme-par-bloc.md)) : bouton « Forme » dans la barre de chaque bloc, menu Thème / Coins droits / Rond / Octogone / Hexagone (`data.shape`) ; aussi dans `/dashboard/blocs` (sélecteur « Forme ») ;
 - **position** (petits blocs) : Gauche / Centre / Droite (`data.align`, `blockGridClass` dans `components/blocks/registry.tsx`) ; sans valeur, prochaine case libre ; un second appui sur la position choisie revient à l'automatique. Aussi dans `/dashboard/blocs` (sélecteur « Auto / Gauche / Centre / Droite »).
 
 Le bouton « 🎨 Apparence » ouvre un panneau en bas d'écran avec le sélecteur de thème (`components/theme-picker.tsx`, chargé à la demande) : la page change en direct.
 
-« Enregistrer » écrit le thème s'il a changé (`users.theme`), les tailles et positions modifiées (`update` de `links.size` / `links.data`), puis l'ordre s'il a changé (`rpc("reorder_blocks", { ids })`), protégés par la RLS, et appelle `router.refresh()` ; « Annuler » rétablit la disposition enregistrée.
+« Enregistrer » écrit le thème s'il a changé (`users.theme`), les tailles, positions et formes modifiées (`update` de `links.size` / `links.data`), puis l'ordre s'il a changé (`rpc("reorder_blocks", { ids })`), protégés par la RLS, et appelle `router.refresh()` ; « Annuler » rétablit la disposition enregistrée.
 
 ---
 

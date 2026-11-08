@@ -109,14 +109,14 @@ export default function UserPageClient({
     setSavingLayout(true);
     debug("[UserPage] Enregistrement de la personnalisation de la page.");
 
-    // Taille ou position (data.align) modifiée : un seul update par bloc.
+    // Taille ou data (position, forme…) modifiée : un seul update par bloc.
     const saved = new Map(userData.blocks.map((block) => [block.id, block]));
     const changed = draftLayout.filter((block) => {
       const before = saved.get(block.id);
       return (
         !before ||
         before.size !== block.size ||
-        before.data.align !== block.data.align
+        JSON.stringify(before.data) !== JSON.stringify(block.data)
       );
     });
     const orderChanged = draftLayout.some(

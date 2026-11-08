@@ -2,6 +2,7 @@
 
 import {
   BLOCK_ALIGN_LABELS,
+  BLOCK_SHAPE_LABELS,
   BLOCK_SIZE_LABELS,
 } from "@/components/blocks/registry";
 import {
@@ -10,11 +11,15 @@ import {
 } from "@/lib/block-dnd";
 import {
   BLOCK_ALIGNS,
+  BLOCK_SHAPES,
   BLOCK_SIZES,
   blockAlign,
+  blockShape,
   withAlign,
+  withShape,
   type Block,
   type BlockAlign,
+  type BlockShape,
   type BlockSize,
 } from "@/lib/blocks";
 import { defaultNetworkIcon } from "@/lib/social-networks";
@@ -158,6 +163,19 @@ export default function BlocsPage() {
       .eq("id", link.id);
     if (error) {
       console.error("[Dashboard] Échec du changement de position.");
+      alert("Erreur : " + error.message);
+    }
+    await reloadBlocks();
+  };
+
+  const handleShapeChange = async (link: Block, shape: BlockShape | null) => {
+    debug("[Dashboard] Changement de forme d'un bloc.");
+    const { error } = await supabaseClient
+      .from("links")
+      .update({ data: withShape(link, shape).data })
+      .eq("id", link.id);
+    if (error) {
+      console.error("[Dashboard] Échec du changement de forme.");
       alert("Erreur : " + error.message);
     }
     await reloadBlocks();
@@ -414,6 +432,24 @@ export default function BlocsPage() {
                             {BLOCK_SIZES.map((size) => (
                               <option key={size} value={size}>
                                 {BLOCK_SIZE_LABELS[size]}
+                              </option>
+                            ))}
+                          </select>
+                          <select
+                            value={blockShape(link) ?? ""}
+                            onChange={(e) =>
+                              handleShapeChange(
+                                link,
+                                (e.target.value || null) as BlockShape | null,
+                              )
+                            }
+                            aria-label={`Forme de ${link.title}`}
+                            className="px-2 py-1 text-sm border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                          >
+                            <option value="">{BLOCK_SHAPE_LABELS.theme}</option>
+                            {BLOCK_SHAPES.map((shape) => (
+                              <option key={shape} value={shape}>
+                                {BLOCK_SHAPE_LABELS[shape]}
                               </option>
                             ))}
                           </select>

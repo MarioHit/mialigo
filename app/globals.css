@@ -78,6 +78,81 @@ body {
   border-radius: min(var(--block-radius, 9999px), 1.75rem);
 }
 
+/* ============================================================
+   Forme par bloc (#20, data.shape) : prioritaire sur l'arrondi
+   du thème. Coins droits et rond : border-radius. Octogone et
+   hexagone : clip-path en double couche (bordure + fond), la
+   carte elle-même devient transparente.
+   ============================================================ */
+.page-theme .block-card[data-shape="square"] {
+  border-radius: 0;
+}
+.page-theme .block-card[data-shape="circle"] {
+  border-radius: 50%;
+}
+.page-theme .block-card[data-shape="octagon"] {
+  --shape-clip: polygon(
+    14px 0,
+    calc(100% - 14px) 0,
+    100% 14px,
+    100% calc(100% - 14px),
+    calc(100% - 14px) 100%,
+    14px 100%,
+    0 calc(100% - 14px),
+    0 14px
+  );
+}
+.page-theme .block-card[data-shape="hexagon"] {
+  --shape-clip: polygon(
+    16px 0,
+    calc(100% - 16px) 0,
+    100% 50%,
+    calc(100% - 16px) 100%,
+    16px 100%,
+    0 50%
+  );
+}
+.page-theme .block-card[data-shape="octagon"],
+.page-theme .block-card[data-shape="hexagon"] {
+  position: relative;
+  isolation: isolate;
+  border-color: transparent;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.page-theme .block-card[data-shape="hexagon"] {
+  /* Le contenu ne déborde pas dans les pointes. */
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+.block-shape-border,
+.block-shape-fill {
+  position: absolute;
+  clip-path: var(--shape-clip);
+  pointer-events: none;
+  transition: background-color 0.2s ease;
+}
+.block-shape-border {
+  /* La carte a une bordure transparente : on couvre aussi cette bordure. */
+  inset: calc(-1 * var(--card-border-w, 1px));
+  background: var(--link-border);
+  z-index: -1;
+}
+.block-shape-fill {
+  inset: calc(var(--shape-border-w, 1px) - var(--card-border-w, 1px));
+  background: var(--link-bg);
+  z-index: -1;
+}
+.block-card:hover .block-shape-border {
+  background: var(--accent, #6366f1);
+}
+.block-card:hover .block-shape-fill {
+  background: var(--link-hover);
+}
+
 /* Minimal : noir et blanc, cartes à simple contour. */
 .page-theme[data-page-style="minimal"] {
   --bg-color: #ffffff;
@@ -97,6 +172,10 @@ body {
 .page-theme[data-page-style="minimal"] .block-card {
   border-width: 2px;
   box-shadow: none;
+}
+.page-theme[data-page-style="minimal"] {
+  --shape-border-w: 2px;
+  --card-border-w: 2px;
 }
 
 /* Verre : fond dégradé de l'accent, cartes translucides floutées. */
@@ -144,6 +223,10 @@ body {
   background-attachment: fixed;
 }
 .page-theme[data-page-style="glass"] .block-card {
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+.page-theme[data-page-style="glass"] .block-shape-fill {
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
 }
@@ -195,4 +278,27 @@ body {
 }
 .dark-mode .theme-toggle .fa-moon {
   display: none;
+}
+
+/* Néon et formes découpées : la lueur suit la forme (drop-shadow), pas le rectangle. */
+.page-theme[data-page-style="neon"] .block-card[data-shape="octagon"],
+.page-theme[data-page-style="neon"] .block-card[data-shape="hexagon"] {
+  box-shadow: none;
+  filter: drop-shadow(
+    0 0 6px color-mix(in srgb, var(--accent) 60%, transparent)
+  );
+}
+.page-theme[data-page-style="neon"] .block-card[data-shape="octagon"]:hover,
+.page-theme[data-page-style="neon"] .block-card[data-shape="hexagon"]:hover {
+  box-shadow: none;
+  filter: drop-shadow(
+    0 0 12px color-mix(in srgb, var(--accent) 85%, transparent)
+  );
+}
+
+/* Verre et formes découpées : le flou est sur la couche de fond découpée, pas sur la carte. */
+.page-theme[data-page-style="glass"] .block-card[data-shape="octagon"],
+.page-theme[data-page-style="glass"] .block-card[data-shape="hexagon"] {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }

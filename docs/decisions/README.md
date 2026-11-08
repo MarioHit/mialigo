@@ -35,3 +35,4 @@ Un ADR « Acceptée » n'est plus modifié sur le fond. Pour changer de décisio
 | [0018](0018-drag-drop-dnd-kit-grille-bento.md) | Réorganisation par drag & drop avec `@dnd-kit` et grille « bento » en CSS Grid | Acceptée, en partie remplacée par 0019 | 2026-11-08 |
 | [0019](0019-reorganiser-sur-la-page-publique.md) | Modifier la disposition de ses blocs (ordre, taille, position) directement sur sa page publique | Acceptée | 2026-11-08 |
 | [0020](0020-themes-de-page.md) | Thèmes de page en variables CSS, stockés dans `users.theme` (jsonb validé par CHECK) | Acceptée | 2026-11-08 |
+| [0021](0021-forme-par-bloc.md) | Forme par bloc dans `links.data`, `border-radius` ou `clip-path` en double couche | Acceptée | 2026-11-08 |
