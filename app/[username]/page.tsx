@@ -1,5 +1,6 @@
 import { BLOCK_COLUMNS, toBlocks } from "@/lib/blocks";
 import { supabase } from "@/lib/supabase";
+import { parseTheme } from "@/lib/themes";
 import { siteName } from "@/lib/site";
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
@@ -25,7 +26,7 @@ const getProfile = cache(async (username: string) => {
   // Colonnes explicites : `email` n'est pas lisible publiquement (droits par colonne).
   const { data, error } = await supabase
     .from("users")
-    .select("id, username, name, bio, avatar_url, banner_url")
+    .select("id, username, name, bio, avatar_url, banner_url, theme")
     .eq("username", username)
     .single();
 
@@ -119,5 +120,11 @@ export default async function UserPage({ params }: PageProps) {
     blocks: toBlocks(blockRows),
   };
 
-  return <UserPageClient userData={pageData} ownerId={userData.id} />;
+  return (
+    <UserPageClient
+      userData={pageData}
+      ownerId={userData.id}
+      theme={parseTheme(userData.theme)}
+    />
+  );
 }
