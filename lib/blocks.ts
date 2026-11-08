@@ -9,6 +9,13 @@ export type BlockType = (typeof BLOCK_TYPES)[number];
 export const BLOCK_SIZES = ["small", "wide", "large"] as const;
 export type BlockSize = (typeof BLOCK_SIZES)[number];
 
+/**
+ * Position d'un petit bloc dans sa ligne, stockée dans data.align (aucune
+ * colonne dédiée). Sans valeur : placement automatique (prochaine case libre).
+ */
+export const BLOCK_ALIGNS = ["start", "center", "end"] as const;
+export type BlockAlign = (typeof BLOCK_ALIGNS)[number];
+
 export interface Block {
   id: string;
   type: BlockType;
@@ -28,6 +35,23 @@ export const BLOCK_COLUMNS = "id, type, title, url, icon, data, size, order";
 /** Props reçues par chaque composant de bloc du registre. */
 export interface BlockProps {
   block: Block;
+}
+
+/** Position choisie d'un petit bloc ; null = automatique (ou bloc non petit). */
+export function blockAlign(block: Block): BlockAlign | null {
+  if (block.size !== "small") return null;
+  const align = block.data.align;
+  return BLOCK_ALIGNS.includes(align as BlockAlign)
+    ? (align as BlockAlign)
+    : null;
+}
+
+/** Copie du bloc avec une nouvelle position (null : automatique). */
+export function withAlign(block: Block, align: BlockAlign | null): Block {
+  const data = { ...block.data };
+  if (align) data.align = align;
+  else delete data.align;
+  return { ...block, data };
 }
 
 function isBlockType(value: unknown): value is BlockType {

@@ -1,4 +1,11 @@
-import type { Block, BlockProps, BlockSize, BlockType } from "@/lib/blocks";
+import {
+  blockAlign,
+  type Block,
+  type BlockAlign,
+  type BlockProps,
+  type BlockSize,
+  type BlockType,
+} from "@/lib/blocks";
 import type { ComponentType } from "react";
 import LinkCard from "./link-card";
 
@@ -35,14 +42,46 @@ export const BLOCK_SIZE_LABELS: Record<BlockSize, string> = {
 };
 
 /**
- * Grille « bento » des blocs d'une page, dans l'ordre reçu. grid-flow-row-dense
- * comble les trous laissés par un petit bloc isolé avec le petit bloc suivant.
+ * Position d'un petit bloc : gauche (1re colonne), droite (2e colonne) ou
+ * centre (ligne entière, largeur d'un petit bloc, centré). Sans position, le
+ * bloc prend la prochaine case libre.
+ */
+const BLOCK_ALIGN_CLASSES: Record<BlockAlign, string> = {
+  start: "col-start-1",
+  center: "col-span-2 justify-self-center w-[calc(50%-0.5rem)]",
+  end: "col-start-2",
+};
+
+export const BLOCK_ALIGN_LABELS: Record<BlockAlign, string> = {
+  start: "Gauche",
+  center: "Centre",
+  end: "Droite",
+};
+
+export const BLOCK_ALIGN_ICONS: Record<BlockAlign, string> = {
+  start: "fa-solid fa-align-left",
+  center: "fa-solid fa-align-center",
+  end: "fa-solid fa-align-right",
+};
+
+/** Classes de placement d'un bloc dans la grille (taille, puis position). */
+export function blockGridClass(block: Block): string {
+  const align = blockAlign(block);
+  return align
+    ? `${BLOCK_SIZE_CLASSES[block.size]} ${BLOCK_ALIGN_CLASSES[align]}`
+    : BLOCK_SIZE_CLASSES[block.size];
+}
+
+/**
+ * Grille « bento » des blocs d'une page, strictement dans l'ordre reçu : un petit
+ * bloc suivi d'un bloc large reste seul sur sa ligne (pas de remplissage
+ * « dense », qui remontait le petit bloc suivant à côté, cf. ADR-0019).
  */
 export function BlockList({ blocks }: { blocks: Block[] }) {
   return (
-    <ul className="list-none p-0 grid grid-cols-2 grid-flow-row-dense auto-rows-[4.5rem] gap-4">
+    <ul className="list-none p-0 grid grid-cols-2 auto-rows-[4.5rem] gap-4">
       {blocks.map((block) => (
-        <li key={block.id} className={BLOCK_SIZE_CLASSES[block.size]}>
+        <li key={block.id} className={blockGridClass(block)}>
           <BlockView block={block} />
         </li>
       ))}

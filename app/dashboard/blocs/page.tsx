@@ -1,7 +1,22 @@
 "use client";
 
-import { BLOCK_SIZE_LABELS } from "@/components/blocks/registry";
-import { BLOCK_SIZES, type Block, type BlockSize } from "@/lib/blocks";
+import {
+  BLOCK_ALIGN_LABELS,
+  BLOCK_SIZE_LABELS,
+} from "@/components/blocks/registry";
+import {
+  blockAnnouncements,
+  blockScreenReaderInstructions,
+} from "@/lib/block-dnd";
+import {
+  BLOCK_ALIGNS,
+  BLOCK_SIZES,
+  blockAlign,
+  withAlign,
+  type Block,
+  type BlockAlign,
+  type BlockSize,
+} from "@/lib/blocks";
 import { defaultNetworkIcon } from "@/lib/social-networks";
 import { supabaseClient } from "@/lib/supabase-auth";
 import {
@@ -11,7 +26,6 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  type Announcements,
   type DragEndEvent,
 } from "@dnd-kit/core";
 import {
@@ -122,27 +136,6 @@ export default function BlocsPage() {
     }),
   );
 
-  const titleOf = (id: string | number) =>
-    links.find((link) => link.id === id)?.title ?? "le lien";
-  const positionOf = (id: string | number) =>
-    links.findIndex((link) => link.id === id) + 1;
-
-  // Annonces pour les lecteurs d'écran, en français.
-  const announcements: Announcements = {
-    onDragStart: ({ active }) =>
-      `${titleOf(active.id)} saisi, position ${positionOf(active.id)} sur ${links.length}.`,
-    onDragOver: ({ active, over }) =>
-      over
-        ? `${titleOf(active.id)} au-dessus de la position ${positionOf(over.id)}.`
-        : undefined,
-    onDragEnd: ({ active, over }) =>
-      over
-        ? `${titleOf(active.id)} déposé en position ${positionOf(over.id)}.`
-        : `${titleOf(active.id)} déposé.`,
-    onDragCancel: ({ active }) =>
-      `Déplacement annulé, ${titleOf(active.id)} reste à sa place.`,
-  };
-
   const handleDragEnd = async ({ active, over }: DragEndEvent) => {
     if (!over || active.id === over.id) return;
     const from = links.findIndex((link) => link.id === active.id);
@@ -154,6 +147,20 @@ export default function BlocsPage() {
     const ok = await reorderBlocks(arrayMove(links, from, to));
     setSavingOrder(false);
     if (!ok) alert("Impossible d’enregistrer le nouvel ordre. Réessayez.");
+  };
+
+  const handleAlignChange = async (link: Block, align: BlockAlign | null) => {
+    debug("[Dashboard] Changement de position d'un bloc.");
+    // data complet (les autres clés sont conservées par withAlign).
+    const { error } = await supabaseClient
+      .from("links")
+      .update({ data: withAlign(link, align).data })
+      .eq("id", link.id);
+    if (error) {
+      console.error("[Dashboard] Échec du changement de position.");
+      alert("Erreur : " + error.message);
+    }
+    await reloadBlocks();
   };
 
   const handleSizeChange = async (linkId: string, size: BlockSize) => {
@@ -304,11 +311,8 @@ export default function BlocsPage() {
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
             accessibility={{
-              announcements,
-              screenReaderInstructions: {
-                draggable:
-                  "Pour déplacer un lien, appuyez sur Espace, utilisez les flèches haut et bas, puis Espace pour le déposer ou Échap pour annuler.",
-              },
+              announcements: blockAnnouncements(links),
+              screenReaderInstructions: blockScreenReaderInstructions,
             }}
           >
             <SortableContext
@@ -413,6 +417,26 @@ export default function BlocsPage() {
                               </option>
                             ))}
                           </select>
+                          {link.size === "small" && (
+                            <select
+                              value={blockAlign(link) ?? ""}
+                              onChange={(e) =>
+                                handleAlignChange(
+                                  link,
+                                  (e.target.value || null) as BlockAlign | null,
+                                )
+                              }
+                              aria-label={`Position de ${link.title} dans sa ligne`}
+                              className="px-2 py-1 text-sm border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                            >
+                              <option value="">Auto</option>
+                              {BLOCK_ALIGNS.map((align) => (
+                                <option key={align} value={align}>
+                                  {BLOCK_ALIGN_LABELS[align]}
+                                </option>
+                              ))}
+                            </select>
+                          )}
                           <button
                             type="button"
                             onClick={() => handleEditLink(link)}
@@ -444,7 +468,9 @@ export default function BlocsPage() {
           Glissez la poignée{" "}
           <i className="fa-solid fa-grip-vertical" aria-hidden="true"></i> pour
           changer l’ordre ; la taille choisit la place du lien dans la grille de
-          votre page.
+          votre page. Astuce : sur votre page, le bouton « Modifier la
+          disposition » permet de changer l’ordre et la taille en voyant le vrai
+          rendu.
         </p>
       )}
 
