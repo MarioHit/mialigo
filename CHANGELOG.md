@@ -10,6 +10,10 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 - Nouvelle « Disposition » dans l'apparence de sa page : en plus de la grille habituelle, le « Nid d'abeille » (des hexagones qui s'emboîtent) et les « Bulles » (des cercles en quinconce), avec 3 puis 2 blocs par rangée ou 2 puis 1 plus grands. Les blocs y ont tous la même taille ; les tailles choisies reviennent si l'on repasse en grille. ([#98])
 
+### Interne
+
+- Mise en place d'un cadre de travail commun (« software factory ») : modèles pour décrire chaque besoin avec ses critères d'acceptation, checklist de fin dans chaque demande de modification, et une page qui explique la démarche. ([#104])
+
 ## [0.8.0] - 2026-11-08
 
 ### Ajouté
@@ -127,3 +131,4 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 [#85]: https://github.com/MarioHit/mialigo/issues/85
 [#90]: https://github.com/MarioHit/mialigo/issues/90
 [#98]: https://github.com/MarioHit/mialigo/issues/98
+[#104]: https://github.com/MarioHit/mialigo/issues/104
