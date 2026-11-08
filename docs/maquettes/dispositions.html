@@ -167,7 +167,16 @@
 
   /* Nid d'abeille : hexagones pointe en haut, découpés, bordure et fond en deux couches. */
   .weave.hex li { aspect-ratio: 1 / 1.1547; }
-  .weave.hex .card { --clip: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); }
+  /* Bordure en anneau (hexagone évidé, evenodd) et fond à l'intérieur : rien ne se
+     superpose, un fond transparent (Minimal, Néon, Verre) le reste. */
+  .weave.hex .card {
+    --b: var(--bw, 1px);
+    --inner: 50% calc(var(--b) * 1.1547), calc(100% - var(--b)) calc(25% + var(--b) * 0.577),
+             calc(100% - var(--b)) calc(75% - var(--b) * 0.577), 50% calc(100% - var(--b) * 1.1547),
+             var(--b) calc(75% - var(--b) * 0.577), var(--b) calc(25% + var(--b) * 0.577);
+  }
+  .weave.hex .shape-border { clip-path: polygon(evenodd, 50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%, 50% 0, var(--inner), 50% calc(var(--b) * 1.1547)); }
+  .weave.hex .shape-fill { inset: calc(-1 * var(--bw, 1px)); clip-path: polygon(var(--inner)); }
   /* Bulles : cercles, simple border-radius (bordure et ombre gardées). */
   .weave.bub li { aspect-ratio: 1; }
   .weave.bub .card { border-radius: 50%; padding: 0 16%; }
@@ -178,7 +187,6 @@
   .shape-border, .shape-fill { position: absolute; clip-path: var(--clip); pointer-events: none; z-index: -1; transition: background-color 0.2s ease; }
   .shape-border { inset: calc(-1 * var(--bw, 1px)); background: var(--link-border); }
   .shape-fill { inset: 0; background: var(--link-bg); }
-  .page-theme[data-style="minimal"] .shape-fill { inset: 0; }
   .card[data-clip]:hover .shape-border { background: var(--accent); }
   .card[data-clip]:hover .shape-fill { background: var(--link-hover); }
   .page-theme[data-style="glass"] .shape-fill { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }

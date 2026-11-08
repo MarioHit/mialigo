@@ -205,10 +205,21 @@ body {
 }
 
 /* Nid d'abeille : hexagone pointe en haut. Un clip-path couperait la bordure
-   et les ombres de la carte : elle devient transparente, une couche découpée
-   dessine la bordure, une autre le fond par-dessus. */
+   et les ombres de la carte : elle devient transparente, et deux couches
+   découpées, de même boîte, dessinent l'une la bordure (un anneau : hexagone
+   évidé, règle evenodd), l'autre le fond à l'intérieur de l'anneau. Rien ne se
+   superpose : un fond transparent (Minimal, Néon, Verre) le reste.
+   Hexagone intérieur décalé de --hex-b perpendiculairement aux côtés : les
+   pointes haute et basse bougent de 1,1547 × b, les autres de (b ; 0,577 × b). */
 .page-theme[data-page-layout="honeycomb"] .block-cell .block-card {
-  --shape-clip: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  --hex-b: var(--shape-border-w, 1px);
+  --hex-inner:
+    50% calc(var(--hex-b) * 1.1547),
+    calc(100% - var(--hex-b)) calc(25% + var(--hex-b) * 0.577),
+    calc(100% - var(--hex-b)) calc(75% - var(--hex-b) * 0.577),
+    50% calc(100% - var(--hex-b) * 1.1547),
+    var(--hex-b) calc(75% - var(--hex-b) * 0.577),
+    var(--hex-b) calc(25% + var(--hex-b) * 0.577);
   position: relative;
   isolation: isolate;
   border-radius: 0;
@@ -222,18 +233,29 @@ body {
 .page-theme[data-page-layout="honeycomb"] .block-cell .block-shape-fill {
   display: block;
   position: absolute;
-  clip-path: var(--shape-clip);
+  /* La carte a une bordure transparente : les couches la couvrent aussi. */
+  inset: calc(-1 * var(--card-border-w, 1px));
   pointer-events: none;
   z-index: -1;
   transition: background-color 0.2s ease;
 }
 .page-theme[data-page-layout="honeycomb"] .block-cell .block-shape-border {
-  /* La carte a une bordure transparente : la couche couvre aussi cette bordure. */
-  inset: calc(-1 * var(--card-border-w, 1px));
+  clip-path: polygon(
+    evenodd,
+    50% 0,
+    100% 25%,
+    100% 75%,
+    50% 100%,
+    0 75%,
+    0 25%,
+    50% 0,
+    var(--hex-inner),
+    50% calc(var(--hex-b) * 1.1547)
+  );
   background: var(--link-border);
 }
 .page-theme[data-page-layout="honeycomb"] .block-cell .block-shape-fill {
-  inset: calc(var(--shape-border-w, 1px) - var(--card-border-w, 1px));
+  clip-path: polygon(var(--hex-inner));
   background: var(--link-bg);
 }
 .page-theme[data-page-layout="honeycomb"]
