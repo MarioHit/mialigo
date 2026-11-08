@@ -73,15 +73,17 @@ export function blockGridClass(block: Block): string {
 }
 
 /**
- * Grille « bento » des blocs d'une page, strictement dans l'ordre reçu : un petit
+ * Grille « bento » des blocs d'une page, strictement dans l'ordre reçu. Les
+ * classes block-grid / block-cell permettent aux dispositions nid d'abeille et
+ * bulles (#98, app/globals.css) de redisposer les mêmes éléments en CSS. Un petit
  * bloc suivi d'un bloc large reste seul sur sa ligne (pas de remplissage
  * « dense », qui remontait le petit bloc suivant à côté, cf. ADR-0019).
  */
 export function BlockList({ blocks }: { blocks: Block[] }) {
   return (
-    <ul className="list-none p-0 grid grid-cols-2 auto-rows-[4.5rem] gap-4">
+    <ul className="block-grid list-none p-0 grid grid-cols-2 auto-rows-[4.5rem] gap-4">
       {blocks.map((block) => (
-        <li key={block.id} className={blockGridClass(block)}>
+        <li key={block.id} className={`block-cell ${blockGridClass(block)}`}>
           <BlockView block={block} />
         </li>
       ))}

@@ -2,7 +2,12 @@
 
 import ThemePicker from "@/components/theme-picker";
 import { supabaseClient } from "@/lib/supabase-auth";
-import { DEFAULT_THEME, sameTheme, type PageTheme } from "@/lib/themes";
+import {
+  DEFAULT_THEME,
+  sameTheme,
+  serializeTheme,
+  type PageTheme,
+} from "@/lib/themes";
 import { useEffect, useState } from "react";
 import { useDashboard } from "../dashboard-shell";
 
@@ -47,10 +52,12 @@ export default function ApparencePage() {
     setSaving(true);
     debug("[Dashboard] Enregistrement du thème.");
     // Thème par défaut : NULL, la page garde l'apparence standard.
-    const value = sameTheme(theme, DEFAULT_THEME) ? null : theme;
     const { error } = await supabaseClient
       .from("users")
-      .update({ theme: value, updated_at: new Date().toISOString() })
+      .update({
+        theme: serializeTheme(theme),
+        updated_at: new Date().toISOString(),
+      })
       .eq("id", user.id);
 
     if (error) {

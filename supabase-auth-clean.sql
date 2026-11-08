@@ -18,6 +18,7 @@
 --   6. supabase-blocks.sql                (#16, liens → blocs typés)
 --   7. supabase-reorder-blocks.sql        (#18, reorder_blocks, taille « wide » par défaut)
 --   8. supabase-themes.sql                (#19, users.theme)
+--   9. supabase-page-layout.sql           (#98, disposition et densité dans users.theme)
 -- Toute nouvelle migration : un nouveau fichier supabase-*.sql non destructif,
 -- ajouté à cette liste, ET sa définition recopiée dans ce fichier.
 
@@ -34,16 +35,19 @@ CREATE TABLE users (
   bio TEXT,
   avatar_url TEXT,
   banner_url TEXT,
-  -- Thème de page (#19, même définition que supabase-themes.sql ; listes
-  -- synchronisées avec lib/themes.ts). NULL = thème par défaut.
+  -- Thème de page (#19, disposition #98 : même définition que
+  -- supabase-page-layout.sql ; listes synchronisées avec lib/themes.ts).
+  -- NULL = thème par défaut.
   theme JSONB CONSTRAINT users_theme_check CHECK (
     theme IS NULL OR (
       jsonb_typeof(theme) = 'object'
       AND theme ?& ARRAY['style', 'accent', 'radius']
-      AND (theme - ARRAY['style', 'accent', 'radius']) = '{}'::jsonb
+      AND (theme - ARRAY['style', 'accent', 'radius', 'layout', 'density']) = '{}'::jsonb
       AND (theme->>'style') IN ('classic', 'glass', 'minimal', 'neon')
       AND (theme->>'accent') ~ '^#[0-9a-fA-F]{6}$'
       AND (theme->>'radius') IN ('none', 'soft', 'strong', 'pill')
+      AND (NOT theme ? 'layout' OR (theme->>'layout') IN ('grid', 'honeycomb', 'bubbles'))
+      AND (NOT theme ? 'density' OR (theme->>'density') IN ('compact', 'roomy'))
     )
   ),
   created_at TIMESTAMPTZ DEFAULT NOW(),

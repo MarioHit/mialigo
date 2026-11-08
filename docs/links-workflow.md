@@ -7,7 +7,7 @@ Organisation du dashboard :
 - `/dashboard` redirige vers `/dashboard/profil` (c'est l'URL d'arrivée du magic link).
 - `app/dashboard/layout.tsx` enveloppe toutes les sous-pages dans `DashboardShell` (`app/dashboard/dashboard-shell.tsx`, composant client) : vérification de session (sinon `/login`), chargement du profil et des blocs, en-tête (« Voir ma page », déconnexion), onglets et **aperçu en direct**. Les sous-pages lisent `user`, `profile`, `reloadProfile()`, `blocks`, `reloadBlocks()` avec `useDashboard()`, et y poussent leurs brouillons (`setProfileDraft`, `setEditDraft`, `setNewDraft`).
 - `/dashboard/profil` (`app/dashboard/profil/page.tsx`) : pseudo, nom affiché, bio, et le bloc « Photo et bannière » (`profile-images.tsx`, action serveur `actions.ts`).
-- `/dashboard/apparence` (`app/dashboard/apparence/page.tsx`) : thème de la page (style, couleur d'accent, arrondis), voir [ADR-0020](decisions/0020-themes-de-page.md) ; brouillon dans l'aperçu (`setThemeDraft`), « Enregistrer » écrit `users.theme` (`NULL` pour le thème par défaut).
+- `/dashboard/apparence` (`app/dashboard/apparence/page.tsx`) : thème de la page (style, disposition et densité, couleur d'accent, arrondis), voir [ADR-0020](decisions/0020-themes-de-page.md) et [ADR-0022](decisions/0022-disposition-nid-abeille-bulles.md) ; brouillon dans l'aperçu (`setThemeDraft`), « Enregistrer » écrit `users.theme` avec `serializeTheme()` (`NULL` pour le thème par défaut, `layout` / `density` seulement hors défaut). En nid d'abeille et en bulles, tous les blocs ont la même taille (CSS `[data-page-layout]` sur les mêmes `.block-grid` / `.block-cell`) : taille et position restent enregistrées et ne servent qu'en Grille.
 - `/dashboard/blocs` (`app/dashboard/blocs/page.tsx`) : liste, ajout, modification et suppression des liens ; réorganisation par drag & drop (`@dnd-kit`, poignée, clavier : Espace puis flèches) et choix de la taille (petit / large / grand) de chaque bloc.
 
 
@@ -31,7 +31,7 @@ Voir [ADR-0019](decisions/0019-reorganiser-sur-la-page-publique.md). Sur `/<pseu
 - **taille** : barre « Petit / Large / Grand » sur chaque bloc, appliquée tout de suite à la grille ;
 - **position** (petits blocs) : Gauche / Centre / Droite (`data.align`, `blockGridClass` dans `components/blocks/registry.tsx`) ; sans valeur, prochaine case libre ; un second appui sur la position choisie revient à l'automatique. Aussi dans `/dashboard/blocs` (sélecteur « Auto / Gauche / Centre / Droite »).
 
-Le bouton « 🎨 Apparence » ouvre un panneau en bas d'écran avec le sélecteur de thème (`components/theme-picker.tsx`, chargé à la demande) : la page change en direct.
+Le bouton « 🎨 Apparence » ouvre un panneau en bas d'écran avec le sélecteur de thème (`components/theme-picker.tsx`, chargé à la demande) : la page change en direct, disposition comprise. En nid d'abeille et en bulles, la grille triable reçoit `layout` et masque les boutons de taille et de position (seul l'ordre compte).
 
 « Enregistrer » écrit le thème s'il a changé (`users.theme`), les tailles et positions modifiées (`update` de `links.size` / `links.data`), puis l'ordre s'il a changé (`rpc("reorder_blocks", { ids })`), protégés par la RLS, et appelle `router.refresh()` ; « Annuler » rétablit la disposition enregistrée.
 

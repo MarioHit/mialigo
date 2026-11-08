@@ -117,7 +117,10 @@ export default function BlocsPage() {
     reorderBlocks,
     setEditDraft,
     setNewDraft,
+    profile,
   } = useDashboard();
+  // Nid d'abeille et bulles (#98) : tailles et positions sans effet sur la page.
+  const uniformLayout = profile !== null && profile.theme.layout !== "grid";
   const [editingLinkId, setEditingLinkId] = useState<string | null>(null);
   const [savingLinkId, setSavingLinkId] = useState<string | null>(null);
   const [editedLink, setEditedLink] = useState<LinkFields>({
@@ -471,6 +474,13 @@ export default function BlocsPage() {
           votre page. Astuce : sur votre page, le bouton « Modifier la
           disposition » permet de changer l’ordre et la taille en voyant le vrai
           rendu.
+        </p>
+      )}
+      {uniformLayout && (
+        <p className="-mt-3 mb-6 text-xs text-amber-700 dark:text-amber-400">
+          Votre page est en nid d’abeille ou en bulles : tous les blocs y ont la
+          même taille, la taille et la position choisies ici ne s’appliquent
+          qu’en Grille (onglet Apparence).
         </p>
       )}
 

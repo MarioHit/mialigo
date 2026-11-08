@@ -34,11 +34,17 @@ export default function LinkCard({ block }: BlockProps) {
       target="_blank"
       rel="noopener noreferrer"
     >
+      {/* Nid d'abeille (#98) : bordure et fond de l'hexagone en deux couches,
+          car un clip-path coupe la bordure de la carte. Masquées ailleurs (CSS). */}
+      <span className="block-shape-border" aria-hidden="true"></span>
+      <span className="block-shape-fill" aria-hidden="true"></span>
       <i
-        className={`${block.icon} shrink-0 text-center ${style.icon}`}
+        className={`block-icon ${block.icon} shrink-0 text-center ${style.icon}`}
         aria-hidden="true"
       ></i>
-      <span className={`min-w-0 ${style.title}`}>{block.title}</span>
+      <span className={`block-title min-w-0 ${style.title}`}>
+        {block.title}
+      </span>
     </a>
   );
 }
