@@ -16,6 +16,7 @@
 --   4. supabase-fix-email-exposure.sql    (#14, email non lisible via l'API)
 --   5. supabase-avatars.sql               (#15, photo de profil et bannière)
 --   6. supabase-blocks.sql                (#16, liens → blocs typés)
+--   7. supabase-reorder-blocks.sql        (#18, reorder_blocks, taille « wide » par défaut)
 -- Toute nouvelle migration : un nouveau fichier supabase-*.sql non destructif,
 -- ajouté à cette liste, ET sa définition recopiée dans ce fichier.
 
@@ -48,7 +49,7 @@ CREATE TABLE links (
   -- types et tailles synchronisés avec lib/blocks.ts)
   type TEXT NOT NULL DEFAULT 'link' CONSTRAINT links_type_check CHECK (type IN ('link')),
   data JSONB NOT NULL DEFAULT '{}'::jsonb CONSTRAINT links_data_check CHECK (jsonb_typeof(data) = 'object'),
-  size TEXT NOT NULL DEFAULT 'small' CONSTRAINT links_size_check CHECK (size IN ('small', 'wide', 'large')),
+  size TEXT NOT NULL DEFAULT 'wide' CONSTRAINT links_size_check CHECK (size IN ('small', 'wide', 'large')),
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -227,6 +228,23 @@ $$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = '';
 CREATE INDEX idx_users_username ON users(LOWER(username));
 CREATE INDEX idx_links_user_id ON links(user_id);
 CREATE INDEX idx_links_order ON links("order");
+
+-- 9b. Réordonner les blocs en une requête (#18, même définition que supabase-reorder-blocks.sql)
+CREATE OR REPLACE FUNCTION public.reorder_blocks(ids UUID[])
+RETURNS VOID
+LANGUAGE sql
+SECURITY INVOKER
+SET search_path = ''
+AS $$
+  UPDATE public.links AS l
+  SET "order" = t.pos
+  FROM unnest(ids) WITH ORDINALITY AS t(id, pos)
+  WHERE l.id = t.id
+    AND l.user_id = (SELECT auth.uid());
+$$;
+
+REVOKE EXECUTE ON FUNCTION public.reorder_blocks(UUID[]) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.reorder_blocks(UUID[]) TO authenticated;
 
 -- 10. Storage : photo de profil et bannière (bucket public « avatars »)
 -- Même définition que supabase-avatars.sql (#15) : chacun n'écrit que dans « <auth.uid()>/… ».

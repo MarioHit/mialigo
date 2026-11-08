@@ -1,8 +1,27 @@
 "use client";
 
+import { BLOCK_SIZE_LABELS } from "@/components/blocks/registry";
+import { BLOCK_SIZES, type Block, type BlockSize } from "@/lib/blocks";
 import { defaultNetworkIcon } from "@/lib/social-networks";
 import { supabaseClient } from "@/lib/supabase-auth";
-import type { Block } from "@/lib/blocks";
+import {
+  closestCenter,
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type Announcements,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { useEffect, useState } from "react";
 import { useDashboard } from "../dashboard-shell";
 import SocialNetworkPicker from "../social-network-picker";
@@ -19,6 +38,56 @@ interface LinkFields {
   icon: string;
 }
 
+/** Ligne déplaçable de la liste ; `children` reçoit la poignée à afficher. */
+function SortableRow({
+  id,
+  label,
+  disabled,
+  children,
+}: {
+  id: string;
+  label: string;
+  disabled: boolean;
+  children: (handle: React.ReactNode) => React.ReactNode;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id, disabled });
+
+  // Poignée : glisser à la souris ou au doigt, ou Espace puis flèches au clavier.
+  const handle = (
+    <button
+      type="button"
+      ref={setActivatorNodeRef}
+      {...attributes}
+      {...listeners}
+      aria-label={`Déplacer ${label}`}
+      disabled={disabled}
+      className="shrink-0 self-center px-1 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 cursor-grab active:cursor-grabbing touch-none disabled:cursor-not-allowed disabled:opacity-40"
+    >
+      <i className="fa-solid fa-grip-vertical" aria-hidden="true"></i>
+    </button>
+  );
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+      className={`flex items-start gap-3 sm:gap-4 p-3 sm:p-4 border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-600 ${
+        isDragging ? "relative z-10 shadow-lg" : ""
+      }`}
+    >
+      {children(handle)}
+    </div>
+  );
+}
+
 const emptyNewLink: LinkFields = {
   title: "",
   url: "",
@@ -31,6 +100,7 @@ export default function BlocsPage() {
     blocks: links,
     blocksError,
     reloadBlocks,
+    reorderBlocks,
     setEditDraft,
     setNewDraft,
   } = useDashboard();
@@ -42,6 +112,62 @@ export default function BlocsPage() {
     icon: "",
   });
   const [newLink, setNewLink] = useState<LinkFields>(emptyNewLink);
+  const [savingOrder, setSavingOrder] = useState(false);
+
+  const sensors = useSensors(
+    // 5 px avant de commencer : un simple clic sur la poignée ne déplace rien.
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  const titleOf = (id: string | number) =>
+    links.find((link) => link.id === id)?.title ?? "le lien";
+  const positionOf = (id: string | number) =>
+    links.findIndex((link) => link.id === id) + 1;
+
+  // Annonces pour les lecteurs d'écran, en français.
+  const announcements: Announcements = {
+    onDragStart: ({ active }) =>
+      `${titleOf(active.id)} saisi, position ${positionOf(active.id)} sur ${links.length}.`,
+    onDragOver: ({ active, over }) =>
+      over
+        ? `${titleOf(active.id)} au-dessus de la position ${positionOf(over.id)}.`
+        : undefined,
+    onDragEnd: ({ active, over }) =>
+      over
+        ? `${titleOf(active.id)} déposé en position ${positionOf(over.id)}.`
+        : `${titleOf(active.id)} déposé.`,
+    onDragCancel: ({ active }) =>
+      `Déplacement annulé, ${titleOf(active.id)} reste à sa place.`,
+  };
+
+  const handleDragEnd = async ({ active, over }: DragEndEvent) => {
+    if (!over || active.id === over.id) return;
+    const from = links.findIndex((link) => link.id === active.id);
+    const to = links.findIndex((link) => link.id === over.id);
+    if (from === -1 || to === -1) return;
+
+    debug("[Dashboard] Réorganisation des liens.");
+    setSavingOrder(true);
+    const ok = await reorderBlocks(arrayMove(links, from, to));
+    setSavingOrder(false);
+    if (!ok) alert("Impossible d’enregistrer le nouvel ordre. Réessayez.");
+  };
+
+  const handleSizeChange = async (linkId: string, size: BlockSize) => {
+    debug("[Dashboard] Changement de taille d'un bloc.");
+    const { error } = await supabaseClient
+      .from("links")
+      .update({ size })
+      .eq("id", linkId);
+    if (error) {
+      console.error("[Dashboard] Échec du changement de taille.");
+      alert("Erreur : " + error.message);
+    }
+    await reloadBlocks();
+  };
 
   // Les brouillons de l'aperçu disparaissent quand on quitte la page.
   useEffect(
@@ -80,6 +206,7 @@ export default function BlocsPage() {
     const { error } = await supabaseClient.from("links").insert({
       user_id: user.id,
       type: "link",
+      size: "wide",
       title: newLink.title.trim(),
       url: newLink.url.trim(),
       icon: newLink.icon,
@@ -171,106 +298,155 @@ export default function BlocsPage() {
             Aucun lien pour le moment
           </p>
         ) : (
-          links.map((link) => (
-            <div
-              key={link.id}
-              className="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 border rounded-lg dark:border-gray-600"
+          <DndContext
+            id="blocs-dnd"
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+            accessibility={{
+              announcements,
+              screenReaderInstructions: {
+                draggable:
+                  "Pour déplacer un lien, appuyez sur Espace, utilisez les flèches haut et bas, puis Espace pour le déposer ou Échap pour annuler.",
+              },
+            }}
+          >
+            <SortableContext
+              items={links.map((link) => link.id)}
+              strategy={verticalListSortingStrategy}
             >
-              {editingLinkId === link.id ? (
-                <form
-                  onSubmit={(e) => handleSaveLink(e, link.id)}
-                  className="w-full space-y-3"
+              {links.map((link) => (
+                <SortableRow
+                  key={link.id}
+                  id={link.id}
+                  label={link.title}
+                  disabled={editingLinkId !== null || savingOrder}
                 >
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                    <input
-                      type="text"
-                      value={editedLink.title}
-                      onChange={(e) =>
-                        updateEditedLink({
-                          ...editedLink,
-                          title: e.target.value,
-                        })
-                      }
-                      aria-label="Nom du lien"
-                      className="min-w-0 w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                      required
-                    />
-                    <input
-                      type="url"
-                      value={editedLink.url}
-                      onChange={(e) =>
-                        updateEditedLink({
-                          ...editedLink,
-                          url: e.target.value,
-                        })
-                      }
-                      aria-label="URL du lien"
-                      className="min-w-0 w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                      required
-                    />
-                    <SocialNetworkPicker
-                      value={editedLink.icon}
-                      onChange={(icon) =>
-                        updateEditedLink({ ...editedLink, icon })
-                      }
-                    />
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      type="submit"
-                      disabled={savingLinkId === link.id}
-                      className="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
-                    >
-                      {savingLinkId === link.id
-                        ? "Enregistrement..."
-                        : "Enregistrer"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleCancelEdit}
-                      className="px-3 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-                    >
-                      Annuler
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                <>
-                  <i
-                    className={`${link.icon} shrink-0 text-xl w-6 text-center mt-0.5`}
-                  ></i>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium text-gray-900 dark:text-white">
-                      {link.title}
-                    </p>
-                    <p className="text-sm text-gray-500 break-all">
-                      {link.url}
-                    </p>
-                  </div>
-                  <div className="flex shrink-0 gap-1">
-                    <button
-                      type="button"
-                      onClick={() => handleEditLink(link)}
-                      aria-label={`Modifier ${link.title}`}
-                      className="px-3 py-1 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded transition-colors"
-                    >
-                      ✎
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteLink(link.id)}
-                      aria-label={`Supprimer ${link.title}`}
-                      className="px-3 py-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          ))
+                  {(handle) =>
+                    editingLinkId === link.id ? (
+                      <form
+                        onSubmit={(e) => handleSaveLink(e, link.id)}
+                        className="w-full space-y-3"
+                      >
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                          <input
+                            type="text"
+                            value={editedLink.title}
+                            onChange={(e) =>
+                              updateEditedLink({
+                                ...editedLink,
+                                title: e.target.value,
+                              })
+                            }
+                            aria-label="Nom du lien"
+                            className="min-w-0 w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                            required
+                          />
+                          <input
+                            type="url"
+                            value={editedLink.url}
+                            onChange={(e) =>
+                              updateEditedLink({
+                                ...editedLink,
+                                url: e.target.value,
+                              })
+                            }
+                            aria-label="URL du lien"
+                            className="min-w-0 w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                            required
+                          />
+                          <SocialNetworkPicker
+                            value={editedLink.icon}
+                            onChange={(icon) =>
+                              updateEditedLink({ ...editedLink, icon })
+                            }
+                          />
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          <button
+                            type="submit"
+                            disabled={savingLinkId === link.id}
+                            className="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                          >
+                            {savingLinkId === link.id
+                              ? "Enregistrement..."
+                              : "Enregistrer"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleCancelEdit}
+                            className="px-3 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                          >
+                            Annuler
+                          </button>
+                        </div>
+                      </form>
+                    ) : (
+                      <>
+                        {handle}
+                        <i
+                          className={`${link.icon} shrink-0 text-xl w-6 text-center mt-0.5`}
+                        ></i>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium text-gray-900 dark:text-white">
+                            {link.title}
+                          </p>
+                          <p className="text-sm text-gray-500 break-all">
+                            {link.url}
+                          </p>
+                        </div>
+                        <div className="flex shrink-0 flex-wrap items-center justify-end gap-1">
+                          <select
+                            value={link.size}
+                            onChange={(e) =>
+                              handleSizeChange(
+                                link.id,
+                                e.target.value as BlockSize,
+                              )
+                            }
+                            aria-label={`Taille de ${link.title}`}
+                            className="px-2 py-1 text-sm border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                          >
+                            {BLOCK_SIZES.map((size) => (
+                              <option key={size} value={size}>
+                                {BLOCK_SIZE_LABELS[size]}
+                              </option>
+                            ))}
+                          </select>
+                          <button
+                            type="button"
+                            onClick={() => handleEditLink(link)}
+                            aria-label={`Modifier ${link.title}`}
+                            className="px-3 py-1 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded transition-colors"
+                          >
+                            ✎
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteLink(link.id)}
+                            aria-label={`Supprimer ${link.title}`}
+                            className="px-3 py-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </>
+                    )
+                  }
+                </SortableRow>
+              ))}
+            </SortableContext>
+          </DndContext>
         )}
       </div>
+      {links.length > 1 && (
+        <p className="-mt-3 mb-6 text-xs text-gray-500">
+          Glissez la poignée{" "}
+          <i className="fa-solid fa-grip-vertical" aria-hidden="true"></i> pour
+          changer l’ordre ; la taille choisit la place du lien dans la grille de
+          votre page.
+        </p>
+      )}
 
       {/* Ajouter un lien */}
       <form

@@ -55,7 +55,7 @@ export function toBlock(row: Record<string, unknown>): Block | null {
     url: typeof row.url === "string" ? row.url : "",
     icon: typeof row.icon === "string" ? row.icon : "",
     data,
-    size: isBlockSize(row.size) ? row.size : "small",
+    size: isBlockSize(row.size) ? row.size : "wide",
     order: typeof row.order === "number" ? row.order : 0,
   };
 }
