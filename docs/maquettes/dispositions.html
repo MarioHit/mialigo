@@ -1,0 +1,392 @@
+<title>Dispositions Mialigo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+<style>
+  /* Mise en page : barre de réglages, puis une rangée de téléphones (une disposition par téléphone). */
+  :root {
+    --bg: #f3f3f7;
+    --surface: #ffffff;
+    --fg: #1d1d27;
+    --muted: #5d5d70;
+    --line: #dcdce6;
+    --brand: #4f46e5;
+    --font-ui: "Figtree", "Segoe UI", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #101016; --surface: #1a1a23; --fg: #ececf4; --muted: #a2a2b6; --line: #2e2e3b; --brand: #a5b4fc;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #101016; --surface: #1a1a23; --fg: #ececf4; --muted: #a2a2b6; --line: #2e2e3b; --brand: #a5b4fc;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-ui);
+    font-size: 15px;
+    padding-block: 28px 56px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .wrap { max-width: 1240px; margin: 0 auto; display: grid; gap: 24px; }
+  header.intro h1 { font-size: 1.75rem; margin: 0 0 6px; text-wrap: balance; }
+  header.intro p { margin: 0; color: var(--muted); max-width: 70ch; line-height: 1.5; }
+  .controls {
+    display: flex; flex-wrap: wrap; gap: 16px 28px; align-items: center;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px;
+  }
+  .control { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .control > span { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-right: 4px; }
+  .seg button {
+    font: inherit; font-size: 0.875rem; padding: 6px 12px; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--line); background: transparent; color: var(--fg);
+  }
+  .seg button[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: var(--surface); }
+  .seg button:focus-visible, .swatch:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+  .swatch { width: 26px; height: 26px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; padding: 0; }
+  .swatch[aria-pressed="true"] { border-color: var(--fg); transform: scale(1.12); }
+
+  .phones { display: flex; flex-wrap: wrap; gap: 28px; justify-content: center; }
+  figure.option { margin: 0; width: 340px; max-width: 100%; display: grid; gap: 10px; align-content: start; }
+  figure.option figcaption h2 { font-size: 1.05rem; margin: 0 0 2px; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+  figure.option figcaption .tag { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); font-weight: 600; }
+  figure.option figcaption .tag.now { border-color: var(--brand); color: var(--brand); }
+  figure.option figcaption p { margin: 0; color: var(--muted); font-size: 0.875rem; line-height: 1.45; }
+  .phone {
+    border: 9px solid #23232d; border-radius: 38px; overflow: hidden; background: #23232d;
+    box-shadow: 0 18px 40px -20px rgba(0,0,0,0.45);
+  }
+
+  /* =========================================================
+     Reprise fidèle des thèmes de page Mialigo (app/globals.css).
+     .dark remplace .dark-mode du site.
+     ========================================================= */
+  .page-theme {
+    --bg-color: #f4f4f9; --muted-color: #666; --text-color: #333;
+    --link-bg: #ffffff; --link-hover: #eef2ff; --link-border: #ddd;
+    --page-bg: var(--bg-color);
+    background: var(--page-bg); color: var(--text-color);
+    font-family: "Segoe UI", system-ui, sans-serif;
+    border-radius: 29px; padding: 34px 20px 28px; text-align: center; min-height: 560px;
+    container-type: inline-size;
+  }
+  .page-theme.dark {
+    --bg-color: #121212; --muted-color: #999; --text-color: #f0f0f0;
+    --link-bg: #1e1e1e; --link-hover: #2d2d2d; --link-border: #333;
+  }
+  .page-theme[data-style="minimal"] { --bg-color: #fff; --text-color: #111; --muted-color: #555; --link-bg: transparent; --link-hover: #f5f5f5; --link-border: #111; --bw: 2px; }
+  .page-theme.dark[data-style="minimal"] { --bg-color: #000; --text-color: #fafafa; --muted-color: #a3a3a3; --link-hover: #171717; --link-border: #fafafa; }
+  .page-theme[data-style="glass"] {
+    --bg-color: color-mix(in srgb, var(--accent) 30%, #fff);
+    --page-bg: radial-gradient(circle at 15% 10%, color-mix(in srgb, var(--accent) 55%, #fff) 0%, transparent 55%),
+               radial-gradient(circle at 85% 90%, color-mix(in srgb, var(--accent) 45%, #ffd6e7) 0%, transparent 60%),
+               color-mix(in srgb, var(--accent) 20%, #fff);
+    --text-color: #14141f; --muted-color: #3f3f55;
+    --link-bg: rgba(255,255,255,0.38); --link-hover: rgba(255,255,255,0.55); --link-border: rgba(255,255,255,0.65);
+  }
+  .page-theme[data-style="neon"] {
+    --bg-color: #07070d; --text-color: #f5f5ff; --muted-color: #a1a1c2;
+    --link-bg: rgba(255,255,255,0.03); --link-hover: color-mix(in srgb, var(--accent) 12%, transparent); --link-border: var(--accent);
+  }
+  .page-theme[data-style="neon"] h3 { text-shadow: 0 0 12px color-mix(in srgb, var(--accent) 70%, transparent); }
+
+  .profile .avatar {
+    width: 84px; height: 84px; border-radius: 50%; margin: 0 auto 12px; display: grid; place-items: center;
+    font-size: 1.9rem; font-weight: 600; color: #fff;
+    background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 45%, #000));
+    border: 4px solid var(--bg-color);
+  }
+  .profile h3 { font-size: 1.6rem; font-weight: 600; margin: 0 0 6px; }
+  .profile p { color: var(--muted-color); margin: 0 0 26px; font-size: 0.95rem; }
+
+  ul.blocks { list-style: none; margin: 0; padding: 0; }
+  .card {
+    display: flex; align-items: center; width: 100%; height: 100%;
+    border: var(--bw, 1px) solid var(--link-border); background: var(--link-bg); color: var(--text-color);
+    font-weight: 500; text-decoration: none; cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  }
+  .card:hover { transform: translateY(-2px); background: var(--link-hover); border-color: var(--accent); }
+  .card .t { min-width: 0; }
+  .page-theme[data-style="glass"] .card { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  .page-theme[data-style="neon"] .card {
+    box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 55%, transparent), inset 0 0 6px color-mix(in srgb, var(--accent) 25%, transparent);
+  }
+  .page-theme[data-style="neon"] .card:hover {
+    box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 80%, transparent), inset 0 0 8px color-mix(in srgb, var(--accent) 35%, transparent);
+  }
+
+  /* ---------- 1. Grille actuelle (2 colonnes, tailles Petit / Large / Grand) ---------- */
+  .layout-grid { display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 4.5rem; gap: 16px; }
+  .layout-grid li.small { grid-column: span 1; }
+  .layout-grid li.wide { grid-column: span 2; }
+  .layout-grid li.large { grid-column: span 2; grid-row: span 2; }
+  .layout-grid .card { border-radius: 9999px; padding: 0 20px; }
+  .layout-grid li.small .card, .layout-grid li.large .card { flex-direction: column; justify-content: center; border-radius: 1.75rem; padding: 0 12px; }
+  .layout-grid li.wide .card svg { margin-right: 16px; font-size: 1.25rem; width: 1.5rem; }
+  .layout-grid li.small .card { font-size: 0.875rem; }
+  .layout-grid li.small .card svg { font-size: 1.25rem; margin-bottom: 4px; }
+  .layout-grid li.large .card { font-size: 1.125rem; }
+  .layout-grid li.large .card svg { font-size: 2.25rem; margin-bottom: 12px; }
+  .layout-grid .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+
+  /* Formes par bloc (#97), sur la grille actuelle. */
+  .layout-grid .card[data-shape="square"] { border-radius: 0; }
+  .layout-grid .card[data-shape="circle"] { border-radius: 50%; }
+  .layout-grid .card[data-shape="octagon"] { --clip: polygon(14px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px), 0 14px); }
+  .layout-grid .card[data-shape="hexagon"] { --clip: polygon(16px 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 16px 100%, 0 50%); padding-inline: 24px; }
+
+  /* ---------- 2. Nid d'abeille et 3. Bulles : trame en quinconce ----------
+     Positions calculées (script plus bas) en unités de --p, le pas d'une
+     case : 3 puis 2 → --p = 1/3 de la largeur ; 2 puis 1 → 1/2. Rangée
+     longue aux x = 0, 1, 2 ; rangée courte décalée d'une demi-case ; pas
+     vertical 0,866 × --p, pour que les formes s'emboîtent. Un bloc Grand
+     prend une rangée à lui, centré, puis la trame reprend. */
+  .weave { --g: 8px; position: relative; }
+  .weave.r32 { --p: calc(100cqw / 3); }
+  .weave.r21 { --p: calc(100cqw / 2); }
+  .weave li {
+    position: absolute;
+    left: calc(var(--p) * var(--x) + var(--g) / 2);
+    top: calc(var(--p) * var(--y));
+    width: calc(var(--p) * var(--s) - var(--g));
+  }
+  .weave .card { flex-direction: column; justify-content: center; text-align: center; padding: 0 14%; font-size: 0.82rem; line-height: 1.2; }
+  .weave .card svg { font-size: 1.45rem; margin-bottom: 6px; position: relative; }
+  .weave.r21 .card { font-size: 0.95rem; }
+  .weave.r21 .card svg { font-size: 2rem; margin-bottom: 8px; }
+  .weave li.big .card { font-size: 1.1rem; }
+  .weave li.big .card svg { font-size: 2.8rem; margin-bottom: 10px; }
+  .weave .t { position: relative; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* Nid d'abeille : hexagones pointe en haut, découpés, bordure et fond en deux couches. */
+  .weave.hex li { aspect-ratio: 1 / 1.1547; }
+  /* Bordure en anneau (hexagone évidé, evenodd) et fond à l'intérieur : rien ne se
+     superpose, un fond transparent (Minimal, Néon, Verre) le reste. */
+  .weave.hex .card {
+    --b: var(--bw, 1px);
+    --inner: 50% calc(var(--b) * 1.1547), calc(100% - var(--b)) calc(25% + var(--b) * 0.577),
+             calc(100% - var(--b)) calc(75% - var(--b) * 0.577), 50% calc(100% - var(--b) * 1.1547),
+             var(--b) calc(75% - var(--b) * 0.577), var(--b) calc(25% + var(--b) * 0.577);
+  }
+  .weave.hex .shape-border { clip-path: polygon(evenodd, 50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%, 50% 0, var(--inner), 50% calc(var(--b) * 1.1547)); }
+  .weave.hex .shape-fill { inset: calc(-1 * var(--bw, 1px)); clip-path: polygon(var(--inner)); }
+  /* Bulles : cercles, simple border-radius (bordure et ombre gardées). */
+  .weave.bub li { aspect-ratio: 1; }
+  .weave.bub .card { border-radius: 50%; padding: 0 16%; }
+
+  /* Couches des formes découpées (hexagone du nid d'abeille, octogone/hexagone #97). */
+  .card[data-clip] { position: relative; isolation: isolate; background: transparent; border-color: transparent; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .card[data-clip]:hover { background: transparent; border-color: transparent; }
+  .shape-border, .shape-fill { position: absolute; clip-path: var(--clip); pointer-events: none; z-index: -1; transition: background-color 0.2s ease; }
+  .shape-border { inset: calc(-1 * var(--bw, 1px)); background: var(--link-border); }
+  .shape-fill { inset: 0; background: var(--link-bg); }
+  .card[data-clip]:hover .shape-border { background: var(--accent); }
+  .card[data-clip]:hover .shape-fill { background: var(--link-hover); }
+  .page-theme[data-style="glass"] .shape-fill { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  .page-theme[data-style="neon"] .card[data-clip] { box-shadow: none; filter: drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 60%, transparent)); }
+  .page-theme[data-style="neon"] .card[data-clip]:hover { box-shadow: none; filter: drop-shadow(0 0 12px color-mix(in srgb, var(--accent) 85%, transparent)); }
+  .card svg, .card .t { position: relative; }
+
+  .footer-note { font-size: 0.75rem; opacity: 0.6; margin-top: 28px; }
+
+  section.notes { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; }
+  section.notes h2 { font-size: 1.05rem; margin: 0 0 8px; }
+  section.notes ul { margin: 0; padding-left: 20px; color: var(--muted); line-height: 1.6; max-width: 80ch; }
+  section.notes strong { color: var(--fg); }
+
+  @media (prefers-reduced-motion: reduce) { .card, .card:hover { transition: none; transform: none; } }
+</style>
+
+<div class="wrap">
+  <header class="intro">
+    <h1>Dispositions de page Mialigo</h1>
+    <p>Maquette de l’issue #98 : la même page de 5 liens dans la disposition actuelle et dans les propositions. Changez le style et la couleur pour comparer. Passez la souris sur un bloc pour voir le survol.</p>
+  </header>
+
+  <div class="controls" role="group" aria-label="Réglages de la maquette">
+    <div class="control seg" id="style-control"><span>Style</span></div>
+    <div class="control" id="accent-control"><span>Couleur</span></div>
+    <div class="control seg" id="count-control"><span>Liens</span></div>
+    <div class="control seg" id="big-control"><span>Bloc Grand</span></div>
+  </div>
+
+  <div class="phones" id="phones"></div>
+
+  <section class="notes">
+    <h2>Ce qui change dans les nouvelles dispositions</h2>
+    <ul>
+      <li><strong>Les blocs ont tous la même taille, sauf un bloc Grand</strong> : avec « GitHub en Grand », le bloc Grand prend une rangée à lui, centré et deux fois plus large, puis la trame reprend. Petit et Large deviennent des cases normales ; les tailles restent enregistrées et reviennent si on repasse en Grille.</li>
+      <li><strong>Icône au-dessus, titre sur 2 lignes au plus</strong> : un titre long est coupé. En « 2 puis 1 », les blocs sont plus grands et plus lisibles, mais la page est plus longue.</li>
+      <li><strong>Le style s’applique toujours</strong> : bordure, survol à la couleur d’accent, lueur Néon et flou Verre suivent la forme.</li>
+      <li><strong>Les formes par bloc (#97) restent possibles en Grille</strong> : c’est le dernier téléphone.</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+  const STYLES = [
+    { id: "classic-light", label: "Classique clair", style: "classic", dark: false },
+    { id: "classic-dark", label: "Classique sombre", style: "classic", dark: true },
+    { id: "glass", label: "Verre", style: "glass", dark: false },
+    { id: "minimal", label: "Minimal", style: "minimal", dark: false },
+    { id: "neon", label: "Néon", style: "neon", dark: true },
+  ];
+  const ACCENTS = ["#6366f1", "#0284c7", "#0d9488", "#16a34a", "#ea580c", "#ef4444", "#ec4899", "#a855f7"];
+  const LINKS = [
+    { title: "Instagram", icon: "fa-brands fa-instagram", size: "wide", shape: "square" },
+    { title: "YouTube", icon: "fa-brands fa-youtube", size: "small", shape: "circle" },
+    { title: "Mon site", icon: "fa-solid fa-globe", size: "small", shape: "octagon" },
+    { title: "GitHub", icon: "fa-brands fa-github", size: "large", shape: "hexagon" },
+    { title: "Me contacter", icon: "fa-solid fa-envelope", size: "wide", shape: "circle" },
+    { title: "TikTok", icon: "fa-brands fa-tiktok", size: "small", shape: null },
+    { title: "Spotify", icon: "fa-brands fa-spotify", size: "small", shape: null },
+    { title: "Mon portfolio photo", icon: "fa-solid fa-camera", size: "wide", shape: null },
+  ];
+  const OPTIONS = [
+    { id: "grid", title: "Grille", tag: "Actuel", now: true, desc: "Rectangles en 2 colonnes, chaque bloc a sa taille (Petit, Large, Grand)." },
+    { id: "hex32", title: "Nid d’abeille", tag: "3 puis 2", desc: "Hexagones identiques qui s’emboîtent. Compact : 5 liens tiennent sur deux rangées." },
+    { id: "bub32", title: "Bulles", tag: "3 puis 2", desc: "Cercles identiques en quinconce, même trame que le nid d’abeille." },
+    { id: "hex21", title: "Nid d’abeille", tag: "2 puis 1", desc: "Hexagones plus grands, titres plus lisibles, page plus longue." },
+    { id: "bub21", title: "Bulles", tag: "2 puis 1", desc: "Cercles plus grands en quinconce." },
+    { id: "shapes", title: "Grille + formes par bloc", tag: "PR #97", desc: "La grille actuelle où chaque bloc a sa forme : coins droits, rond, octogone, hexagone." },
+  ];
+
+  const state = { style: "classic-light", accent: ACCENTS[0], count: 5, big: false };
+  try {
+    const saved = JSON.parse(localStorage.getItem("mialigo-maquette") || "null");
+    if (saved) Object.assign(state, saved);
+  } catch (e) {}
+
+  function esc(s) { return s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]); }
+
+  function card(link, clip) {
+    const layers = clip ? '<span class="shape-border"></span><span class="shape-fill"></span>' : "";
+    return `<a class="card"${clip ? " data-clip" : ""}${link.shapeAttr ? ` data-shape="${link.shapeAttr}"` : ""} tabindex="0">${layers}<i class="${link.icon}" aria-hidden="true"></i><span class="t">${esc(link.title)}</span></a>`;
+  }
+
+  /**
+   * Trame en quinconce, en unités du pas d'une case (p). Rangées longues (3 ou 2
+   * cases) et courtes (2 ou 1, décalées d'une demi-case) en alternance, pas
+   * vertical 0,866. Bloc Grand (si l'option est active) : rangée à lui, centré,
+   * 2 cases de large en « 3 puis 2 », 1,5 en « 2 puis 1 » ; la trame repart
+   * ensuite d'une rangée longue.
+   */
+  function weave(links, hex, r32) {
+    const cols = r32 ? 3 : 2;
+    const ratio = hex ? 1.1547 : 1; // hauteur / largeur de la forme
+    const gap = 0.05; // espace entre une rangée et un bloc Grand, en pas
+    const items = [];
+    let rowTop = null, rowLong = true, inRow = 0, bottom = 0;
+    for (const link of links) {
+      const big = state.big && link.size === "large";
+      if (big) {
+        const s = r32 ? 2 : 1.5;
+        const top = items.length ? bottom + gap : 0;
+        items.push({ link, x: (cols - s) / 2, y: top, s, big });
+        bottom = top + s * ratio;
+        rowTop = null; rowLong = true; inRow = 0;
+        continue;
+      }
+      const capacity = rowLong ? cols : cols - 1;
+      if (rowTop === null || inRow >= capacity) {
+        if (rowTop === null) {
+          rowTop = items.length ? bottom + gap : 0;
+          rowLong = true;
+        } else {
+          rowTop += 0.866;
+          rowLong = !rowLong;
+        }
+        inRow = 0;
+      }
+      const x = (rowLong ? 0 : 0.5) + inRow;
+      items.push({ link, x, y: rowTop, s: 1, big: false });
+      inRow++;
+      bottom = Math.max(bottom, rowTop + ratio);
+    }
+    return { items, height: bottom };
+  }
+
+  function blocks(option, links) {
+    if (option === "grid" || option === "shapes") {
+      const items = links.map((l) => {
+        const shape = option === "shapes" ? l.shape : null;
+        const clip = shape === "octagon" || shape === "hexagon";
+        return `<li class="${l.size}">${card({ ...l, shapeAttr: shape }, clip)}</li>`;
+      });
+      return `<ul class="blocks layout-grid">${items.join("")}</ul>`;
+    }
+    const hex = option.startsWith("hex");
+    const r32 = option.endsWith("32");
+    const { items, height } = weave(links, hex, r32);
+    const html = items.map(({ link, x, y, s, big }) =>
+      `<li class="${big ? "big" : ""}" style="--x:${x};--y:${y};--s:${s}">${card(link, hex)}</li>`);
+    return `<ul class="blocks weave ${hex ? "hex" : "bub"} ${r32 ? "r32" : "r21"}" style="height:calc(var(--p) * ${height})">${html.join("")}</ul>`;
+  }
+
+  function render() {
+    const s = STYLES.find((x) => x.id === state.style) || STYLES[0];
+    const links = LINKS.slice(0, state.count);
+    document.getElementById("phones").innerHTML = OPTIONS.map((o) => `
+      <figure class="option">
+        <figcaption>
+          <h2>${o.title} <span class="tag${o.now ? " now" : ""}">${o.tag}</span></h2>
+          <p>${o.desc}</p>
+        </figcaption>
+        <div class="phone">
+          <div class="page-theme${s.dark ? " dark" : ""}" data-style="${s.style}" style="--accent:${state.accent}">
+            <div class="profile">
+              <div class="avatar" aria-hidden="true">LM</div>
+              <h3>Léa Martin</h3>
+              <p>Photographe à Lyon · voyages et portraits</p>
+            </div>
+            ${blocks(o.id, links)}
+            <div class="footer-note">Créé avec <strong>Mialigo</strong></div>
+          </div>
+        </div>
+      </figure>`).join("");
+
+    document.querySelectorAll("#style-control button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.id === state.style)));
+    document.querySelectorAll("#accent-control button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.c === state.accent)));
+    document.querySelectorAll("#big-control button").forEach((b) => b.setAttribute("aria-pressed", String((b.dataset.v === "1") === state.big)));
+    document.querySelectorAll("#count-control button").forEach((b) => b.setAttribute("aria-pressed", String(Number(b.dataset.n) === state.count)));
+    try { localStorage.setItem("mialigo-maquette", JSON.stringify(state)); } catch (e) {}
+  }
+
+  const styleCtl = document.getElementById("style-control");
+  STYLES.forEach((s) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = s.label; b.dataset.id = s.id;
+    b.addEventListener("click", () => { state.style = s.id; render(); });
+    styleCtl.appendChild(b);
+  });
+  const accentCtl = document.getElementById("accent-control");
+  ACCENTS.forEach((c) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "swatch"; b.dataset.c = c; b.style.background = c;
+    b.setAttribute("aria-label", "Couleur " + c);
+    b.addEventListener("click", () => { state.accent = c; render(); });
+    accentCtl.appendChild(b);
+  });
+  const countCtl = document.getElementById("count-control");
+  [5, 8].forEach((n) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = n + " liens"; b.dataset.n = n;
+    b.addEventListener("click", () => { state.count = n; render(); });
+    countCtl.appendChild(b);
+  });
+  const bigCtl = document.getElementById("big-control");
+  [["0", "Non"], ["1", "GitHub en Grand"]].forEach(([v, label]) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = label; b.dataset.v = v;
+    b.addEventListener("click", () => { state.big = v === "1"; render(); });
+    bigCtl.appendChild(b);
+  });
+  render();
+</script>

@@ -37,6 +37,7 @@ import {
   useSortable,
   type SortingStrategy,
 } from "@dnd-kit/sortable";
+import type { ThemeLayout } from "@/lib/themes";
 import { useMemo, useState } from "react";
 import {
   BLOCK_ALIGN_ICONS,
@@ -71,10 +72,13 @@ const stopDrag = {
 function SortableTile({
   block,
   isTarget,
+  showControls,
   onResize,
   onAlign,
 }: {
   block: Block;
+  /** Taille et position : seulement en grille (nid d'abeille et bulles : blocs identiques). */
+  showControls: boolean;
   /** Bloc survolé : le bloc déplacé sera déposé à sa place. */
   isTarget: boolean;
   onResize: (size: BlockSize) => void;
@@ -93,7 +97,7 @@ function SortableTile({
       {...attributes}
       {...listeners}
       aria-label={`Déplacer ${title}`}
-      className={`${blockGridClass(block)} relative cursor-grab touch-manipulation select-none rounded-[2rem] outline-2 outline-dashed outline-offset-4 focus-visible:outline-indigo-600 active:cursor-grabbing ${
+      className={`block-cell ${blockGridClass(block)} relative cursor-grab touch-manipulation select-none rounded-[2rem] outline-2 outline-dashed outline-offset-4 focus-visible:outline-indigo-600 active:cursor-grabbing ${
         isTarget
           ? "outline-indigo-600 ring-4 ring-indigo-500/40"
           : "outline-indigo-400/70"
@@ -105,71 +109,73 @@ function SortableTile({
       </div>
 
       {/* Taille (et position d'un petit bloc) : posées sur le bord bas, dans l'espace entre les lignes. */}
-      <div
-        {...stopDrag}
-        className="absolute -bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-1"
-      >
+      {showControls && (
         <div
-          role="group"
-          aria-label={`Taille de ${title}`}
-          className="flex overflow-hidden rounded-full border text-[11px] font-medium shadow-sm"
-          style={toolbarStyle}
+          {...stopDrag}
+          className="absolute -bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-1"
         >
-          {BLOCK_SIZES.map((size) => {
-            const selected = block.size === size;
-            return (
-              <button
-                key={size}
-                type="button"
-                aria-pressed={selected}
-                aria-label={`Taille de ${title} : ${BLOCK_SIZE_LABELS[size]}`}
-                onClick={() => onResize(size)}
-                className={`cursor-pointer px-2 py-0.5 ${
-                  selected ? "bg-indigo-600 text-white" : "hover:opacity-80"
-                }`}
-              >
-                {BLOCK_SIZE_LABELS[size]}
-              </button>
-            );
-          })}
-        </div>
-
-        {block.size === "small" && (
           <div
             role="group"
-            aria-label={`Position de ${title} dans sa ligne`}
-            className="flex overflow-hidden rounded-full border text-[11px] shadow-sm"
+            aria-label={`Taille de ${title}`}
+            className="flex overflow-hidden rounded-full border text-[11px] font-medium shadow-sm"
             style={toolbarStyle}
           >
-            {BLOCK_ALIGNS.map((value) => {
-              const selected = align === value;
+            {BLOCK_SIZES.map((size) => {
+              const selected = block.size === size;
               return (
                 <button
-                  key={value}
+                  key={size}
                   type="button"
                   aria-pressed={selected}
-                  aria-label={`Position de ${title} : ${BLOCK_ALIGN_LABELS[value]}`}
-                  title={
-                    selected
-                      ? "Revenir au placement automatique"
-                      : BLOCK_ALIGN_LABELS[value]
-                  }
-                  // Un second appui sur la position choisie revient à l'automatique.
-                  onClick={() => onAlign(selected ? null : value)}
+                  aria-label={`Taille de ${title} : ${BLOCK_SIZE_LABELS[size]}`}
+                  onClick={() => onResize(size)}
                   className={`cursor-pointer px-2 py-0.5 ${
                     selected ? "bg-indigo-600 text-white" : "hover:opacity-80"
                   }`}
                 >
-                  <i
-                    className={BLOCK_ALIGN_ICONS[value]}
-                    aria-hidden="true"
-                  ></i>
+                  {BLOCK_SIZE_LABELS[size]}
                 </button>
               );
             })}
           </div>
-        )}
-      </div>
+
+          {block.size === "small" && (
+            <div
+              role="group"
+              aria-label={`Position de ${title} dans sa ligne`}
+              className="flex overflow-hidden rounded-full border text-[11px] shadow-sm"
+              style={toolbarStyle}
+            >
+              {BLOCK_ALIGNS.map((value) => {
+                const selected = align === value;
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    aria-pressed={selected}
+                    aria-label={`Position de ${title} : ${BLOCK_ALIGN_LABELS[value]}`}
+                    title={
+                      selected
+                        ? "Revenir au placement automatique"
+                        : BLOCK_ALIGN_LABELS[value]
+                    }
+                    // Un second appui sur la position choisie revient à l'automatique.
+                    onClick={() => onAlign(selected ? null : value)}
+                    className={`cursor-pointer px-2 py-0.5 ${
+                      selected ? "bg-indigo-600 text-white" : "hover:opacity-80"
+                    }`}
+                  >
+                    <i
+                      className={BLOCK_ALIGN_ICONS[value]}
+                      aria-hidden="true"
+                    ></i>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
     </li>
   );
 }
@@ -177,11 +183,15 @@ function SortableTile({
 export default function SortableBlockGrid({
   blocks,
   onChange,
+  layout,
 }: {
   blocks: Block[];
   /** Nouvelle disposition (ordre ou taille), non enregistrée. */
   onChange: (blocks: Block[]) => void;
+  /** Disposition du thème en cours (#98) : hors grille, ni taille ni position. */
+  layout: ThemeLayout;
 }) {
+  const isGrid = layout === "grid";
   const [activeId, setActiveId] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
 
@@ -255,12 +265,22 @@ export default function SortableBlockGrid({
     >
       <SortableContext items={items} strategy={noTransform}>
         {/* Même grille que BlockList, avec plus d'espace entre les lignes pour la barre de tailles. */}
-        <ul className="list-none p-0 grid grid-cols-2 auto-rows-[4.5rem] gap-x-4 gap-y-8 pb-4">
+        {!isGrid && (
+          <p
+            className="mb-4 rounded-2xl px-4 py-2 text-xs"
+            style={toolbarStyle}
+          >
+            En nid d’abeille et en bulles, tous les blocs ont la même taille :
+            seul l’ordre compte. Repassez en Grille pour changer les tailles.
+          </p>
+        )}
+        <ul className="block-grid list-none p-0 grid grid-cols-2 auto-rows-[4.5rem] gap-x-4 gap-y-8 pb-4">
           {blocks.map((block) => (
             <SortableTile
               key={block.id}
               block={block}
               isTarget={block.id === overId}
+              showControls={isGrid}
               onResize={(size) => handleResize(block.id, size)}
               onAlign={(align) => handleAlign(block.id, align)}
             />
@@ -271,7 +291,7 @@ export default function SortableBlockGrid({
       {/* Copie du bloc qui suit le pointeur ou le doigt. */}
       <DragOverlay>
         {activeBlock ? (
-          <div className="pointer-events-none h-full scale-105 shadow-2xl rounded-[2rem]">
+          <div className="block-cell pointer-events-none h-full scale-105 shadow-2xl rounded-[2rem]">
             <BlockView block={activeBlock} />
           </div>
         ) : null}

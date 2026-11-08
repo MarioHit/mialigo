@@ -3,7 +3,7 @@
 import PageThemeScope from "@/components/page-theme-scope";
 import ProfileView, { type ProfileViewData } from "@/components/profile-view";
 import type { Block } from "@/lib/blocks";
-import { DEFAULT_THEME, sameTheme, type PageTheme } from "@/lib/themes";
+import { sameTheme, serializeTheme, type PageTheme } from "@/lib/themes";
 import { supabaseClient } from "@/lib/supabase-auth";
 import type { Session } from "@supabase/supabase-js";
 import dynamic from "next/dynamic";
@@ -145,7 +145,7 @@ export default function UserPageClient({
             supabaseClient
               .from("users")
               .update({
-                theme: sameTheme(draftTheme, DEFAULT_THEME) ? null : draftTheme,
+                theme: serializeTheme(draftTheme),
                 updated_at: new Date().toISOString(),
               })
               .eq("id", ownerId),
@@ -229,6 +229,7 @@ export default function UserPageClient({
                 <SortableBlockGrid
                   blocks={draftLayout}
                   onChange={setDraftLayout}
+                  layout={(draftTheme ?? theme).layout}
                 />
               ) : undefined
             }
