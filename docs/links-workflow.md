@@ -7,7 +7,7 @@ Organisation du dashboard :
 - `/dashboard` redirige vers `/dashboard/profil` (c'est l'URL d'arrivée du magic link).
 - `app/dashboard/layout.tsx` enveloppe toutes les sous-pages dans `DashboardShell` (`app/dashboard/dashboard-shell.tsx`, composant client) : vérification de session (sinon `/login`), chargement du profil et des blocs, en-tête (« Voir ma page », déconnexion), onglets et **aperçu en direct**. Les sous-pages lisent `user`, `profile`, `reloadProfile()`, `blocks`, `reloadBlocks()` avec `useDashboard()`, et y poussent leurs brouillons (`setProfileDraft`, `setEditDraft`, `setNewDraft`).
 - `/dashboard/profil` (`app/dashboard/profil/page.tsx`) : pseudo, nom affiché, bio, et le bloc « Photo et bannière » (`profile-images.tsx`, action serveur `actions.ts`).
-- `/dashboard/blocs` (`app/dashboard/blocs/page.tsx`) : liste, ajout, modification et suppression des liens.
+- `/dashboard/blocs` (`app/dashboard/blocs/page.tsx`) : liste, ajout, modification et suppression des liens ; réorganisation par drag & drop (`@dnd-kit`, poignée, clavier : Espace puis flèches) et choix de la taille (petit / large / grand) de chaque bloc.
 
 
 ### Blocs et aperçu en direct
@@ -15,6 +15,11 @@ Organisation du dashboard :
 Voir [ADR-0017](decisions/0017-modele-blocs-registre-apercu.md). Chaque ligne de `public.links` est un bloc typé (`type`, `data`, `size` ; `title` / `url` / `icon` pour le type `link`), lu avec `BLOCK_COLUMNS` / `toBlocks()` (`lib/blocks.ts`) et rendu par le registre `components/blocks/registry.tsx`. `components/profile-view.tsx` affiche la page (bannière, photo, nom, bio, blocs) à l'identique sur `/<pseudo>` et dans l'aperçu.
 
 L'aperçu combine les données enregistrées et les brouillons : nom et bio en cours de saisie (`/dashboard/profil`), lien en cours d'édition ou d'ajout (`/dashboard/blocs`). Les brouillons sont effacés à l'enregistrement, à l'annulation ou en quittant la page. Aucune requête n'est faite pendant la saisie.
+
+
+### Ordre et tailles (grille bento)
+
+Voir [ADR-0018](decisions/0018-drag-drop-dnd-kit-grille-bento.md). La page affiche les blocs dans une grille à 2 colonnes (`BlockList`, `grid-flow-row-dense`) : `small` 1×1, `wide` 2×1 (défaut, la ligne habituelle), `large` 2×2. Dans le dashboard, déposer un lien à une nouvelle place met à jour l'aperçu tout de suite, puis enregistre tout l'ordre en une requête : `rpc("reorder_blocks", { ids })` (`SECURITY INVOKER`, filtrée sur `auth.uid()`). En cas d'échec, les blocs sont relus. Le changement de taille est un `update` de `links.size`.
 
 ---
 

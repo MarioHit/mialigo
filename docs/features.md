@@ -11,8 +11,9 @@ Ce document répertorie l'ensemble des fonctionnalités du projet Mialigo, leur 
 | **Inscription par Magic Link**   | ✅ En production | [auth-workflow.md](auth-workflow.md)                                    | Création de compte avec réservation de pseudo unique `mialigo.com/<pseudo>` et lien magique sécurisé.              |
 | **Connexion sans mot de passe**  | ✅ En production | [login-workflow.md](login-workflow.md)                                  | Authentification par email direct sans mot de passe (Magic Link Server-Side PKCE).                                 |
 | **Gestion du Profil & Liens**    | ✅ En production | [links-workflow.md](links-workflow.md)                                  | Dashboard d'administration : modification du pseudo/nom/bio, ajout, édition et suppression de liens.               |
-| **Blocs & Aperçu en direct**     | 🚧 En pré-prod   | [links-workflow.md](links-workflow.md), [ADR-0017](decisions/0017-modele-blocs-registre-apercu.md) | Liens stockés comme blocs typés (`type`, `data`, `size`), registre de composants, aperçu en direct dans le dashboard. |
-| **Photo de profil & Bannière**   | 🚧 En pré-prod   | [links-workflow.md](links-workflow.md), [ADR-0016](decisions/0016-photo-profil-banniere-storage.md) | Envoi depuis le dashboard (recadrage dans le navigateur), import Gravatar / GitHub copié dans Supabase Storage.    |
+| **Drag & drop & Grille bento**   | 🚧 En pré-prod   | [links-workflow.md](links-workflow.md), [ADR-0018](decisions/0018-drag-drop-dnd-kit-grille-bento.md) | Réorganisation des blocs (`@dnd-kit`, souris / tactile / clavier), tailles petit / large / grand, grille à 2 colonnes. |
+| **Blocs & Aperçu en direct**     | ✅ En production | [links-workflow.md](links-workflow.md), [ADR-0017](decisions/0017-modele-blocs-registre-apercu.md) | Liens stockés comme blocs typés (`type`, `data`, `size`), registre de composants, aperçu en direct dans le dashboard. |
+| **Photo de profil & Bannière**   | ✅ En production | [links-workflow.md](links-workflow.md), [ADR-0016](decisions/0016-photo-profil-banniere-storage.md) | Envoi depuis le dashboard (recadrage dans le navigateur), import Gravatar / GitHub copié dans Supabase Storage.    |
 | **Pages Publiques Utilisateurs** | ✅ En production | [app/[username]/page.tsx](../app/[username]/page.tsx)                   | Rendu dynamique SSR (`mialigo.com/<username>`), redirection auto des majuscules (`/MARIO` $\rightarrow$ `/mario`). |
 | **Sélecteur de Réseaux Sociaux** | ✅ En production | [social-network-picker.tsx](../app/dashboard/social-network-picker.tsx) | Détection et attribution automatique des icônes Font Awesome (Instagram, YouTube, TikTok, GitHub, etc.).           |
 | **Thème Clair / Sombre**         | ✅ En production | [theme-toggle.tsx](../app/theme-toggle.tsx)                             | Persistance du choix utilisateur dans le `localStorage` avec synchronisation inter-onglets.                        |
@@ -44,7 +45,7 @@ Ce document répertorie l'ensemble des fonctionnalités du projet Mialigo, leur 
 ## 🗺️ Fonctionnalités à venir (Roadmap)
 
 - [x] **Upload d'avatar / Photo de profil :** stockage des images dans Supabase Storage (#15).
-- [ ] **Drag & Drop pour les liens :** réorganisation intuitive de l'ordre d'affichage des liens.
+- [x] **Drag & Drop pour les liens :** réorganisation intuitive de l'ordre d'affichage des liens (#18).
 - [ ] **Statistiques & Analytics :** compteur de clics par lien et visites globales du profil.
 - [ ] **Personnalisation de thèmes :** choix de palettes de couleurs personnalisées par utilisateur.
 - [ ] **Générateur de QR Code :** téléchargement d'un QR code dirigeant vers `mialigo.com/<username>`.

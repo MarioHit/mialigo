@@ -55,6 +55,8 @@ interface DashboardContextValue {
   /** true si le dernier chargement des blocs a échoué. */
   blocksError: boolean;
   reloadBlocks: () => Promise<void>;
+  /** Enregistre un nouvel ordre (affiché tout de suite) ; false en cas d'échec. */
+  reorderBlocks: (ordered: Block[]) => Promise<boolean>;
   /** Brouillons affichés par l'aperçu ; null quand rien n'est en cours. */
   setProfileDraft: (draft: ProfileDraft | null) => void;
   setEditDraft: (draft: BlockDraft | null) => void;
@@ -134,7 +136,7 @@ function previewBlocks(
       url: newDraft.url,
       icon: newDraft.icon,
       data: {},
-      size: "small",
+      size: "wide",
       order: Number.MAX_SAFE_INTEGER,
     });
   }
@@ -210,6 +212,24 @@ export default function DashboardShell({
     setBlocksError(data === null);
   };
 
+  const reorderBlocks = async (ordered: Block[]) => {
+    if (!user) return false;
+    // Affichage immédiat, puis une seule requête pour tout l'ordre.
+    setBlocks(ordered.map((block, index) => ({ ...block, order: index + 1 })));
+    const { error } = await supabaseClient.rpc("reorder_blocks", {
+      ids: ordered.map((block) => block.id),
+    });
+    if (error) {
+      console.error(
+        "[Dashboard] Échec de l'enregistrement de l'ordre des blocs.",
+      );
+      await reloadBlocks();
+      return false;
+    }
+    debug("[Dashboard] Ordre des blocs enregistré.");
+    return true;
+  };
+
   const handleLogout = async () => {
     debug("[Dashboard] Déconnexion.");
     await supabaseClient.auth.signOut();
@@ -236,6 +256,7 @@ export default function DashboardShell({
         blocks,
         blocksError,
         reloadBlocks,
+        reorderBlocks,
         setProfileDraft,
         setEditDraft,
         setNewDraft,
