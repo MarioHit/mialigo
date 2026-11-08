@@ -1,21 +1,12 @@
 "use client";
 
+import ProfileView, { type ProfileViewData } from "@/components/profile-view";
 import { supabaseClient } from "@/lib/supabase-auth";
-import { IMAGE_SIZE } from "@/lib/avatars";
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-interface UserData {
-  name: string;
-  bio: string;
-  avatarUrl: string | null;
-  bannerUrl: string | null;
-  links: Array<{ title: string; url: string; icon: string }>;
-}
-
 interface UserPageClientProps {
-  userData: UserData;
+  userData: ProfileViewData;
 }
 
 export default function UserPageClient({ userData }: UserPageClientProps) {
@@ -78,65 +69,7 @@ export default function UserPageClient({ userData }: UserPageClientProps) {
       )}
 
       <main className="w-full max-w-md text-center p-5">
-        <header className="mb-8">
-          {userData.bannerUrl && (
-            <div className="aspect-[3/1] w-full overflow-hidden rounded-2xl mb-4">
-              <Image
-                src={userData.bannerUrl}
-                alt=""
-                width={IMAGE_SIZE.banner.width}
-                height={IMAGE_SIZE.banner.height}
-                loading="eager"
-                className="h-full w-full object-cover"
-              />
-            </div>
-          )}
-          {userData.avatarUrl && (
-            <Image
-              src={userData.avatarUrl}
-              alt={`Photo de profil de ${userData.name}`}
-              width={IMAGE_SIZE.avatar.width}
-              height={IMAGE_SIZE.avatar.height}
-              loading="eager"
-              className={`mx-auto mb-4 h-24 w-24 rounded-full object-cover border-4 ${
-                userData.bannerUrl ? "-mt-16 relative" : ""
-              }`}
-              style={{ borderColor: "var(--bg-color)" }}
-            />
-          )}
-          <h1 className="text-3xl font-semibold mb-2">{userData.name}</h1>
-          <p className="profile-bio text-[#666] mb-8">{userData.bio}</p>
-        </header>
-        <nav>
-          <ul className="list-none p-0 flex flex-col gap-4">
-            {userData.links.map((link, index) => (
-              <li key={index}>
-                <a
-                  href={link.url}
-                  className="flex items-center px-5 py-4 rounded-full border no-underline font-medium w-full transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-500"
-                  style={{
-                    backgroundColor: "var(--link-bg)",
-                    borderColor: "var(--link-border)",
-                    color: "var(--text-color)",
-                  }}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = "var(--link-hover)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = "var(--link-bg)";
-                  }}
-                >
-                  <i
-                    className={`${link.icon} mr-4 text-xl w-6 text-center`}
-                  ></i>
-                  {link.title}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        <ProfileView profile={userData} eager />
 
         <footer className="mt-8 pt-4">
           <Link

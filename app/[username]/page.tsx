@@ -1,3 +1,4 @@
+import { BLOCK_COLUMNS, toBlocks } from "@/lib/blocks";
 import { supabase } from "@/lib/supabase";
 import { siteName } from "@/lib/site";
 import type { Metadata } from "next";
@@ -97,31 +98,26 @@ export default async function UserPage({ params }: PageProps) {
 
   debug("[UserPage] Profil public trouvé.");
 
-  // Récupérer les liens de l'utilisateur
-  const { data: links, error: linksError } = await supabase
+  // Récupérer les blocs de l'utilisateur (table links)
+  const { data: blockRows, error: linksError } = await supabase
     .from("links")
-    .select("*")
+    .select(BLOCK_COLUMNS)
     .eq("user_id", userData.id)
     .order("order", { ascending: true });
 
   if (linksError) {
-    console.error("[UserPage] Échec du chargement des liens publics.");
+    console.error("[UserPage] Échec du chargement des blocs publics.");
   } else {
-    debug("[UserPage] Liens publics chargés.");
+    debug("[UserPage] Blocs publics chargés.");
   }
 
-  const userWithLinks = {
+  const pageData = {
     name: userData.name,
     bio: userData.bio || "",
     avatarUrl: userData.avatar_url,
     bannerUrl: userData.banner_url,
-    links:
-      links?.map((link) => ({
-        title: link.title,
-        url: link.url,
-        icon: link.icon,
-      })) || [],
+    blocks: toBlocks(blockRows),
   };
 
-  return <UserPageClient userData={userWithLinks} />;
+  return <UserPageClient userData={pageData} />;
 }

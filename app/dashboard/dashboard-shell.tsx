@@ -1,5 +1,7 @@
 "use client";
 
+import ProfileView from "@/components/profile-view";
+import { BLOCK_COLUMNS, toBlocks, type Block } from "@/lib/blocks";
 import { supabaseClient } from "@/lib/supabase-auth";
 import type { Session, User } from "@supabase/supabase-js";
 import Link from "next/link";
@@ -28,12 +30,35 @@ export interface UserProfile {
   banner_url: string | null;
 }
 
+/** Modifications pas encore enregistrées, montrées dans l'aperçu en direct. */
+export interface ProfileDraft {
+  name: string;
+  bio: string;
+}
+
+/** Champs d'un bloc « link » en cours d'édition (id null : bloc pas encore ajouté). */
+export interface BlockDraft {
+  id: string | null;
+  title: string;
+  url: string;
+  icon: string;
+}
+
 interface DashboardContextValue {
   user: User;
   /** null si le trigger n'a pas encore créé la ligne public.users. */
   profile: UserProfile | null;
   /** Relit le profil (après une sauvegarde) et le renvoie. */
   reloadProfile: () => Promise<UserProfile | null>;
+  /** Blocs enregistrés, dans l'ordre d'affichage. */
+  blocks: Block[];
+  /** true si le dernier chargement des blocs a échoué. */
+  blocksError: boolean;
+  reloadBlocks: () => Promise<void>;
+  /** Brouillons affichés par l'aperçu ; null quand rien n'est en cours. */
+  setProfileDraft: (draft: ProfileDraft | null) => void;
+  setEditDraft: (draft: BlockDraft | null) => void;
+  setNewDraft: (draft: BlockDraft | null) => void;
 }
 
 const DashboardContext = createContext<DashboardContextValue | null>(null);
@@ -69,6 +94,53 @@ async function fetchProfile(userId: string): Promise<UserProfile | null> {
   return data;
 }
 
+async function fetchBlocks(userId: string): Promise<Block[] | null> {
+  debug("[Dashboard] Chargement des blocs.");
+  const { data, error } = await supabaseClient
+    .from("links")
+    .select(BLOCK_COLUMNS)
+    .eq("user_id", userId)
+    .order("order", { ascending: true });
+
+  if (error) {
+    console.error("[Dashboard] Échec du chargement des blocs.");
+    return null;
+  }
+  debug("[Dashboard] Blocs chargés.");
+  return toBlocks(data);
+}
+
+/** Applique les brouillons aux blocs enregistrés, pour l'aperçu. */
+function previewBlocks(
+  blocks: Block[],
+  editDraft: BlockDraft | null,
+  newDraft: BlockDraft | null,
+): Block[] {
+  const merged = blocks.map((block) =>
+    editDraft && block.id === editDraft.id
+      ? {
+          ...block,
+          title: editDraft.title,
+          url: editDraft.url,
+          icon: editDraft.icon,
+        }
+      : block,
+  );
+  if (newDraft && (newDraft.title.trim() || newDraft.url.trim())) {
+    merged.push({
+      id: "__nouveau-bloc",
+      type: "link",
+      title: newDraft.title.trim() || "Nouveau lien",
+      url: newDraft.url,
+      icon: newDraft.icon,
+      data: {},
+      size: "small",
+      order: Number.MAX_SAFE_INTEGER,
+    });
+  }
+  return merged;
+}
+
 const tabs = [
   { href: "/dashboard/profil", label: "Profil" },
   { href: "/dashboard/blocs", label: "Liens" },
@@ -81,6 +153,12 @@ export default function DashboardShell({
 }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [blocks, setBlocks] = useState<Block[]>([]);
+  const [blocksError, setBlocksError] = useState(false);
+  const [profileDraft, setProfileDraft] = useState<ProfileDraft | null>(null);
+  const [editDraft, setEditDraft] = useState<BlockDraft | null>(null);
+  const [newDraft, setNewDraft] = useState<BlockDraft | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
@@ -94,7 +172,13 @@ export default function DashboardShell({
 
     debug("[Dashboard] Session active trouvée.");
     setUser(session.user);
-    setProfile(await fetchProfile(session.user.id));
+    const [loadedProfile, loadedBlocks] = await Promise.all([
+      fetchProfile(session.user.id),
+      fetchBlocks(session.user.id),
+    ]);
+    setProfile(loadedProfile);
+    setBlocks(loadedBlocks ?? []);
+    setBlocksError(loadedBlocks === null);
     setLoading(false);
   };
 
@@ -119,6 +203,13 @@ export default function DashboardShell({
     return data;
   };
 
+  const reloadBlocks = async () => {
+    if (!user) return;
+    const data = await fetchBlocks(user.id);
+    if (data) setBlocks(data);
+    setBlocksError(data === null);
+  };
+
   const handleLogout = async () => {
     debug("[Dashboard] Déconnexion.");
     await supabaseClient.auth.signOut();
@@ -137,9 +228,21 @@ export default function DashboardShell({
   }
 
   return (
-    <DashboardContext.Provider value={{ user, profile, reloadProfile }}>
+    <DashboardContext.Provider
+      value={{
+        user,
+        profile,
+        reloadProfile,
+        blocks,
+        blocksError,
+        reloadBlocks,
+        setProfileDraft,
+        setEditDraft,
+        setNewDraft,
+      }}
+    >
       <div className="min-h-screen w-full bg-gray-50 dark:bg-gray-900 px-4 py-20 sm:px-6 sm:py-8 lg:px-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 mb-6">
             <div>
@@ -195,7 +298,50 @@ export default function DashboardShell({
             })}
           </nav>
 
-          {children}
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
+            <div className="min-w-0">
+              {/* Sur petit écran, l'aperçu s'ouvre au-dessus du formulaire. */}
+              <button
+                type="button"
+                onClick={() => setShowPreview((shown) => !shown)}
+                aria-expanded={showPreview}
+                aria-controls="apercu-page"
+                className="lg:hidden mb-4 w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-white"
+              >
+                {showPreview ? "Masquer l’aperçu" : "👁️ Voir l’aperçu"}
+              </button>
+              {children}
+            </div>
+
+            <aside
+              id="apercu-page"
+              aria-label="Aperçu de ma page"
+              className={`${showPreview ? "block" : "hidden"} lg:block order-first lg:order-none lg:sticky lg:top-8`}
+            >
+              <p className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+                Aperçu en direct
+              </p>
+              {/* inert : l'aperçu se regarde, ses liens ne s'ouvrent pas. */}
+              <div
+                inert
+                className="max-h-[75vh] overflow-y-auto rounded-3xl border border-gray-300 dark:border-gray-600 p-5 text-center shadow-inner"
+                style={{
+                  backgroundColor: "var(--bg-color)",
+                  color: "var(--text-color)",
+                }}
+              >
+                <ProfileView
+                  profile={{
+                    name: profileDraft?.name ?? profile?.name ?? "",
+                    bio: profileDraft?.bio ?? profile?.bio ?? "",
+                    avatarUrl: profile?.avatar_url ?? null,
+                    bannerUrl: profile?.banner_url ?? null,
+                    blocks: previewBlocks(blocks, editDraft, newDraft),
+                  }}
+                />
+              </div>
+            </aside>
+          </div>
         </div>
       </div>
     </DashboardContext.Provider>

@@ -2,6 +2,7 @@
 
 import { defaultNetworkIcon } from "@/lib/social-networks";
 import { supabaseClient } from "@/lib/supabase-auth";
+import type { Block } from "@/lib/blocks";
 import { useEffect, useState } from "react";
 import { useDashboard } from "../dashboard-shell";
 import SocialNetworkPicker from "../social-network-picker";
@@ -12,58 +13,55 @@ function debug(message: string) {
   }
 }
 
-interface UserLink {
-  id: string;
+interface LinkFields {
   title: string;
   url: string;
   icon: string;
-  order: number;
 }
 
-async function fetchLinks(userId: string): Promise<UserLink[] | null> {
-  debug("[Dashboard] Chargement des liens.");
-  const { data, error } = await supabaseClient
-    .from("links")
-    .select("*")
-    .eq("user_id", userId)
-    .order("order", { ascending: true });
-
-  if (error) {
-    console.error("[Dashboard] Échec du chargement des liens.");
-    return null;
-  }
-  debug("[Dashboard] Liens chargés.");
-  return data;
-}
+const emptyNewLink: LinkFields = {
+  title: "",
+  url: "",
+  icon: defaultNetworkIcon,
+};
 
 export default function BlocsPage() {
-  const { user } = useDashboard();
-  const [links, setLinks] = useState<UserLink[]>([]);
-  const [linksLoaded, setLinksLoaded] = useState(false);
+  const {
+    user,
+    blocks: links,
+    blocksError,
+    reloadBlocks,
+    setEditDraft,
+    setNewDraft,
+  } = useDashboard();
   const [editingLinkId, setEditingLinkId] = useState<string | null>(null);
   const [savingLinkId, setSavingLinkId] = useState<string | null>(null);
-  const [editedLink, setEditedLink] = useState({
+  const [editedLink, setEditedLink] = useState<LinkFields>({
     title: "",
     url: "",
     icon: "",
   });
-  const [newLink, setNewLink] = useState({
-    title: "",
-    url: "",
-    icon: defaultNetworkIcon,
-  });
+  const [newLink, setNewLink] = useState<LinkFields>(emptyNewLink);
 
-  // Chargement initial : l'état est mis à jour dans le callback de la promesse.
-  useEffect(() => {
-    fetchLinks(user.id).then((data) => {
-      if (data) setLinks(data);
-      setLinksLoaded(true);
-    });
-  }, [user.id]);
+  // Les brouillons de l'aperçu disparaissent quand on quitte la page.
+  useEffect(
+    () => () => {
+      setEditDraft(null);
+      setNewDraft(null);
+    },
+    [setEditDraft, setNewDraft],
+  );
 
-  const reloadLinks = async () => {
-    const data = await fetchLinks(user.id);
-    if (data) setLinks(data);
+  /** Met à jour le formulaire d'édition et l'aperçu en direct. */
+  const updateEditedLink = (fields: LinkFields) => {
+    setEditedLink(fields);
+    setEditDraft({ id: editingLinkId, ...fields });
+  };
+
+  /** Met à jour le formulaire d'ajout et l'aperçu en direct. */
+  const updateNewLink = (fields: LinkFields) => {
+    setNewLink(fields);
+    setNewDraft({ id: null, ...fields });
   };
 
   const handleAddLink = async (e: React.FormEvent) => {
@@ -81,6 +79,7 @@ export default function BlocsPage() {
 
     const { error } = await supabaseClient.from("links").insert({
       user_id: user.id,
+      type: "link",
       title: newLink.title.trim(),
       url: newLink.url.trim(),
       icon: newLink.icon,
@@ -92,8 +91,9 @@ export default function BlocsPage() {
       alert("Erreur : " + error.message);
     } else {
       debug("[Dashboard] Lien ajouté.");
-      setNewLink({ title: "", url: "", icon: defaultNetworkIcon });
-      await reloadLinks();
+      setNewLink(emptyNewLink);
+      setNewDraft(null);
+      await reloadBlocks();
     }
   };
 
@@ -111,22 +111,21 @@ export default function BlocsPage() {
       alert("Erreur : " + error.message);
     } else {
       debug("[Dashboard] Lien supprimé.");
-      await reloadLinks();
+      await reloadBlocks();
     }
   };
 
-  const handleEditLink = (link: UserLink) => {
+  const handleEditLink = (link: Block) => {
+    const fields = { title: link.title, url: link.url, icon: link.icon };
     setEditingLinkId(link.id);
-    setEditedLink({
-      title: link.title,
-      url: link.url,
-      icon: link.icon,
-    });
+    setEditedLink(fields);
+    setEditDraft({ id: link.id, ...fields });
   };
 
   const handleCancelEdit = () => {
     setEditingLinkId(null);
     setEditedLink({ title: "", url: "", icon: "" });
+    setEditDraft(null);
   };
 
   const handleSaveLink = async (e: React.FormEvent, linkId: string) => {
@@ -148,7 +147,7 @@ export default function BlocsPage() {
       alert("Erreur : " + error.message);
     } else {
       debug("[Dashboard] Lien mis à jour.");
-      await reloadLinks();
+      await reloadBlocks();
       handleCancelEdit();
     }
 
@@ -163,8 +162,10 @@ export default function BlocsPage() {
 
       {/* Liste des liens */}
       <div className="space-y-3 mb-6">
-        {!linksLoaded ? (
-          <p className="text-gray-500 text-center py-4">Chargement...</p>
+        {blocksError ? (
+          <p className="text-red-600 text-center py-4">
+            Impossible de charger vos liens. Rechargez la page.
+          </p>
         ) : links.length === 0 ? (
           <p className="text-gray-500 text-center py-4">
             Aucun lien pour le moment
@@ -185,7 +186,7 @@ export default function BlocsPage() {
                       type="text"
                       value={editedLink.title}
                       onChange={(e) =>
-                        setEditedLink({
+                        updateEditedLink({
                           ...editedLink,
                           title: e.target.value,
                         })
@@ -198,7 +199,7 @@ export default function BlocsPage() {
                       type="url"
                       value={editedLink.url}
                       onChange={(e) =>
-                        setEditedLink({
+                        updateEditedLink({
                           ...editedLink,
                           url: e.target.value,
                         })
@@ -210,7 +211,7 @@ export default function BlocsPage() {
                     <SocialNetworkPicker
                       value={editedLink.icon}
                       onChange={(icon) =>
-                        setEditedLink({ ...editedLink, icon })
+                        updateEditedLink({ ...editedLink, icon })
                       }
                     />
                   </div>
@@ -284,19 +285,21 @@ export default function BlocsPage() {
             type="text"
             placeholder="Titre (ex: Instagram)"
             value={newLink.title}
-            onChange={(e) => setNewLink({ ...newLink, title: e.target.value })}
+            onChange={(e) =>
+              updateNewLink({ ...newLink, title: e.target.value })
+            }
             className="px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           />
           <input
             type="url"
             placeholder="URL (https://...)"
             value={newLink.url}
-            onChange={(e) => setNewLink({ ...newLink, url: e.target.value })}
+            onChange={(e) => updateNewLink({ ...newLink, url: e.target.value })}
             className="px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           />
           <SocialNetworkPicker
             value={newLink.icon}
-            onChange={(icon) => setNewLink({ ...newLink, icon })}
+            onChange={(icon) => updateNewLink({ ...newLink, icon })}
           />
         </div>
         <button
