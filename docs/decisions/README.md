@@ -30,3 +30,4 @@ Un ADR « Acceptée » n'est plus modifié sur le fond. Pour changer de décisio
 | [0013](0013-dashboard-sous-pages-shell-client.md) | Sous-pages du dashboard sous un layout client partagé (`DashboardShell`) | Acceptée | 2026-11-07 |
 | [0014](0014-garde-fou-version.md) | La PR de mise en prod reste en brouillon tant que la version n'a pas changé | Remplacée par 0015 | 2026-11-07 |
 | [0015](0015-version-par-pr.md) | Chaque PR met à jour la version et le CHANGELOG elle-même | Acceptée | 2026-11-07 |
+| [0016](0016-photo-profil-banniere-storage.md) | Photo de profil et bannière dans Supabase Storage, Gravatar et GitHub copiés à l'import | Acceptée | 2026-11-07 |

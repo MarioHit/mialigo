@@ -14,6 +14,8 @@ CREATE TABLE users (
   username TEXT UNIQUE NOT NULL,
   name TEXT NOT NULL,
   bio TEXT,
+  avatar_url TEXT,
+  banner_url TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -167,7 +169,7 @@ CREATE POLICY "Users can insert own profile"
 -- ⚠️ Toute nouvelle colonne de users doit être ajoutée à ce GRANT.
 -- ⚠️ Conséquence : pas d'upsert sur users depuis l'app (il exige de lire email) → insert / update.
 REVOKE SELECT ON public.users FROM PUBLIC, anon, authenticated;
-GRANT SELECT (id, username, name, bio, created_at, updated_at)
+GRANT SELECT (id, username, name, bio, avatar_url, banner_url, created_at, updated_at)
   ON public.users TO anon, authenticated;
 
 -- 7. Politiques RLS pour links
@@ -204,3 +206,33 @@ $$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = '';
 CREATE INDEX idx_users_username ON users(LOWER(username));
 CREATE INDEX idx_links_user_id ON links(user_id);
 CREATE INDEX idx_links_order ON links("order");
+
+-- 10. Storage : photo de profil et bannière (bucket public « avatars »)
+-- Même définition que supabase-avatars.sql (#15) : chacun n'écrit que dans « <auth.uid()>/… ».
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES ('avatars', 'avatars', true, 2097152, ARRAY['image/webp', 'image/jpeg', 'image/png', 'image/gif'])
+ON CONFLICT (id) DO UPDATE SET
+  public = EXCLUDED.public,
+  file_size_limit = EXCLUDED.file_size_limit,
+  allowed_mime_types = EXCLUDED.allowed_mime_types;
+
+DROP POLICY IF EXISTS "Avatars : lecture de son dossier" ON storage.objects;
+CREATE POLICY "Avatars : lecture de son dossier"
+  ON storage.objects FOR SELECT TO authenticated
+  USING (bucket_id = 'avatars' AND (storage.foldername(name))[1] = (SELECT auth.uid())::text);
+
+DROP POLICY IF EXISTS "Avatars : ajout dans son dossier" ON storage.objects;
+CREATE POLICY "Avatars : ajout dans son dossier"
+  ON storage.objects FOR INSERT TO authenticated
+  WITH CHECK (bucket_id = 'avatars' AND (storage.foldername(name))[1] = (SELECT auth.uid())::text);
+
+DROP POLICY IF EXISTS "Avatars : modification dans son dossier" ON storage.objects;
+CREATE POLICY "Avatars : modification dans son dossier"
+  ON storage.objects FOR UPDATE TO authenticated
+  USING (bucket_id = 'avatars' AND (storage.foldername(name))[1] = (SELECT auth.uid())::text)
+  WITH CHECK (bucket_id = 'avatars' AND (storage.foldername(name))[1] = (SELECT auth.uid())::text);
+
+DROP POLICY IF EXISTS "Avatars : suppression dans son dossier" ON storage.objects;
+CREATE POLICY "Avatars : suppression dans son dossier"
+  ON storage.objects FOR DELETE TO authenticated
+  USING (bucket_id = 'avatars' AND (storage.foldername(name))[1] = (SELECT auth.uid())::text);

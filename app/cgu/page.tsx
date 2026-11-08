@@ -24,6 +24,14 @@ export default function TermsPage() {
         utilisés et respecter les lois applicables.
       </p>
 
+      <h2>Photo de profil et bannière</h2>
+      <p>
+        En ajoutant une photo de profil ou une bannière, y compris importée
+        depuis Gravatar ou GitHub, l’utilisateur garantit qu’il dispose des
+        droits sur cette image et, si une personne y figure, de son accord.
+        L’image est publiée sur sa page publique.
+      </p>
+
       <h2>Usages interdits</h2>
       <p>
         Il est interdit d’utiliser Mialigo pour publier du contenu illégal,

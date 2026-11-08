@@ -21,7 +21,10 @@ export default function PrivacyPage() {
         <li>l’adresse e-mail utilisée pour la connexion par lien reçu ;</li>
         <li>le nom d’utilisateur et le nom affiché ;</li>
         <li>la biographie et les liens ajoutés à la page publique ;</li>
-        <li>les icônes choisies pour ces liens.</li>
+        <li>les icônes choisies pour ces liens ;</li>
+        <li>
+          la photo de profil et la bannière, si l’utilisateur en ajoute une.
+        </li>
       </ul>
 
       <h2>Utilisation des données</h2>
@@ -37,12 +40,19 @@ export default function PrivacyPage() {
         déploiement du site utilise Vercel. Ces services peuvent traiter des
         données selon leurs propres politiques de confidentialité.
       </p>
+      <p>
+        Si l’utilisateur importe sa photo depuis Gravatar, une empreinte de son
+        adresse e-mail est transmise à Gravatar pour retrouver l’image ; s’il
+        l’importe depuis GitHub, seul le pseudo GitHub saisi est utilisé. Dans
+        les deux cas, l’image est copiée sur Mialigo : les visiteurs de la page
+        ne contactent ni Gravatar ni GitHub.
+      </p>
 
       <h2>Pages publiques</h2>
       <p>
-        Le nom affiché, la biographie et les liens publiés sont visibles par les
-        visiteurs de la page utilisateur. N’ajoutez pas d’information que vous
-        souhaitez garder privée.
+        Le nom affiché, la photo de profil, la bannière, la biographie et les
+        liens publiés sont visibles par les visiteurs de la page utilisateur.
+        N’ajoutez pas d’information que vous souhaitez garder privée.
       </p>
 
       <h2>Vos droits</h2>
