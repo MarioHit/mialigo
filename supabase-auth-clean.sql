@@ -1,7 +1,23 @@
 -- ============================================
 -- Recréer les tables avec Supabase Auth (CLEAN)
 -- ============================================
--- ATTENTION : Ceci va supprimer toutes les données existantes !
+--
+-- ⛔⛔⛔ NE JAMAIS EXÉCUTER CE FICHIER SUR LA BASE DE PRODUCTION ⛔⛔⛔
+--
+-- Il commence par DROP TABLE ... CASCADE : TOUS les profils et TOUS les liens
+-- seraient supprimés définitivement. Il décrit le schéma complet, à jour, pour
+-- une base NEUVE (projet de test, nouvelle installation) et sert de référence.
+--
+-- Pour faire évoluer la production, exécuter UNIQUEMENT le script de migration
+-- non destructif de la PR concernée, dans le SQL Editor. Ordre d'application :
+--   1. supabase-security-fixes.sql        (correctifs Security Advisor)
+--   2. supabase-fix-trigger-username.sql  (pseudo choisi à l'inscription)
+--   3. supabase-reserved-usernames.sql    (pseudos réservés)
+--   4. supabase-fix-email-exposure.sql    (#14, email non lisible via l'API)
+--   5. supabase-avatars.sql               (#15, photo de profil et bannière)
+--   6. supabase-blocks.sql                (#16, liens → blocs typés)
+-- Toute nouvelle migration : un nouveau fichier supabase-*.sql non destructif,
+-- ajouté à cette liste, ET sa définition recopiée dans ce fichier.
 
 -- 1. Supprimer les tables existantes
 DROP TABLE IF EXISTS links CASCADE;
@@ -28,6 +44,11 @@ CREATE TABLE links (
   url TEXT NOT NULL,
   icon TEXT DEFAULT 'fa-solid fa-link',
   "order" INTEGER NOT NULL DEFAULT 1,
+  -- Blocs typés (#16, même définition que supabase-blocks.sql ;
+  -- types et tailles synchronisés avec lib/blocks.ts)
+  type TEXT NOT NULL DEFAULT 'link' CONSTRAINT links_type_check CHECK (type IN ('link')),
+  data JSONB NOT NULL DEFAULT '{}'::jsonb CONSTRAINT links_data_check CHECK (jsonb_typeof(data) = 'object'),
+  size TEXT NOT NULL DEFAULT 'small' CONSTRAINT links_size_check CHECK (size IN ('small', 'wide', 'large')),
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

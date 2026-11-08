@@ -5,9 +5,16 @@ Ce document décrit le cycle de vie des données (création, mise à jour, suppr
 Organisation du dashboard :
 
 - `/dashboard` redirige vers `/dashboard/profil` (c'est l'URL d'arrivée du magic link).
-- `app/dashboard/layout.tsx` enveloppe toutes les sous-pages dans `DashboardShell` (`app/dashboard/dashboard-shell.tsx`, composant client) : vérification de session (sinon `/login`), chargement du profil, en-tête (« Voir ma page », déconnexion) et onglets. Les sous-pages lisent `user`, `profile` et `reloadProfile()` avec `useDashboard()`.
+- `app/dashboard/layout.tsx` enveloppe toutes les sous-pages dans `DashboardShell` (`app/dashboard/dashboard-shell.tsx`, composant client) : vérification de session (sinon `/login`), chargement du profil et des blocs, en-tête (« Voir ma page », déconnexion), onglets et **aperçu en direct**. Les sous-pages lisent `user`, `profile`, `reloadProfile()`, `blocks`, `reloadBlocks()` avec `useDashboard()`, et y poussent leurs brouillons (`setProfileDraft`, `setEditDraft`, `setNewDraft`).
 - `/dashboard/profil` (`app/dashboard/profil/page.tsx`) : pseudo, nom affiché, bio, et le bloc « Photo et bannière » (`profile-images.tsx`, action serveur `actions.ts`).
 - `/dashboard/blocs` (`app/dashboard/blocs/page.tsx`) : liste, ajout, modification et suppression des liens.
+
+
+### Blocs et aperçu en direct
+
+Voir [ADR-0017](decisions/0017-modele-blocs-registre-apercu.md). Chaque ligne de `public.links` est un bloc typé (`type`, `data`, `size` ; `title` / `url` / `icon` pour le type `link`), lu avec `BLOCK_COLUMNS` / `toBlocks()` (`lib/blocks.ts`) et rendu par le registre `components/blocks/registry.tsx`. `components/profile-view.tsx` affiche la page (bannière, photo, nom, bio, blocs) à l'identique sur `/<pseudo>` et dans l'aperçu.
+
+L'aperçu combine les données enregistrées et les brouillons : nom et bio en cours de saisie (`/dashboard/profil`), lien en cours d'édition ou d'ajout (`/dashboard/blocs`). Les brouillons sont effacés à l'enregistrement, à l'annulation ou en quittant la page. Aucune requête n'est faite pendant la saisie.
 
 ---
 
