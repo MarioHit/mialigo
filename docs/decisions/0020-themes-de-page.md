@@ -32,7 +32,7 @@ Toutes les pages ont la même apparence : variables CSS globales (`--bg-color`, 
 - **Classique** et **Minimal** suivent le mode clair / sombre du visiteur ; **Verre** a un fond dégradé de l'accent, en clair et en sombre ; **Néon** est toujours sombre (son principe), la bascule du visiteur n'y change rien.
 - **Verre** : `backdrop-filter: blur(12px)` sur les cartes seulement, avec cartes plus opaques si le navigateur ne le gère pas (`@supports`). Coût à vérifier sur mobile d'entrée de gamme (demandé par l'issue).
 - **Arrondis** : `--block-radius` (aucun, léger, fort, pilule), plafonné à 1,75 rem pour les tuiles petites et grandes (une pilule sur une tuile carrée deviendrait un ovale).
-- Le choix se fait dans un onglet **Apparence** du dashboard, avec l'aperçu en direct (brouillon `setThemeDraft`) ; « Enregistrer » écrit `users.theme` (ou `NULL` pour le thème par défaut).
+- Le choix se fait dans un onglet **Apparence** du dashboard, avec l'aperçu en direct (brouillon `setThemeDraft`), **ou directement sur sa page** : le mode d'édition d'[ADR-0019](0019-reorganiser-sur-la-page-publique.md) devient « **Personnaliser** » (disposition et apparence) ; le bouton « 🎨 Apparence » ouvre un panneau en bas d'écran, hors de la zone du thème pour rester lisible, et la page elle-même sert d'aperçu. Les deux interfaces partagent le même sélecteur (`components/theme-picker.tsx`) ; sur la page, il est chargé à la demande (`next/dynamic`), comme la grille triable. « Enregistrer » écrit `users.theme` (ou `NULL` pour le thème par défaut) ; sur la page, dans la même opération que la disposition.
 
 ## Conséquences
 

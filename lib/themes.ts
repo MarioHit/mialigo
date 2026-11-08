@@ -24,6 +24,11 @@ export const DEFAULT_THEME: PageTheme = {
   radius: "pill",
 };
 
+/** Deux thèmes identiques (style, accent, arrondi). */
+export function sameTheme(a: PageTheme, b: PageTheme): boolean {
+  return a.style === b.style && a.accent === b.accent && a.radius === b.radius;
+}
+
 export const THEME_STYLE_LABELS: Record<
   ThemeStyle,
   { label: string; description: string }

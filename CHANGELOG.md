@@ -8,7 +8,7 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ### Ajouté
 
-- Choix de l'apparence de sa page dans un nouvel onglet « Apparence » : quatre styles (Classique, Verre, Minimal, Néon), une couleur d'accent et l'arrondi des blocs, avec l'aperçu en direct. Un avertissement signale une couleur trop peu visible sur le fond choisi. ([#19])
+- Choix de l'apparence de sa page dans un nouvel onglet « Apparence » : quatre styles (Classique, Verre, Minimal, Néon), une couleur d'accent et l'arrondi des blocs, avec l'aperçu en direct. On peut aussi le faire directement sur sa page avec le bouton « Personnaliser », qui regroupe désormais la disposition et l'apparence. Un avertissement signale une couleur trop peu visible sur le fond choisi. ([#19])
 
 ## [0.7.0] - 2026-11-08
 
