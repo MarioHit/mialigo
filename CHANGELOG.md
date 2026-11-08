@@ -4,11 +4,16 @@ Toutes les évolutions notables de Mialigo sont consignées dans ce fichier, éc
 
 Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le projet respecte le [versionnage sémantique](https://semver.org/lang/fr/). Chaque version correspond à une mise en production : même numéro dans `package.json`, tag Git `vX.Y.Z` sur le merge vers `main`. Chaque modification inscrit sa ligne directement dans la section de la prochaine version, la plus haute du fichier tant qu'elle n'est pas en production. Les catégories sont celles de Keep a Changelog (Ajouté, Modifié, Obsolète, Supprimé, Corrigé, Sécurité), plus « Interne » pour les changements sans effet visible sur le site (voir [ADR-0010](docs/decisions/0010-versionnage-semver-tags.md) et [ADR-0015](docs/decisions/0015-version-par-pr.md)).
 
-## [0.4.0] - 2026-11-07
+## [0.4.0] - 2026-11-08
 
 ### Ajouté
 
 - Photo de profil et bannière sur chaque page : on les choisit depuis le tableau de bord (elles sont recadrées automatiquement), et la photo peut aussi être reprise de son Gravatar ou de son compte GitHub. La photo apparaît aussi lors d'un partage de la page sur les réseaux sociaux. ([#15])
+- Aperçu en direct de sa page dans le tableau de bord : il se met à jour pendant qu'on modifie son nom, sa bio ou ses liens, avant même d'enregistrer. ([#16])
+
+### Interne
+
+- Les liens deviennent des « blocs », première étape vers de nouveaux types de contenu sur la page. ([#16])
 
 ## [0.3.1] - 2026-11-07
 
@@ -69,6 +74,7 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 [0.1.1]: https://github.com/MarioHit/mialigo/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/MarioHit/mialigo/tree/v0.1.0
 [#15]: https://github.com/MarioHit/mialigo/issues/15
+[#16]: https://github.com/MarioHit/mialigo/issues/16
 [#17]: https://github.com/MarioHit/mialigo/issues/17
 [#29]: https://github.com/MarioHit/mialigo/issues/29
 [#57]: https://github.com/MarioHit/mialigo/issues/57

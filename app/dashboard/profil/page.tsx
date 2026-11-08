@@ -2,7 +2,7 @@
 
 import { isReservedUsername } from "@/lib/reserved-usernames";
 import { supabaseClient } from "@/lib/supabase-auth";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDashboard } from "../dashboard-shell";
 import ProfileImages from "./profile-images";
 
@@ -13,7 +13,7 @@ function debug(message: string) {
 }
 
 export default function ProfilPage() {
-  const { user, profile, reloadProfile } = useDashboard();
+  const { user, profile, reloadProfile, setProfileDraft } = useDashboard();
   const [saving, setSaving] = useState(false);
 
   // Valeurs initiales : le profil, ou à défaut (trigger pas encore passé) les
@@ -33,6 +33,19 @@ export default function ProfilPage() {
   const [bio, setBio] = useState(() =>
     profile ? profile.bio || "" : "Bienvenue sur ma page !",
   );
+
+  // Le brouillon de l'aperçu disparaît quand on quitte la page sans enregistrer.
+  useEffect(() => () => setProfileDraft(null), [setProfileDraft]);
+
+  const updateName = (value: string) => {
+    setName(value);
+    setProfileDraft({ name: value, bio });
+  };
+
+  const updateBio = (value: string) => {
+    setBio(value);
+    setProfileDraft({ name, bio: value });
+  };
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,6 +90,7 @@ export default function ProfilPage() {
       debug("[Dashboard] Profil sauvegardé.");
       alert("✅ Profil mis à jour !");
       const saved = await reloadProfile();
+      setProfileDraft(null);
       if (saved) {
         setUsername(saved.username || "");
         setName(saved.name || "");
@@ -121,7 +135,7 @@ export default function ProfilPage() {
             <input
               type="text"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => updateName(e.target.value)}
               className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               required
             />
@@ -133,7 +147,7 @@ export default function ProfilPage() {
             </label>
             <textarea
               value={bio}
-              onChange={(e) => setBio(e.target.value)}
+              onChange={(e) => updateBio(e.target.value)}
               rows={3}
               className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             />

@@ -16,12 +16,4 @@ export interface User {
   created_at: string;
 }
 
-export interface Link {
-  id: string;
-  user_id: string;
-  title: string;
-  url: string;
-  icon: string;
-  order: number;
-  created_at: string;
-}
+// Les lignes de public.links sont des blocs typés : voir Block dans lib/blocks.ts.
