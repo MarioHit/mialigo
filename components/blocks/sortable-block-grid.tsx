@@ -8,7 +8,15 @@ import {
   blockAnnouncements,
   blockScreenReaderInstructions,
 } from "@/lib/block-dnd";
-import { BLOCK_SIZES, type Block, type BlockSize } from "@/lib/blocks";
+import {
+  BLOCK_ALIGNS,
+  BLOCK_SIZES,
+  blockAlign,
+  withAlign,
+  type Block,
+  type BlockAlign,
+  type BlockSize,
+} from "@/lib/blocks";
 import {
   closestCenter,
   DndContext,
@@ -30,7 +38,13 @@ import {
   type SortingStrategy,
 } from "@dnd-kit/sortable";
 import { useMemo, useState } from "react";
-import { BLOCK_SIZE_CLASSES, BLOCK_SIZE_LABELS, BlockView } from "./registry";
+import {
+  BLOCK_ALIGN_ICONS,
+  BLOCK_ALIGN_LABELS,
+  BLOCK_SIZE_LABELS,
+  BlockView,
+  blockGridClass,
+} from "./registry";
 
 /**
  * Aucun décalage calculé pendant le glisser, et l'ordre ne change qu'au dépôt
@@ -39,6 +53,12 @@ import { BLOCK_SIZE_CLASSES, BLOCK_SIZE_LABELS, BlockView } from "./registry";
  * (« Maximum update depth exceeded »).
  */
 const noTransform: SortingStrategy = () => null;
+
+const toolbarStyle = {
+  backgroundColor: "var(--btn-bg)",
+  color: "var(--btn-text)",
+  borderColor: "var(--link-border)",
+};
 
 /** Empêche un appui sur la barre de tailles de démarrer un glisser. */
 const stopDrag = {
@@ -52,16 +72,20 @@ function SortableTile({
   block,
   isTarget,
   onResize,
+  onAlign,
 }: {
   block: Block;
   /** Bloc survolé : le bloc déplacé sera déposé à sa place. */
   isTarget: boolean;
   onResize: (size: BlockSize) => void;
+  /** null : retour au placement automatique. */
+  onAlign: (align: BlockAlign | null) => void;
 }) {
   const { attributes, listeners, setNodeRef, isDragging } = useSortable({
     id: block.id,
   });
   const title = block.title || "le bloc";
+  const align = blockAlign(block);
 
   return (
     <li
@@ -69,7 +93,7 @@ function SortableTile({
       {...attributes}
       {...listeners}
       aria-label={`Déplacer ${title}`}
-      className={`${BLOCK_SIZE_CLASSES[block.size]} relative cursor-grab touch-manipulation select-none rounded-[2rem] outline-2 outline-dashed outline-offset-4 focus-visible:outline-indigo-600 active:cursor-grabbing ${
+      className={`${blockGridClass(block)} relative cursor-grab touch-manipulation select-none rounded-[2rem] outline-2 outline-dashed outline-offset-4 focus-visible:outline-indigo-600 active:cursor-grabbing ${
         isTarget
           ? "outline-indigo-600 ring-4 ring-indigo-500/40"
           : "outline-indigo-400/70"
@@ -80,35 +104,71 @@ function SortableTile({
         <BlockView block={block} />
       </div>
 
-      {/* Taille du bloc : posée sur le bord bas, dans l'espace entre les lignes. */}
+      {/* Taille (et position d'un petit bloc) : posées sur le bord bas, dans l'espace entre les lignes. */}
       <div
-        role="group"
-        aria-label={`Taille de ${title}`}
         {...stopDrag}
-        className="absolute -bottom-4 left-1/2 z-10 flex -translate-x-1/2 overflow-hidden rounded-full border text-[11px] font-medium shadow-sm"
-        style={{
-          backgroundColor: "var(--btn-bg)",
-          color: "var(--btn-text)",
-          borderColor: "var(--link-border)",
-        }}
+        className="absolute -bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-1"
       >
-        {BLOCK_SIZES.map((size) => {
-          const selected = block.size === size;
-          return (
-            <button
-              key={size}
-              type="button"
-              aria-pressed={selected}
-              aria-label={`Taille de ${title} : ${BLOCK_SIZE_LABELS[size]}`}
-              onClick={() => onResize(size)}
-              className={`cursor-pointer px-2 py-0.5 ${
-                selected ? "bg-indigo-600 text-white" : "hover:opacity-80"
-              }`}
-            >
-              {BLOCK_SIZE_LABELS[size]}
-            </button>
-          );
-        })}
+        <div
+          role="group"
+          aria-label={`Taille de ${title}`}
+          className="flex overflow-hidden rounded-full border text-[11px] font-medium shadow-sm"
+          style={toolbarStyle}
+        >
+          {BLOCK_SIZES.map((size) => {
+            const selected = block.size === size;
+            return (
+              <button
+                key={size}
+                type="button"
+                aria-pressed={selected}
+                aria-label={`Taille de ${title} : ${BLOCK_SIZE_LABELS[size]}`}
+                onClick={() => onResize(size)}
+                className={`cursor-pointer px-2 py-0.5 ${
+                  selected ? "bg-indigo-600 text-white" : "hover:opacity-80"
+                }`}
+              >
+                {BLOCK_SIZE_LABELS[size]}
+              </button>
+            );
+          })}
+        </div>
+
+        {block.size === "small" && (
+          <div
+            role="group"
+            aria-label={`Position de ${title} dans sa ligne`}
+            className="flex overflow-hidden rounded-full border text-[11px] shadow-sm"
+            style={toolbarStyle}
+          >
+            {BLOCK_ALIGNS.map((value) => {
+              const selected = align === value;
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  aria-pressed={selected}
+                  aria-label={`Position de ${title} : ${BLOCK_ALIGN_LABELS[value]}`}
+                  title={
+                    selected
+                      ? "Revenir au placement automatique"
+                      : BLOCK_ALIGN_LABELS[value]
+                  }
+                  // Un second appui sur la position choisie revient à l'automatique.
+                  onClick={() => onAlign(selected ? null : value)}
+                  className={`cursor-pointer px-2 py-0.5 ${
+                    selected ? "bg-indigo-600 text-white" : "hover:opacity-80"
+                  }`}
+                >
+                  <i
+                    className={BLOCK_ALIGN_ICONS[value]}
+                    aria-hidden="true"
+                  ></i>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
     </li>
   );
@@ -173,6 +233,13 @@ export default function SortableBlockGrid({
       blocks.map((block) => (block.id === id ? { ...block, size } : block)),
     );
 
+  const handleAlign = (id: string, align: BlockAlign | null) =>
+    onChange(
+      blocks.map((block) =>
+        block.id === id ? withAlign(block, align) : block,
+      ),
+    );
+
   const activeBlock = blocks.find((block) => block.id === activeId);
 
   return (
@@ -195,6 +262,7 @@ export default function SortableBlockGrid({
               block={block}
               isTarget={block.id === overId}
               onResize={(size) => handleResize(block.id, size)}
+              onAlign={(align) => handleAlign(block.id, align)}
             />
           ))}
         </ul>

@@ -22,9 +22,7 @@ const SortableBlockGrid = dynamic(
   {
     ssr: false,
     loading: () => (
-      <p className="py-8 text-sm opacity-70">
-        Chargement du mode disposition…
-      </p>
+      <p className="py-8 text-sm opacity-70">Chargement du mode disposition…</p>
     ),
   },
 );
@@ -87,22 +85,26 @@ export default function UserPageClient({
     setSavingLayout(true);
     debug("[UserPage] Enregistrement de la disposition des blocs.");
 
-    const savedSize = new Map(
-      userData.blocks.map((block) => [block.id, block.size]),
-    );
-    const resized = draftLayout.filter(
-      (block) => savedSize.get(block.id) !== block.size,
-    );
+    // Taille ou position (data.align) modifiée : un seul update par bloc.
+    const saved = new Map(userData.blocks.map((block) => [block.id, block]));
+    const changed = draftLayout.filter((block) => {
+      const before = saved.get(block.id);
+      return (
+        !before ||
+        before.size !== block.size ||
+        before.data.align !== block.data.align
+      );
+    });
     const orderChanged = draftLayout.some(
       (block, index) => userData.blocks[index]?.id !== block.id,
     );
 
     // Écritures limitées aux blocs du propriétaire par la RLS.
     const results = await Promise.all([
-      ...resized.map((block) =>
+      ...changed.map((block) =>
         supabaseClient
           .from("links")
-          .update({ size: block.size })
+          .update({ size: block.size, data: block.data })
           .eq("id", block.id),
       ),
       ...(orderChanged

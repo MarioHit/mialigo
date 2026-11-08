@@ -1,4 +1,4 @@
-# ADR-0019 : Modifier la disposition de ses blocs (ordre et taille) directement sur sa page publique
+# ADR-0019 : Modifier la disposition de ses blocs (ordre, taille, position) directement sur sa page publique
 
 - **Statut** : Acceptée
 - **Date** : 2026-11-08
@@ -9,12 +9,15 @@
 
 ## Contexte
 
-Avec [ADR-0018](0018-drag-drop-dnd-kit-grille-bento.md), on réorganise les blocs dans la liste de `/dashboard/blocs`, et le résultat n'est visible que dans l'aperçu. Sur mobile, l'aperçu est caché derrière un bouton ; sur grand écran, il est réduit. Le retour du mainteneur : « on ne voit pas le rendu direct ». Le besoin porte sur la **disposition** : l'ordre et la taille des blocs ; le contenu reste modifié dans le dashboard.
+Avec [ADR-0018](0018-drag-drop-dnd-kit-grille-bento.md), on réorganise les blocs dans la liste de `/dashboard/blocs`, et le résultat n'est visible que dans l'aperçu. Sur mobile, l'aperçu est caché derrière un bouton ; sur grand écran, il est réduit. Le retour du mainteneur : « on ne voit pas le rendu direct ». Le besoin porte sur la **disposition** : l'ordre, la taille et la position des blocs ; le contenu reste modifié dans le dashboard.
 
 Premiers essais sur la preview :
 
 - la grille d'ADR-0018 utilise `grid-flow-row-dense` : un bloc « petit » ne peut pas rester seul sur sa ligne, le petit bloc suivant est remonté à côté, quel que soit l'ordre voulu ;
-- réordonner pendant le survol (`onDragOver`) provoquait « Maximum update depth exceeded » : la grille, dont les blocs ont des tailles différentes, bougeait sous le pointeur et relançait un survol en boucle.
+- réordonner pendant le survol (`onDragOver`) provoquait « Maximum update depth exceeded » : la grille, dont les blocs ont des tailles différentes, bougeait sous le pointeur et relançait un survol en boucle ;
+- sans tassement, un petit bloc seul sur sa ligne est toujours à gauche ; le mainteneur veut pouvoir le placer à droite ou au centre.
+
+Pour cette position, trois pistes : **une propriété « position » des petits blocs** (gauche / centre / droite) ; **un bloc « espace vide »** à glisser à côté (nouveau type, peu intuitif, encombre la liste) ; **une grille à 4 colonnes avec placement libre** (colonnes de position en base, complexe, et l'ordre ne décide plus de la disposition). La première est retenue.
 
 ## Options envisagées
 
@@ -31,7 +34,8 @@ Option **1**, sous le nom « Modifier la disposition ».
 - **L'ordre change au dépôt, pas au survol** : pendant le glisser, aucun décalage n'est calculé, le bloc d'origine reste en place (estompé), une copie suit le pointeur (`DragOverlay`) et le bloc survolé est mis en évidence ; au dépôt, la vraie grille se réarrange une fois. Plus de boucle de mises à jour. Sur mobile, l'appui long (250 ms) déclenche le déplacement, pour que la page continue de défiler.
 - **Taille modifiable sur la page** : une barre « Petit / Large / Grand » sur chaque bloc, qui n'enclenche pas de glisser ; le bloc prend sa nouvelle place tout de suite.
 - **Fin du remplissage « dense »** (remplace ce point d'ADR-0018) : les blocs se placent strictement dans l'ordre choisi, un petit bloc peut rester seul sur sa ligne. La page suit les choix de l'utilisateur plutôt qu'un tassement automatique.
-- **Enregistrement explicite** (barre « Annuler / Enregistrer ») : on essaie plusieurs dispositions, puis on valide. Les tailles modifiées sont écrites par des `update` simples sur `links.size` (peu de blocs changent à la fois, pas de nouvelle fonction SQL ni de migration), puis l'ordre par `reorder_blocks` s'il a changé ; `router.refresh()` relit ensuite la page côté serveur.
+- **Position des petits blocs** : Gauche (1re colonne), Droite (2e colonne) ou Centre (ligne entière, largeur d'un petit bloc, centré), stockée dans `links.data.align` : `data` est déjà un objet JSON libre, donc **aucune migration**. Sans valeur, le bloc prend la prochaine case libre (comportement actuel) : forcer « Gauche » par défaut aurait séparé deux petits blocs aujourd'hui côte à côte. Sur la page, un second appui sur la position choisie revient à l'automatique ; le dashboard propose « Auto ». La position n'a d'effet que sur un bloc « Petit ».
+- **Enregistrement explicite** (barre « Annuler / Enregistrer ») : on essaie plusieurs dispositions, puis on valide. Les tailles et positions modifiées sont écrites par des `update` simples sur `links.size` / `links.data` (un par bloc modifié) (peu de blocs changent à la fois, pas de nouvelle fonction SQL ni de migration), puis l'ordre par `reorder_blocks` s'il a changé ; `router.refresh()` relit ensuite la page côté serveur.
 - La liste du dashboard (ADR-0018) est conservée, avec une astuce qui renvoie vers ce mode.
 
 ## Conséquences

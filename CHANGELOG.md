@@ -8,7 +8,7 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ### Ajouté
 
-- Sur sa propre page, le bouton « Modifier la disposition » permet de déplacer ses blocs et de changer leur taille en voyant directement le résultat, aussi sur mobile (appui long puis glisser), puis d'enregistrer. ([#90])
+- Sur sa propre page, le bouton « Modifier la disposition » permet de déplacer ses blocs, de changer leur taille et de placer un petit bloc à gauche, au centre ou à droite de sa ligne, en voyant directement le résultat, aussi sur mobile (appui long puis glisser), puis d'enregistrer. ([#90])
 
 ### Modifié
 

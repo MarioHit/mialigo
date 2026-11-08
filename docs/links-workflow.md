@@ -27,9 +27,10 @@ Voir [ADR-0018](decisions/0018-drag-drop-dnd-kit-grille-bento.md). La page affic
 Voir [ADR-0019](decisions/0019-reorganiser-sur-la-page-publique.md). Sur `/<pseudo>`, le propriétaire (id de la session = `ownerId` transmis par `page.tsx`) voit un bouton « Modifier la disposition ». Le mode charge `components/blocks/sortable-block-grid.tsx` à la demande :
 
 - **ordre** : souris (5 px), appui long sur mobile (250 ms), clavier ; le bloc survolé est mis en évidence et l'ordre ne change **qu'au dépôt** (réordonner au survol bouclait à l'infini avec des blocs de tailles différentes) ;
-- **taille** : barre « Petit / Large / Grand » sur chaque bloc, appliquée tout de suite à la grille.
+- **taille** : barre « Petit / Large / Grand » sur chaque bloc, appliquée tout de suite à la grille ;
+- **position** (petits blocs) : Gauche / Centre / Droite (`data.align`, `blockGridClass` dans `components/blocks/registry.tsx`) ; sans valeur, prochaine case libre ; un second appui sur la position choisie revient à l'automatique. Aussi dans `/dashboard/blocs` (sélecteur « Auto / Gauche / Centre / Droite »).
 
-« Enregistrer » écrit les tailles modifiées (`update` de `links.size`), puis l'ordre s'il a changé (`rpc("reorder_blocks", { ids })`), protégés par la RLS, et appelle `router.refresh()` ; « Annuler » rétablit la disposition enregistrée.
+« Enregistrer » écrit les tailles et positions modifiées (`update` de `links.size` / `links.data`), puis l'ordre s'il a changé (`rpc("reorder_blocks", { ids })`), protégés par la RLS, et appelle `router.refresh()` ; « Annuler » rétablit la disposition enregistrée.
 
 ---
 
