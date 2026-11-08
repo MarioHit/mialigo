@@ -4,6 +4,7 @@
 
 :root {
   --bg-color: #f4f4f9;
+  --muted-color: #666;
   --text-color: #333;
   --link-bg: #ffffff;
   --link-hover: #eef2ff;
@@ -14,6 +15,7 @@
 
 .dark-mode {
   --bg-color: #121212;
+  --muted-color: #999;
   --text-color: #f0f0f0;
   --link-bg: #1e1e1e;
   --link-hover: #2d2d2d;
@@ -45,10 +47,140 @@ body {
 }
 .block-card:hover {
   background-color: var(--link-hover);
+  border-color: var(--accent, #6366f1);
 }
 
-.dark-mode .profile-bio {
-  color: #999;
+.profile-bio {
+  color: var(--muted-color);
+}
+
+/* ============================================================
+   Thèmes de page (#19, lib/themes.ts) : conteneur .page-theme
+   avec data-page-style, --accent et --block-radius en style inline.
+   Chaque style redéfinit les variables pour ses enfants, en mode
+   clair et sombre (classe .dark-mode du body).
+   ============================================================ */
+.page-theme {
+  --page-bg: var(--bg-color);
+  background: var(--page-bg);
+  color: var(--text-color);
+  transition:
+    background-color 0.4s ease,
+    color 0.4s ease;
+}
+
+/* Arrondi des cartes : la valeur du thème, plafonnée pour les tuiles. */
+.page-theme .block-card {
+  border-radius: var(--block-radius, 9999px);
+}
+.page-theme .block-card[data-size="small"],
+.page-theme .block-card[data-size="large"] {
+  border-radius: min(var(--block-radius, 9999px), 1.75rem);
+}
+
+/* Minimal : noir et blanc, cartes à simple contour. */
+.page-theme[data-page-style="minimal"] {
+  --bg-color: #ffffff;
+  --text-color: #111111;
+  --muted-color: #555555;
+  --link-bg: transparent;
+  --link-hover: #f5f5f5;
+  --link-border: #111111;
+}
+.dark-mode .page-theme[data-page-style="minimal"] {
+  --bg-color: #000000;
+  --text-color: #fafafa;
+  --muted-color: #a3a3a3;
+  --link-hover: #171717;
+  --link-border: #fafafa;
+}
+.page-theme[data-page-style="minimal"] .block-card {
+  border-width: 2px;
+  box-shadow: none;
+}
+
+/* Verre : fond dégradé de l'accent, cartes translucides floutées. */
+.page-theme[data-page-style="glass"] {
+  --bg-color: color-mix(in srgb, var(--accent) 30%, #ffffff);
+  --page-bg:
+    radial-gradient(
+      circle at 15% 10%,
+      color-mix(in srgb, var(--accent) 55%, #ffffff) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      circle at 85% 90%,
+      color-mix(in srgb, var(--accent) 45%, #ffd6e7) 0%,
+      transparent 60%
+    ),
+    color-mix(in srgb, var(--accent) 20%, #ffffff);
+  --text-color: #14141f;
+  --muted-color: #3f3f55;
+  --link-bg: rgba(255, 255, 255, 0.38);
+  --link-hover: rgba(255, 255, 255, 0.55);
+  --link-border: rgba(255, 255, 255, 0.65);
+}
+.dark-mode .page-theme[data-page-style="glass"] {
+  --bg-color: color-mix(in srgb, var(--accent) 25%, #0b0b14);
+  --page-bg:
+    radial-gradient(
+      circle at 15% 10%,
+      color-mix(in srgb, var(--accent) 45%, #0b0b14) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      circle at 85% 90%,
+      color-mix(in srgb, var(--accent) 30%, #1a0b1f) 0%,
+      transparent 60%
+    ),
+    #0b0b14;
+  --text-color: #f4f4ff;
+  --muted-color: #c4c4d8;
+  --link-bg: rgba(20, 20, 32, 0.4);
+  --link-hover: rgba(40, 40, 60, 0.55);
+  --link-border: rgba(255, 255, 255, 0.18);
+}
+.page-theme[data-page-style="glass"] {
+  background-attachment: fixed;
+}
+.page-theme[data-page-style="glass"] .block-card {
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+/* Sans backdrop-filter : cartes plus opaques pour rester lisibles. */
+@supports not (
+  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+) {
+  .page-theme[data-page-style="glass"] {
+    --link-bg: rgba(255, 255, 255, 0.8);
+  }
+  .dark-mode .page-theme[data-page-style="glass"] {
+    --link-bg: rgba(20, 20, 32, 0.85);
+  }
+}
+
+/* Néon : toujours sombre, contours et lueur de l'accent. */
+.page-theme[data-page-style="neon"],
+.dark-mode .page-theme[data-page-style="neon"] {
+  --bg-color: #07070d;
+  --text-color: #f5f5ff;
+  --muted-color: #a1a1c2;
+  --link-bg: rgba(255, 255, 255, 0.03);
+  --link-hover: color-mix(in srgb, var(--accent) 12%, transparent);
+  --link-border: var(--accent);
+}
+.page-theme[data-page-style="neon"] .block-card {
+  box-shadow:
+    0 0 8px color-mix(in srgb, var(--accent) 55%, transparent),
+    inset 0 0 6px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+.page-theme[data-page-style="neon"] .block-card:hover {
+  box-shadow:
+    0 0 16px color-mix(in srgb, var(--accent) 80%, transparent),
+    inset 0 0 8px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+.page-theme[data-page-style="neon"] h1 {
+  text-shadow: 0 0 12px color-mix(in srgb, var(--accent) 70%, transparent);
 }
 
 .theme-toggle .fa-sun {

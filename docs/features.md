@@ -11,7 +11,8 @@ Ce document répertorie l'ensemble des fonctionnalités du projet Mialigo, leur 
 | **Inscription par Magic Link**   | ✅ En production | [auth-workflow.md](auth-workflow.md)                                    | Création de compte avec réservation de pseudo unique `mialigo.com/<pseudo>` et lien magique sécurisé.              |
 | **Connexion sans mot de passe**  | ✅ En production | [login-workflow.md](login-workflow.md)                                  | Authentification par email direct sans mot de passe (Magic Link Server-Side PKCE).                                 |
 | **Gestion du Profil & Liens**    | ✅ En production | [links-workflow.md](links-workflow.md)                                  | Dashboard d'administration : modification du pseudo/nom/bio, ajout, édition et suppression de liens.               |
-| **Disposition depuis sa page**   | 🚧 En pré-prod   | [links-workflow.md](links-workflow.md), [ADR-0019](decisions/0019-reorganiser-sur-la-page-publique.md) | Bouton « Modifier la disposition » (propriétaire) sur `/<pseudo>` : ordre, taille et position des blocs avec le vrai rendu, puis enregistrer. |
+| **Thèmes de page**               | 🚧 En pré-prod   | [ADR-0020](decisions/0020-themes-de-page.md) | Onglet « Apparence » : styles Classique / Verre / Minimal / Néon, couleur d'accent (contrôle de contraste), arrondis ; aperçu en direct, aussi depuis sa page (« Personnaliser »). |
+| **Disposition depuis sa page**   | ✅ En production | [links-workflow.md](links-workflow.md), [ADR-0019](decisions/0019-reorganiser-sur-la-page-publique.md) | Bouton « Modifier la disposition » (propriétaire) sur `/<pseudo>` : ordre, taille et position des blocs avec le vrai rendu, puis enregistrer. |
 | **Drag & drop & Grille bento**   | ✅ En production | [links-workflow.md](links-workflow.md), [ADR-0018](decisions/0018-drag-drop-dnd-kit-grille-bento.md) | Réorganisation des blocs (`@dnd-kit`, souris / tactile / clavier), tailles petit / large / grand, grille à 2 colonnes. |
 | **Blocs & Aperçu en direct**     | ✅ En production | [links-workflow.md](links-workflow.md), [ADR-0017](decisions/0017-modele-blocs-registre-apercu.md) | Liens stockés comme blocs typés (`type`, `data`, `size`), registre de composants, aperçu en direct dans le dashboard. |
 | **Photo de profil & Bannière**   | ✅ En production | [links-workflow.md](links-workflow.md), [ADR-0016](decisions/0016-photo-profil-banniere-storage.md) | Envoi depuis le dashboard (recadrage dans le navigateur), import Gravatar / GitHub copié dans Supabase Storage.    |
@@ -48,5 +49,5 @@ Ce document répertorie l'ensemble des fonctionnalités du projet Mialigo, leur 
 - [x] **Upload d'avatar / Photo de profil :** stockage des images dans Supabase Storage (#15).
 - [x] **Drag & Drop pour les liens :** réorganisation intuitive de l'ordre d'affichage des liens (#18).
 - [ ] **Statistiques & Analytics :** compteur de clics par lien et visites globales du profil.
-- [ ] **Personnalisation de thèmes :** choix de palettes de couleurs personnalisées par utilisateur.
+- [x] **Personnalisation de thèmes :** choix de palettes de couleurs personnalisées par utilisateur (#19).
 - [ ] **Générateur de QR Code :** téléchargement d'un QR code dirigeant vers `mialigo.com/<username>`.

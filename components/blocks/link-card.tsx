@@ -29,7 +29,8 @@ export default function LinkCard({ block }: BlockProps) {
   return (
     <a
       href={block.url}
-      className={`block-card flex h-full w-full items-center border no-underline font-medium transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-500 ${style.card}`}
+      className={`block-card flex h-full w-full items-center border no-underline font-medium transition-all duration-200 hover:-translate-y-0.5 ${style.card}`}
+      data-size={block.size}
       target="_blank"
       rel="noopener noreferrer"
     >

@@ -7,6 +7,7 @@ Organisation du dashboard :
 - `/dashboard` redirige vers `/dashboard/profil` (c'est l'URL d'arrivée du magic link).
 - `app/dashboard/layout.tsx` enveloppe toutes les sous-pages dans `DashboardShell` (`app/dashboard/dashboard-shell.tsx`, composant client) : vérification de session (sinon `/login`), chargement du profil et des blocs, en-tête (« Voir ma page », déconnexion), onglets et **aperçu en direct**. Les sous-pages lisent `user`, `profile`, `reloadProfile()`, `blocks`, `reloadBlocks()` avec `useDashboard()`, et y poussent leurs brouillons (`setProfileDraft`, `setEditDraft`, `setNewDraft`).
 - `/dashboard/profil` (`app/dashboard/profil/page.tsx`) : pseudo, nom affiché, bio, et le bloc « Photo et bannière » (`profile-images.tsx`, action serveur `actions.ts`).
+- `/dashboard/apparence` (`app/dashboard/apparence/page.tsx`) : thème de la page (style, couleur d'accent, arrondis), voir [ADR-0020](decisions/0020-themes-de-page.md) ; brouillon dans l'aperçu (`setThemeDraft`), « Enregistrer » écrit `users.theme` (`NULL` pour le thème par défaut).
 - `/dashboard/blocs` (`app/dashboard/blocs/page.tsx`) : liste, ajout, modification et suppression des liens ; réorganisation par drag & drop (`@dnd-kit`, poignée, clavier : Espace puis flèches) et choix de la taille (petit / large / grand) de chaque bloc.
 
 
@@ -22,15 +23,17 @@ L'aperçu combine les données enregistrées et les brouillons : nom et bio en c
 Voir [ADR-0018](decisions/0018-drag-drop-dnd-kit-grille-bento.md). La page affiche les blocs dans une grille à 2 colonnes (`BlockList`), strictement dans l'ordre choisi (pas de remplissage « dense », cf. ADR-0019) : `small` 1×1, `wide` 2×1 (défaut, la ligne habituelle), `large` 2×2. Dans le dashboard, déposer un lien à une nouvelle place met à jour l'aperçu tout de suite, puis enregistre tout l'ordre en une requête : `rpc("reorder_blocks", { ids })` (`SECURITY INVOKER`, filtrée sur `auth.uid()`). En cas d'échec, les blocs sont relus. Le changement de taille est un `update` de `links.size`.
 
 
-### Modifier la disposition depuis sa page publique
+### Personnaliser sa page depuis la page publique (disposition et apparence)
 
-Voir [ADR-0019](decisions/0019-reorganiser-sur-la-page-publique.md). Sur `/<pseudo>`, le propriétaire (id de la session = `ownerId` transmis par `page.tsx`) voit un bouton « Modifier la disposition ». Le mode charge `components/blocks/sortable-block-grid.tsx` à la demande :
+Voir [ADR-0019](decisions/0019-reorganiser-sur-la-page-publique.md). Sur `/<pseudo>`, le propriétaire (id de la session = `ownerId` transmis par `page.tsx`) voit un bouton « Personnaliser » (nommé « Modifier la disposition » avant #19). Le mode charge `components/blocks/sortable-block-grid.tsx` à la demande :
 
 - **ordre** : souris (5 px), appui long sur mobile (250 ms), clavier ; le bloc survolé est mis en évidence et l'ordre ne change **qu'au dépôt** (réordonner au survol bouclait à l'infini avec des blocs de tailles différentes) ;
 - **taille** : barre « Petit / Large / Grand » sur chaque bloc, appliquée tout de suite à la grille ;
 - **position** (petits blocs) : Gauche / Centre / Droite (`data.align`, `blockGridClass` dans `components/blocks/registry.tsx`) ; sans valeur, prochaine case libre ; un second appui sur la position choisie revient à l'automatique. Aussi dans `/dashboard/blocs` (sélecteur « Auto / Gauche / Centre / Droite »).
 
-« Enregistrer » écrit les tailles et positions modifiées (`update` de `links.size` / `links.data`), puis l'ordre s'il a changé (`rpc("reorder_blocks", { ids })`), protégés par la RLS, et appelle `router.refresh()` ; « Annuler » rétablit la disposition enregistrée.
+Le bouton « 🎨 Apparence » ouvre un panneau en bas d'écran avec le sélecteur de thème (`components/theme-picker.tsx`, chargé à la demande) : la page change en direct.
+
+« Enregistrer » écrit le thème s'il a changé (`users.theme`), les tailles et positions modifiées (`update` de `links.size` / `links.data`), puis l'ordre s'il a changé (`rpc("reorder_blocks", { ids })`), protégés par la RLS, et appelle `router.refresh()` ; « Annuler » rétablit la disposition enregistrée.
 
 ---
 

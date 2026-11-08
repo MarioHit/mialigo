@@ -17,6 +17,7 @@
 --   5. supabase-avatars.sql               (#15, photo de profil et bannière)
 --   6. supabase-blocks.sql                (#16, liens → blocs typés)
 --   7. supabase-reorder-blocks.sql        (#18, reorder_blocks, taille « wide » par défaut)
+--   8. supabase-themes.sql                (#19, users.theme)
 -- Toute nouvelle migration : un nouveau fichier supabase-*.sql non destructif,
 -- ajouté à cette liste, ET sa définition recopiée dans ce fichier.
 
@@ -33,6 +34,18 @@ CREATE TABLE users (
   bio TEXT,
   avatar_url TEXT,
   banner_url TEXT,
+  -- Thème de page (#19, même définition que supabase-themes.sql ; listes
+  -- synchronisées avec lib/themes.ts). NULL = thème par défaut.
+  theme JSONB CONSTRAINT users_theme_check CHECK (
+    theme IS NULL OR (
+      jsonb_typeof(theme) = 'object'
+      AND theme ?& ARRAY['style', 'accent', 'radius']
+      AND (theme - ARRAY['style', 'accent', 'radius']) = '{}'::jsonb
+      AND (theme->>'style') IN ('classic', 'glass', 'minimal', 'neon')
+      AND (theme->>'accent') ~ '^#[0-9a-fA-F]{6}$'
+      AND (theme->>'radius') IN ('none', 'soft', 'strong', 'pill')
+    )
+  ),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -191,7 +204,7 @@ CREATE POLICY "Users can insert own profile"
 -- ⚠️ Toute nouvelle colonne de users doit être ajoutée à ce GRANT.
 -- ⚠️ Conséquence : pas d'upsert sur users depuis l'app (il exige de lire email) → insert / update.
 REVOKE SELECT ON public.users FROM PUBLIC, anon, authenticated;
-GRANT SELECT (id, username, name, bio, avatar_url, banner_url, created_at, updated_at)
+GRANT SELECT (id, username, name, bio, avatar_url, banner_url, theme, created_at, updated_at)
   ON public.users TO anon, authenticated;
 
 -- 7. Politiques RLS pour links

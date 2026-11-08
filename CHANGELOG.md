@@ -4,6 +4,12 @@ Toutes les évolutions notables de Mialigo sont consignées dans ce fichier, éc
 
 Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le projet respecte le [versionnage sémantique](https://semver.org/lang/fr/). Chaque version correspond à une mise en production : même numéro dans `package.json`, tag Git `vX.Y.Z` sur le merge vers `main`. Chaque modification inscrit sa ligne directement dans la section de la prochaine version, la plus haute du fichier tant qu'elle n'est pas en production. Les catégories sont celles de Keep a Changelog (Ajouté, Modifié, Obsolète, Supprimé, Corrigé, Sécurité), plus « Interne » pour les changements sans effet visible sur le site (voir [ADR-0010](docs/decisions/0010-versionnage-semver-tags.md) et [ADR-0015](docs/decisions/0015-version-par-pr.md)).
 
+## [0.8.0] - 2026-11-08
+
+### Ajouté
+
+- Choix de l'apparence de sa page dans un nouvel onglet « Apparence » : quatre styles (Classique, Verre, Minimal, Néon), une couleur d'accent et l'arrondi des blocs, avec l'aperçu en direct. On peut aussi le faire directement sur sa page avec le bouton « Personnaliser », qui regroupe désormais la disposition et l'apparence. Un avertissement signale une couleur trop peu visible sur le fond choisi. ([#19])
+
 ## [0.7.0] - 2026-11-08
 
 ### Ajouté
@@ -89,6 +95,7 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 - Pages légales : conditions générales d'utilisation, politique de confidentialité, mentions légales, contact et suppression de compte.
 - Les adresses email des utilisateurs ne sont jamais visibles publiquement.
 
+[0.8.0]: https://github.com/MarioHit/mialigo/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/MarioHit/mialigo/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/MarioHit/mialigo/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/MarioHit/mialigo/compare/v0.4.0...v0.5.0
@@ -103,6 +110,7 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 [#16]: https://github.com/MarioHit/mialigo/issues/16
 [#17]: https://github.com/MarioHit/mialigo/issues/17
 [#18]: https://github.com/MarioHit/mialigo/issues/18
+[#19]: https://github.com/MarioHit/mialigo/issues/19
 [#29]: https://github.com/MarioHit/mialigo/issues/29
 [#57]: https://github.com/MarioHit/mialigo/issues/57
 [#63]: https://github.com/MarioHit/mialigo/issues/63
