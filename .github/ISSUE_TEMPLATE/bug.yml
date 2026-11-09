@@ -1,0 +1,47 @@
+# Modèle « Bug » (software factory, docs/factory.md, ADR-0023).
+name: Bug
+description: Quelque chose ne marche pas comme prévu.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ne collez **jamais** de mot de passe, de clé, de jeton ni d'email dans une issue.
+  - type: textarea
+    id: steps
+    attributes:
+      label: Étapes pour reproduire
+      value: |
+        1. Aller sur …
+        2. Cliquer sur …
+        3. …
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Résultat attendu
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Résultat obtenu
+      description: Message d'erreur, capture d'écran.
+    validations:
+      required: true
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Où
+      options:
+        - Production (mialigo.com)
+        - Preview Vercel d'une PR
+        - En local
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Appareil et navigateur
+      placeholder: ex. iPhone 15, Safari ; PC, Chrome
