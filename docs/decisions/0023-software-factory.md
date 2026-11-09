@@ -22,9 +22,9 @@ Le mainteneur veut une chaîne qui garantisse que chaque user story va au bout, 
 
 ## Décision et raison
 
-Option 1, en **six étapes** suivies dans l'epic #103, chacune avec son issue, sa PR et son ADR :
+Option 1, en **six étapes** suivies dans l'epic #103, chacune avec son issue, sa PR, son ADR et sa **fiche d'étape** (`docs/factory/NN-<slug>.md`, modèle `00-modele.md`) qui décrit en mots simples **a.** l'état d'avant, **b.** ce qui change concrètement dans le processus et ses impacts, **c.** le résultat après :
 
-1. **Cadre** (#104, cette ADR) : modèles d'issue (User story avec critères « Étant donné / Quand / Alors », Bug), issues vierges désactivées, modèle de PR portant la Definition of Done, `docs/factory.md` (Definition of Ready / Done, parcours, feuille de route, réutilisation) et une page explicative (`docs/factory.html`).
+1. **Cadre** (#104, cette ADR, fiche `01-cadre.md`) : modèles d'issue (User story avec critères « Étant donné / Quand / Alors », Bug), issues vierges désactivées, modèle de PR portant la Definition of Done, `docs/factory.md` (Definition of Ready / Done, parcours, feuille de route, réutilisation) et une page explicative (`docs/factory.html`).
 2. **CI qualité** (#105) : TypeScript et build en CI, Dependabot.
 3. **Tests unitaires** (#106).
 4. **Tests de bout en bout sur la preview** (#107).
@@ -38,4 +38,5 @@ L'ordre va du moins coûteux au plus coûteux, et chaque étape renforce les sui
 - Chaque nouvelle issue passe par un modèle (sur le site GitHub ; `gh issue create --body` reste libre, les agents reprennent les mêmes sections).
 - La Definition of Done vit à deux endroits : le modèle de PR (la checklist) et `docs/factory.md` (l'explication). AGENTS.md y renvoie au lieu de la recopier.
 - La checklist ne bloque rien d'elle-même : ce sont les checks des étapes 2 à 5 qui rendront la plupart des points automatiques.
-- Pour un autre projet : recopier `.github/` et `docs/factory.md`, adapter les noms (section « Réutiliser » de `docs/factory.md`).
+- L'ADR garde le *pourquoi* technique ; la fiche d'étape garde le *vécu* du processus (avant / changement / après), lisible sans connaissance technique.
+- Pour un autre projet : recopier `.github/`, `docs/factory.md` et `docs/factory/`, adapter les noms (section « Réutiliser » de `docs/factory.md`).

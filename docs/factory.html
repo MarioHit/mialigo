@@ -172,7 +172,7 @@
   <section>
     <div class="eyebrow">La mise en place</div>
     <h2>Six étapes, chacune utile toute seule</h2>
-    <p>On construit la factory pièce par pièce. Chaque étape est une issue, une PR, une ADR (la trace écrite du choix). Chaque exemple vient de problèmes rencontrés pour de vrai sur Mialigo.</p>
+    <p>On construit la factory pièce par pièce. Chaque étape est une issue, une PR, une ADR (la trace écrite du choix) et une <strong>fiche d'étape</strong> dans <code>docs/factory/</code> qui raconte en mots simples : <em>avant</em> (ce qui se passait), <em>ce qui change</em> (dans le processus, et les impacts) et <em>après</em> (le résultat). Chaque exemple vient de problèmes rencontrés pour de vrai sur Mialigo.</p>
     <div class="stages">
       <article class="stage">
         <div class="num">1</div>
@@ -180,6 +180,9 @@
         <dl>
           <dt>Ce que c'est</dt><dd>Modèles d'issue (User story, Bug) et de PR, Definition of Ready et Definition of Done, document de référence.</dd>
           <dt>Outils</dt><dd>Modèles GitHub dans <code>.github/</code>, <code>docs/factory.md</code>, ADR-0023.</dd>
+          <dt>Avant</dt><dd>Issues en texte libre (l'idée du nid d'abeille n'était pas écrite dans la #20, d'où la PR #97 à côté) ; checklist cachée dans <code>AGENTS.md</code>.</dd>
+          <dt>Ce qui change</dt><dd>« New issue » propose User story ou Bug avec critères « Étant donné / Quand / Alors » ; chaque PR se pré-remplit avec la checklist « terminé ». Pour toi : 2–3 min de plus par issue, moins de PR à refaire.</dd>
+          <dt>Après</dt><dd>Chaque issue dit comment savoir que c'est fini, chaque PR montre les 8 cases à cocher. Fiche : <code>docs/factory/01-cadre.md</code>.</dd>
         </dl>
         <p class="catch"><strong>Ce que ça évite :</strong> oublier une étape. Par exemple, la version 0.4.0 publiée avec des lignes qui appartenaient à la suivante (#85) : la checklist rappelle de revérifier la version de main juste avant le merge.</p>
       </article>
@@ -236,7 +239,7 @@
     <h2>Une base pour tous tes projets</h2>
     <p>Tout vit dans le dépôt (pas dans un outil externe) : pour démarrer un nouveau projet avec la même rigueur, il suffit de recopier.</p>
     <ol>
-      <li>Copier <code>.github/</code> (modèles et workflows) et <code>docs/factory.md</code>.</li>
+      <li>Copier <code>.github/</code> (modèles et workflows), <code>docs/factory.md</code> et le dossier <code>docs/factory/</code> (modèle de fiche d'étape).</li>
       <li>Adapter les noms : branches, numéro du GitHub Project, liens des ADR.</li>
       <li>Reprendre les règles de travail d'<code>AGENTS.md</code> et le modèle d'ADR.</li>
       <li>Créer les labels de priorité (P0 à P4).</li>

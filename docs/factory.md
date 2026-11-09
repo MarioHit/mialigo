@@ -5,6 +5,7 @@ La chaîne de travail qui mène chaque user story de l'idée à la production, s
 - Pourquoi ces choix : [ADR-0023](decisions/0023-software-factory.md).
 - Version illustrée pour débuter : [factory.html](factory.html).
 - Suivi : epic [#103](https://github.com/MarioHit/mialigo/issues/103).
+- Une fiche par étape dans [`factory/`](factory/) : avant, ce qui change (processus et impacts), après.
 
 ## Le parcours d'une user story
 
@@ -56,20 +57,27 @@ La story est **livrée** quand la PR de mise en prod est mergée dans `main` (is
 
 ## Feuille de route
 
-| Étape | Issue | Statut | Apport |
-|---|---|---|---|
-| 1. Cadre : modèles, DoR / DoD, ADR fondateur | [#104](https://github.com/MarioHit/mialigo/issues/104) | en cours | chaque US est bien posée, aucune étape oubliée |
-| 2. CI qualité : TypeScript, build, Dependabot | [#105](https://github.com/MarioHit/mialigo/issues/105) | à faire | erreurs de type et build cassé bloqués avant Vercel |
-| 3. Tests unitaires (Vitest) | [#106](https://github.com/MarioHit/mialigo/issues/106) | à faire | la logique métier est vérifiée à chaque PR |
-| 4. Tests de bout en bout (Playwright sur la preview) | [#107](https://github.com/MarioHit/mialigo/issues/107) | à faire | le parcours réel est testé automatiquement |
-| 5. Migrations SQL vérifiées en CI | [#108](https://github.com/MarioHit/mialigo/issues/108) | à faire | une migration cassée n'atteint pas la prod |
-| 6. Observabilité (Umami, erreurs) | [#109](https://github.com/MarioHit/mialigo/issues/109) | à faire | usage et erreurs visibles, sans dépendre d'un tiers |
+| Étape | Issue | Fiche | Statut | Apport |
+|---|---|---|---|---|
+| 1. Cadre : modèles, DoR / DoD, ADR fondateur | [#104](https://github.com/MarioHit/mialigo/issues/104) | [01-cadre](factory/01-cadre.md) | en cours | chaque US est bien posée, aucune étape oubliée |
+| 2. CI qualité : TypeScript, build, Dependabot | [#105](https://github.com/MarioHit/mialigo/issues/105) | — | à faire | erreurs de type et build cassé bloqués avant Vercel |
+| 3. Tests unitaires (Vitest) | [#106](https://github.com/MarioHit/mialigo/issues/106) | — | à faire | la logique métier est vérifiée à chaque PR |
+| 4. Tests de bout en bout (Playwright sur la preview) | [#107](https://github.com/MarioHit/mialigo/issues/107) | — | à faire | le parcours réel est testé automatiquement |
+| 5. Migrations SQL vérifiées en CI | [#108](https://github.com/MarioHit/mialigo/issues/108) | — | à faire | une migration cassée n'atteint pas la prod |
+| 6. Observabilité (Umami, erreurs) | [#109](https://github.com/MarioHit/mialigo/issues/109) | — | à faire | usage et erreurs visibles, sans dépendre d'un tiers |
 
-Chaque étape est livrée seule et apporte déjà quelque chose ; chacune a son ADR.
+Chaque étape est livrée seule et apporte déjà quelque chose. Sa PR contient :
+
+- son **ADR** (`docs/decisions/`) : le choix technique, les options écartées et pourquoi ;
+- sa **fiche d'étape** (`docs/factory/NN-<slug>.md`, d'après [`00-modele.md`](factory/00-modele.md)), en mots simples :
+  - **a. Avant** : ce qui se passait sans l'étape, avec des exemples réels ;
+  - **b. Ce qui change** : concrètement dans le processus (qui fait quoi, à quel moment) et les impacts (mainteneur, agents, outils, limites) ;
+  - **c. Après** : le résultat obtenu et comment le vérifier soi-même ;
+- la mise à jour de cette feuille de route et de [factory.html](factory.html).
 
 ## Réutiliser dans un autre projet
 
-1. Copier `.github/ISSUE_TEMPLATE/`, `.github/pull_request_template.md`, `.github/workflows/` et ce document.
+1. Copier `.github/ISSUE_TEMPLATE/`, `.github/pull_request_template.md`, `.github/workflows/`, ce document et le dossier `docs/factory/` (les fiches servent d'exemple ; garder `00-modele.md`).
 2. Adapter les noms propres : branches (`pre-prod`, `main`), numéro et identifiants du GitHub Project, liens des ADR.
 3. Reprendre les règles de travail d'`AGENTS.md` (branches, merge, CHANGELOG, version) et le modèle d'ADR `docs/decisions/0000-modele.md`.
 4. Créer les labels de priorité `P0-sécurité`, `P1` à `P4`, `tech`, `enhancement`, `bug`.
