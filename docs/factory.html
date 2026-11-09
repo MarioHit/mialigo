@@ -1,0 +1,270 @@
+<title>Software factory Mialigo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+  /* Mise en page : une colonne de lecture ; le parcours d'une user story en
+     bande de « postes » d'atelier, des portes de contrôle en ambre (signalisation). */
+  :root {
+    --bg: #f5f6f8;
+    --surface: #ffffff;
+    --fg: #1b2230;
+    --muted: #586174;
+    --line: #d9dde5;
+    --steel: #2f4a6d;
+    --signal: #b45309;
+    --signal-soft: #fdf3e2;
+    --ok: #15803d;
+    --ok-soft: #e8f6ec;
+    --font-display: "Sora", "Segoe UI", system-ui, sans-serif;
+    --font-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #11151c; --surface: #19202a; --fg: #e6eaf1; --muted: #9aa4b6; --line: #2b3442;
+      --steel: #8fb0dc; --signal: #f0a64a; --signal-soft: #2e2416; --ok: #5fd08a; --ok-soft: #16271c;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #11151c; --surface: #19202a; --fg: #e6eaf1; --muted: #9aa4b6; --line: #2b3442;
+    --steel: #8fb0dc; --signal: #f0a64a; --signal-soft: #2e2416; --ok: #5fd08a; --ok-soft: #16271c;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.6;
+    padding-block: 40px 72px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  main { max-width: 860px; margin: 0 auto; display: grid; gap: 56px; }
+  h1, h2, h3 { font-family: var(--font-display); line-height: 1.2; text-wrap: balance; margin: 0; }
+  h1 { font-size: clamp(2rem, 5vw, 2.8rem); letter-spacing: -0.01em; }
+  h2 { font-size: 1.55rem; margin-bottom: 14px; }
+  h3 { font-size: 1.1rem; }
+  p { margin: 0 0 12px; max-width: 68ch; }
+  .eyebrow { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--signal); margin-bottom: 10px; }
+  .lead { font-size: 1.15rem; color: var(--muted); margin-top: 14px; }
+  code { font-family: var(--font-mono); font-size: 0.85em; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; }
+  a { color: var(--steel); }
+  a:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
+
+  .analogy { border-left: 4px solid var(--signal); background: var(--signal-soft); padding: 14px 18px; border-radius: 0 10px 10px 0; }
+  .analogy p:last-child { margin-bottom: 0; }
+
+  /* Parcours d'une user story */
+  .line { list-style: none; margin: 18px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; counter-reset: post; }
+  .post { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; position: relative; min-width: 0; }
+  .post .who { font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+  .post h3 { font-size: 1rem; margin: 2px 0 4px; }
+  .post p { font-size: 0.9rem; color: var(--muted); margin: 0; }
+  .post.gate { border-color: var(--signal); background: var(--signal-soft); }
+  .post.gate .who { color: var(--signal); }
+  .post.prod { border-color: var(--ok); background: var(--ok-soft); }
+  .post.prod .who { color: var(--ok); }
+  .post .step { font-family: var(--font-mono); font-size: 0.75rem; color: var(--steel); }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 12px; font-size: 0.85rem; color: var(--muted); }
+  .legend span::before { content: ""; display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; border: 1px solid var(--line); background: var(--surface); }
+  .legend .l-gate::before { border-color: var(--signal); background: var(--signal-soft); }
+  .legend .l-prod::before { border-color: var(--ok); background: var(--ok-soft); }
+
+  /* Avant / après */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 0.95rem; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-family: var(--font-display); font-size: 0.85rem; font-weight: 600; color: var(--muted); background: var(--bg); }
+  tr:last-child td { border-bottom: 0; }
+  td:first-child { font-weight: 600; width: 22%; }
+
+  /* Étapes */
+  .stages { display: grid; gap: 14px; }
+  .stage { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 4px 16px; }
+  .stage .num { grid-row: span 3; font-family: var(--font-display); font-size: 2rem; font-weight: 700; color: var(--steel); line-height: 1; }
+  .stage header { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; }
+  .badge { font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+  .badge.now { border-color: var(--signal); color: var(--signal); }
+  .stage dl { margin: 6px 0 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 12px; font-size: 0.93rem; }
+  .stage dt { color: var(--muted); }
+  .stage dd { margin: 0; }
+  .stage .catch { margin-top: 8px; font-size: 0.9rem; border-top: 1px dashed var(--line); padding-top: 8px; color: var(--muted); }
+  .stage .catch strong { color: var(--fg); }
+
+  .reuse ol { margin: 0; padding-left: 22px; }
+  .reuse li { margin-bottom: 6px; }
+
+  .glossary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 24px; margin: 0; }
+  .glossary div { min-width: 0; }
+  .glossary dt { font-family: var(--font-display); font-weight: 600; }
+  .glossary dd { margin: 0 0 4px; color: var(--muted); font-size: 0.95rem; }
+
+  footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--line); padding-top: 16px; }
+
+  @media (max-width: 720px) {
+    .line { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .glossary { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 440px) {
+    .line { grid-template-columns: 1fr; }
+    .stage { grid-template-columns: 1fr; }
+    .stage .num { grid-row: auto; font-size: 1.5rem; }
+  }
+</style>
+
+<main>
+  <header>
+    <div class="eyebrow">Mialigo · epic #103</div>
+    <h1>La software factory de Mialigo</h1>
+    <p class="lead">Comment chaque idée devient une fonctionnalité en production sans rien oublier ni rien casser : ce qui est mis en place, ce qui change pour toi, et ce que ça deviendra.</p>
+  </header>
+
+  <section>
+    <div class="eyebrow">L'idée</div>
+    <h2>Une chaîne de montage avec des contrôles qualité</h2>
+    <p>Une <strong>software factory</strong> (usine logicielle), c'est l'ensemble des règles et des outils qui font passer une idée par les mêmes étapes, toujours dans le même ordre, avec des contrôles automatiques à chaque poste.</p>
+    <div class="analogy">
+      <p>Pense à une usine : chaque pièce passe par les mêmes postes, et des portiques vérifient la qualité. Une pièce défectueuse est arrêtée tout de suite, pas chez le client.</p>
+      <p>Ici, la « pièce » est une <strong>user story</strong> (un besoin d'utilisateur), les « postes » sont l'issue, la branche, la PR, la preview, et les « portiques » sont les checks automatiques.</p>
+    </div>
+    <p style="margin-top:14px">Une bonne partie existe déjà dans Mialigo (branches, PR vers pre-prod, CHANGELOG, tags de version). La factory complète ce qui manque et l'écrit noir sur blanc pour pouvoir <strong>la réutiliser dans tes autres projets</strong>.</p>
+  </section>
+
+  <section>
+    <div class="eyebrow">Le parcours</div>
+    <h2>Le trajet d'une user story, de l'idée à la prod</h2>
+    <ol class="line">
+      <li class="post"><span class="who">Toi</span><h3>1. L'issue</h3><p>Le besoin, écrit avec le modèle « User story » et ses critères d'acceptation.</p></li>
+      <li class="post"><span class="who">Agent / dev</span><h3>2. La branche</h3><p>L'issue passe en In progress, le travail se fait à part.</p></li>
+      <li class="post"><span class="who">Agent / dev</span><h3>3. La PR</h3><p>Demande de modification vers pre-prod, avec la checklist « terminé ».</p></li>
+      <li class="post gate"><span class="who">Automatique</span><h3>4. Les checks</h3><p>Lint, secrets, build… puis types, tests, SQL (étapes 2 à 5).</p></li>
+      <li class="post gate"><span class="who">Toi</span><h3>5. La preview</h3><p>Tu testes le vrai site, critère par critère.</p></li>
+      <li class="post"><span class="who">Agent / dev</span><h3>6. Merge pre-prod</h3><p>L'issue passe en In review, la PR de mise en prod se met à jour seule.</p></li>
+      <li class="post"><span class="who">Toi</span><h3>7. Merge main</h3><p>Tu décides quand mettre en production.</p></li>
+      <li class="post prod"><span class="who">Automatique</span><h3>8. En production</h3><p>Tag de version créé, issue en Done.</p></li>
+    </ol>
+    <div class="legend"><span class="l-gate">Porte de contrôle : on ne passe que si c'est vert</span><span class="l-prod">Livré</span></div>
+    <p style="margin-top:14px">Si un contrôle échoue (check rouge, critère pas rempli sur la preview), la story revient à l'étape 2 : on corrige sur la même branche, la PR se met à jour.</p>
+  </section>
+
+  <section>
+    <div class="eyebrow">Ce qui change</div>
+    <h2>Avant et après</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Moment</th><th>Avant</th><th>Avec la factory</th></tr></thead>
+        <tbody>
+          <tr><td>Écrire une issue</td><td>Texte libre, critères parfois implicites.</td><td>Modèle « User story » : qui / quoi / pourquoi, critères « Étant donné… quand… alors… », priorité obligatoire.</td></tr>
+          <tr><td>Signaler un bug</td><td>Texte libre.</td><td>Modèle « Bug » : étapes, attendu, obtenu, où (prod, preview, local).</td></tr>
+          <tr><td>Ouvrir une PR</td><td>La liste des choses à ne pas oublier est dans AGENTS.md.</td><td>La PR se pré-remplit avec la checklist « terminé » (Definition of Done).</td></tr>
+          <tr><td>Vérifier le code</td><td>Lint et scan de secrets ; le reste se voit au build Vercel ou sur la preview.</td><td>En plus : types, build, tests unitaires, migrations SQL, puis tests du parcours réel sur la preview.</td></tr>
+          <tr><td>Tester</td><td>Tout à la main sur la preview.</td><td>Les robots testent l'essentiel ; toi, tu valides les critères d'acceptation et le rendu.</td></tr>
+          <tr><td>Suivre l'usage</td><td>Rien.</td><td>Visites et erreurs visibles (Vercel Analytics, puis Umami chez toi).</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">La mise en place</div>
+    <h2>Six étapes, chacune utile toute seule</h2>
+    <p>On construit la factory pièce par pièce. Chaque étape est une issue, une PR, une ADR (la trace écrite du choix) et une <strong>fiche d'étape</strong> dans <code>docs/factory/</code> qui raconte en mots simples : <em>avant</em> (ce qui se passait), <em>ce qui change</em> (dans le processus, et les impacts) et <em>après</em> (le résultat). Chaque exemple vient de problèmes rencontrés pour de vrai sur Mialigo.</p>
+    <div class="stages">
+      <article class="stage">
+        <div class="num">1</div>
+        <header><h3>Le cadre</h3><span class="badge now">En cours · #104</span></header>
+        <dl>
+          <dt>Ce que c'est</dt><dd>Modèles d'issue (User story, Bug) et de PR, Definition of Ready et Definition of Done, document de référence.</dd>
+          <dt>Outils</dt><dd>Modèles GitHub dans <code>.github/</code>, <code>docs/factory.md</code>, ADR-0023.</dd>
+          <dt>Avant</dt><dd>Issues en texte libre (l'idée du nid d'abeille n'était pas écrite dans la #20, d'où la PR #97 à côté) ; checklist cachée dans <code>AGENTS.md</code>.</dd>
+          <dt>Ce qui change</dt><dd>« New issue » propose User story ou Bug avec critères « Étant donné / Quand / Alors » ; chaque PR se pré-remplit avec la checklist « terminé ». Pour toi : 2–3 min de plus par issue, moins de PR à refaire.</dd>
+          <dt>Après</dt><dd>Chaque issue dit comment savoir que c'est fini, chaque PR montre les 8 cases à cocher. Fiche : <code>docs/factory/01-cadre.md</code>.</dd>
+        </dl>
+        <p class="catch"><strong>Ce que ça évite :</strong> oublier une étape. Par exemple, la version 0.4.0 publiée avec des lignes qui appartenaient à la suivante (#85) : la checklist rappelle de revérifier la version de main juste avant le merge.</p>
+      </article>
+      <article class="stage">
+        <div class="num">2</div>
+        <header><h3>La CI qualité</h3><span class="badge">À venir · #105</span></header>
+        <dl>
+          <dt>Ce que c'est</dt><dd>À chaque PR, un robot vérifie les types TypeScript et construit le site ; Dependabot propose les mises à jour des dépendances.</dd>
+          <dt>Outils</dt><dd>GitHub Actions (<code>tsc</code>, <code>next build</code>), Dependabot.</dd>
+        </dl>
+        <p class="catch"><strong>Ce que ça attrape :</strong> une fonction renommée mais encore appelée ailleurs sous son ancien nom, avant même que Vercel ne construise la preview.</p>
+      </article>
+      <article class="stage">
+        <div class="num">3</div>
+        <header><h3>Les tests unitaires</h3><span class="badge">À venir · #106</span></header>
+        <dl>
+          <dt>Ce que c'est</dt><dd>De petits programmes qui vérifient la logique : lecture d'un thème, ordre des blocs, contraste des couleurs…</dd>
+          <dt>Outils</dt><dd>Vitest, lancé en CI.</dd>
+        </dl>
+        <p class="catch"><strong>Ce que ça attrape :</strong> des couleurs d'accent proposées qui étaient illisibles sur fond clair ; un test sur la liste l'aurait signalé aussitôt.</p>
+      </article>
+      <article class="stage">
+        <div class="num">4</div>
+        <header><h3>Les tests de bout en bout</h3><span class="badge">À venir · #107</span></header>
+        <dl>
+          <dt>Ce que c'est</dt><dd>Un navigateur automatique ouvre la preview, clique comme un vrai visiteur et prend des captures d'écran.</dd>
+          <dt>Outils</dt><dd>Playwright, déclenché quand la preview Vercel est prête.</dd>
+        </dl>
+        <p class="catch"><strong>Ce que ça attrape :</strong> les hexagones tout noirs en style Minimal, ou l'erreur « Maximum update depth » au glisser-déposer, sans attendre que tu les trouves.</p>
+      </article>
+      <article class="stage">
+        <div class="num">5</div>
+        <header><h3>Les migrations SQL vérifiées</h3><span class="badge">À venir · #108</span></header>
+        <dl>
+          <dt>Ce que c'est</dt><dd>Une base de données jetable, en CI, rejoue le schéma et chaque migration, puis vérifie les règles (l'email reste invisible, les contraintes acceptent les bonnes valeurs).</dd>
+          <dt>Outils</dt><dd>Postgres dans GitHub Actions (ou Supabase CLI).</dd>
+        </dl>
+        <p class="catch"><strong>Ce que ça attrape :</strong> une contrainte qui refuserait un nouveau réglage (comme la disposition « Nid d'abeille » avant sa migration).</p>
+      </article>
+      <article class="stage">
+        <div class="num">6</div>
+        <header><h3>L'observabilité</h3><span class="badge">À venir · #109</span></header>
+        <dl>
+          <dt>Ce que c'est</dt><dd>Voir l'usage du site et ses erreurs. D'abord Vercel Web Analytics (#110, sans cookies), puis Umami installé sur ton serveur.</dd>
+          <dt>Outils</dt><dd>Umami auto-hébergé, suivi des erreurs.</dd>
+        </dl>
+        <p class="catch"><strong>Ce que ça apporte :</strong> savoir si une fonctionnalité sert (combien de pages en nid d'abeille ?) et voir une erreur avant qu'un utilisateur ne la signale.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="reuse">
+    <div class="eyebrow">Ce que ça devient</div>
+    <h2>Une base pour tous tes projets</h2>
+    <p>Tout vit dans le dépôt (pas dans un outil externe) : pour démarrer un nouveau projet avec la même rigueur, il suffit de recopier.</p>
+    <ol>
+      <li>Copier <code>.github/</code> (modèles et workflows), <code>docs/factory.md</code> et le dossier <code>docs/factory/</code> (modèle de fiche d'étape).</li>
+      <li>Adapter les noms : branches, numéro du GitHub Project, liens des ADR.</li>
+      <li>Reprendre les règles de travail d'<code>AGENTS.md</code> et le modèle d'ADR.</li>
+      <li>Créer les labels de priorité (P0 à P4).</li>
+    </ol>
+    <p style="margin-top:12px">À terme, la plupart des cases de la checklist seront cochées par les robots : il te restera surtout à décrire le besoin et à valider le résultat.</p>
+  </section>
+
+  <section>
+    <div class="eyebrow">Les mots</div>
+    <h2>Glossaire</h2>
+    <dl class="glossary">
+      <div><dt>User story (US)</dt><dd>Un besoin vu par l'utilisateur : « En tant que…, je veux…, afin de… ».</dd></div>
+      <div><dt>Critères d'acceptation</dt><dd>Les cas précis qui prouvent que la story est faite : « Étant donné…, quand…, alors… ».</dd></div>
+      <div><dt>Epic</dt><dd>Une grosse story découpée en plusieurs sous-issues (ici #103).</dd></div>
+      <div><dt>DoR / DoD</dt><dd>Definition of Ready : quand une issue est prête à être codée. Definition of Done : quand elle est vraiment terminée.</dd></div>
+      <div><dt>PR (pull request)</dt><dd>Une demande d'intégrer une branche dans une autre, relue et vérifiée avant le merge.</dd></div>
+      <div><dt>CI</dt><dd>Intégration continue : les robots (GitHub Actions) qui vérifient chaque PR automatiquement.</dd></div>
+      <div><dt>Check</dt><dd>Un contrôle de la CI : vert, on peut merger ; rouge, il faut corriger.</dd></div>
+      <div><dt>Preview</dt><dd>Une copie du site déployée par Vercel pour chaque PR, pour tester avant la prod.</dd></div>
+      <div><dt>Test unitaire</dt><dd>Vérifie un petit morceau de code isolé (une fonction).</dd></div>
+      <div><dt>Test e2e</dt><dd>De bout en bout : un navigateur automatique fait le parcours d'un vrai visiteur.</dd></div>
+      <div><dt>Migration SQL</dt><dd>Un script qui fait évoluer la base de données sans perdre les données.</dd></div>
+      <div><dt>ADR</dt><dd>Architecture Decision Record : une page qui explique un choix technique et les options écartées.</dd></div>
+    </dl>
+  </section>
+
+  <footer>Référence détaillée : <code>docs/factory.md</code> · Décision : ADR-0023 · Suivi : epic #103 sur GitHub.</footer>
+</main>

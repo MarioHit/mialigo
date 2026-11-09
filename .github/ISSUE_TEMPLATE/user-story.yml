@@ -1,0 +1,60 @@
+# Modèle « User story » (software factory, docs/factory.md, ADR-0023).
+# Une issue est « prête » (Definition of Ready) quand toutes les sections
+# obligatoires sont remplies et qu'elle a une priorité.
+name: User story
+description: Une fonctionnalité ou une amélioration, vue par la personne qui l'utilise.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Décrivez le **besoin**, pas la solution technique. Une user story tient en une PR ; si elle est trop grosse, découpez-la (epic + sous-issues).
+  - type: textarea
+    id: story
+    attributes:
+      label: User story
+      description: Qui, quoi, pourquoi.
+      value: |
+        En tant que …
+        je veux …
+        afin de …
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Critères d'acceptation
+      description: Ce qui doit être vrai pour considérer la story terminée. Un critère = un cas vérifiable sur la preview.
+      value: |
+        - Étant donné …, quand …, alors …
+        - Étant donné …, quand …, alors …
+    validations:
+      required: true
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Hors périmètre
+      description: Ce qui ne sera volontairement pas fait ici (éventuellement une autre issue).
+  - type: textarea
+    id: notes
+    attributes:
+      label: Pistes techniques et maquettes
+      description: Idées de solution, données (BDD, migration ?), lien vers une maquette (docs/maquettes/).
+  - type: input
+    id: dependencies
+    attributes:
+      label: Dépend de
+      description: "Issues à terminer avant (ex. #16). Ajoutez aussi le lien « blocked by » de GitHub."
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priorité
+      description: Reportée ensuite en label (P0 à P4).
+      options:
+        - P0 · sécurité, à faire tout de suite
+        - P1 · essentiel
+        - P2 · important
+        - P3 · utile
+        - P4 · plus tard
+    validations:
+      required: true
