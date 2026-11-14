@@ -9,6 +9,7 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 ### Interne
 
 - La carte de la chaîne de travail décrit chaque étape par ce qu'elle reçoit et ce qu'elle doit produire, avec qui peut la faire (le mainteneur, Claude ou un robot). Elle ajoute la préparation des demandes et le développement, et prévoit deux commandes pour les outiller. ([#118])
+- Nouvelle règle de travail : chaque correction demandée lors d'une relecture est relue en entier et comparée à sa source avant d'être envoyée, et la carte de la chaîne garde la trace des leçons apprises. ([#120])
 
 ## [0.9.2] - 2026-11-14
 
@@ -151,3 +152,4 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 [#104]: https://github.com/MarioHit/mialigo/issues/104
 [#115]: https://github.com/MarioHit/mialigo/issues/115
 [#118]: https://github.com/MarioHit/mialigo/issues/118
+[#120]: https://github.com/MarioHit/mialigo/issues/120
