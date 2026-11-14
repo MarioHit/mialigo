@@ -36,26 +36,28 @@ sequenceDiagram
     User->>Browser: Saisie email, username, name sur /signup
     Browser->>SupaDB: SELECT username FROM public.users (Vérification unicité)
     SupaDB-->>Browser: Pseudo disponible
-    Browser->>SupaAuth: supabaseClient.auth.signInWithOtp({ email, redirectTo: /auth/callback })
+    Browser->>SupaAuth: supabaseClient.auth.signInWithOtp({ email, data: { username, name }, emailRedirectTo: /auth/callback?next=/dashboard })
     SupaAuth-->>User: Envoi Email contenant le lien magique
     Browser-->>User: Écran "Lien envoyé"
 
     Note over User, Vercel: 2. Clic sur l'email & échange de session
-    User->>Vercel: Clic lien email -> GET /auth/callback?code=XYZ&next=/dashboard
-    Vercel->>SupaAuth: createSupabaseServerClient().auth.exchangeCodeForSession(code)
+    User->>Vercel: Clic lien email -> GET /auth/callback?next=/dashboard&token_hash=…&type=signup
+    Vercel->>SupaAuth: createSupabaseServerClient().auth.verifyOtp({ token_hash, type })
+    Note over Vercel, SupaAuth: Ancien format de lien (?code=…) : exchangeCodeForSession(code)
     SupaAuth->>SupaDB: INSERT INTO auth.users (id, email)
     SupaDB->>SupaDB: Trigger handle_new_user() -> INSERT INTO public.users
     SupaAuth-->>Vercel: Tokens de session (Access/Refresh)
+    Vercel->>SupaDB: Profil public.users présent ? Sinon INSERT (secours si le trigger n'a pas tourné)
     Vercel-->>Browser: HTTP 302 Redirection vers /dashboard + Set-Cookie (session)
 
     Note over Browser, SupaDB: 3. Chargement du Dashboard
-    Browser->>Browser: GET /dashboard
-    Browser->>SupaAuth: supabaseClient.auth.getSession()
+    Browser->>Browser: GET /dashboard -> redirection vers /dashboard/profil
+    Browser->>SupaAuth: supabaseClient.auth.getSession() (dashboard-shell.tsx)
     SupaAuth-->>Browser: Session active (user.id)
-    Browser->>SupaDB: SELECT * FROM public.users WHERE id = user.id
-    SupaDB-->>Browser: { id, username, name, bio }
-    Browser->>SupaDB: SELECT * FROM public.links WHERE user_id = user.id
-    SupaDB-->>Browser: [ liens... ]
+    Browser->>SupaDB: SELECT id, username, name, bio, avatar_url, banner_url, theme FROM public.users WHERE id = user.id
+    SupaDB-->>Browser: Profil (colonnes explicites : l'email n'est pas lisible)
+    Browser->>SupaDB: SELECT BLOCK_COLUMNS FROM public.links WHERE user_id = user.id
+    SupaDB-->>Browser: [ blocs... ]
     Browser-->>User: Affiche Dashboard prérempli
 ```
 
@@ -63,10 +65,13 @@ sequenceDiagram
 
 ## 3. Logs de diagnostic associés
 
-- `[Signup] 🔍 Vérification de la disponibilité du pseudo: "<pseudo>"`
-- `[Signup] ✅ Pseudo "<pseudo>" DISPONIBLE.` / `[Signup] ⚠️ Pseudo "<pseudo>" DÉJÀ PRIS`
-- `[Signup] 🚀 Tentative d'inscription: { email, username, name }`
-- `[Signup] ✅ Magic link d'inscription envoyé avec succès à: "<email>"`
-- `[Auth/Callback] 📥 Requête reçue: { hasCode, hasTokenHash, next }`
-- `[Auth/Callback] ✅ Session PKCE échangée avec succès: { id, email }`
-- `[Auth/Callback] ✅ Profil public.users créé pour "<pseudo>"`
+Les logs `debug()` n'apparaissent qu'en développement et ne contiennent ni email, ni identifiant, ni jeton.
+
+- `[Signup] Vérification de la disponibilité du pseudo.`
+- `[Signup] Pseudo disponible.` / `[Signup] Pseudo indisponible.` / `[Signup] Pseudo réservé.`
+- `[Signup] Envoi de la demande de création de compte.`
+- `[Signup] Lien de confirmation envoyé.`
+- `[Auth/Callback] Requête reçue.`
+- `[Auth/Callback] Validation du lien magique par token hash.` puis `[Auth/Callback] Lien magique validé.`
+- `[Auth/Callback] Création du profil absent.` / `[Auth/Callback] Profil existant confirmé.`
+- `[Auth/Callback] Authentification réussie, redirection en cours.`

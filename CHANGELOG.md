@@ -4,6 +4,12 @@ Toutes les évolutions notables de Mialigo sont consignées dans ce fichier, éc
 
 Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le projet respecte le [versionnage sémantique](https://semver.org/lang/fr/). Chaque version correspond à une mise en production : même numéro dans `package.json`, tag Git `vX.Y.Z` sur le merge vers `main`. Chaque modification inscrit sa ligne directement dans la section de la prochaine version, la plus haute du fichier tant qu'elle n'est pas en production. Les catégories sont celles de Keep a Changelog (Ajouté, Modifié, Obsolète, Supprimé, Corrigé, Sécurité), plus « Interne » pour les changements sans effet visible sur le site (voir [ADR-0010](docs/decisions/0010-versionnage-semver-tags.md) et [ADR-0015](docs/decisions/0015-version-par-pr.md)).
 
+## [0.9.5] - 2026-11-14
+
+### Interne
+
+- Ménage de la documentation : les guides dépassés sont rangés dans une archive, un ancien script de base de données dangereux est supprimé, et le guide de mise en ligne est regroupé en un seul document à jour. ([#124])
+
 ## [0.9.4] - 2026-11-14
 
 ### Interne
@@ -125,6 +131,7 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 - Pages légales : conditions générales d'utilisation, politique de confidentialité, mentions légales, contact et suppression de compte.
 - Les adresses email des utilisateurs ne sont jamais visibles publiquement.
 
+[0.9.5]: https://github.com/MarioHit/mialigo/compare/v0.9.4...v0.9.5
 [0.9.4]: https://github.com/MarioHit/mialigo/compare/v0.9.3...v0.9.4
 [0.9.3]: https://github.com/MarioHit/mialigo/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/MarioHit/mialigo/compare/v0.9.1...v0.9.2
@@ -159,3 +166,4 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 [#115]: https://github.com/MarioHit/mialigo/issues/115
 [#118]: https://github.com/MarioHit/mialigo/issues/118
 [#120]: https://github.com/MarioHit/mialigo/issues/120
+[#124]: https://github.com/MarioHit/mialigo/issues/124

@@ -33,20 +33,20 @@ sequenceDiagram
     participant SupaDB as Supabase PostgreSQL
 
     User->>Browser: Saisie email sur /login
-    Browser->>SupaAuth: signInWithOtp({ email, shouldCreateUser: false, redirectTo: /auth/callback })
+    Browser->>SupaAuth: signInWithOtp({ email, shouldCreateUser: false, emailRedirectTo: /auth/callback?next=/dashboard })
     alt Utilisateur inconnu
         SupaAuth-->>Browser: Erreur: User not found
         Browser-->>User: "Aucun compte associé à cet email. Veuillez d'abord créer un compte."
     else Utilisateur existant
         SupaAuth-->>User: Envoi Email contenant le lien magique
-        User->>Vercel: Clic lien email -> GET /auth/callback?code=XYZ
-        Vercel->>SupaAuth: exchangeCodeForSession(code)
+        User->>Vercel: Clic lien email -> GET /auth/callback?next=/dashboard&token_hash=…&type=magiclink
+        Vercel->>SupaAuth: verifyOtp({ token_hash, type }) (ancien format ?code=… : exchangeCodeForSession)
         SupaAuth-->>Vercel: Session validée + Cookies HTTP
         Vercel-->>Browser: HTTP 302 vers /dashboard + Set-Cookie
-        Browser->>SupaDB: loadProfile() -> SELECT * FROM public.users
-        SupaDB-->>Browser: Données utilisateur
-        Browser->>SupaDB: loadLinks() -> SELECT * FROM public.links
-        SupaDB-->>Browser: Liste des liens
+        Browser->>SupaDB: dashboard-shell : SELECT id, username, name, bio, avatar_url, banner_url, theme FROM public.users
+        SupaDB-->>Browser: Profil (sans l'email)
+        Browser->>SupaDB: dashboard-shell : SELECT BLOCK_COLUMNS FROM public.links
+        SupaDB-->>Browser: Liste des blocs
         Browser-->>User: Affiche Dashboard prêt
     end
 ```
@@ -55,8 +55,10 @@ sequenceDiagram
 
 ## 3. Logs de diagnostic associés
 
-- `[Login] 🔍 Vérification de la session active...`
-- `[Login] 🚀 Demande de lien magique pour l'email: "<email>"`
-- `[Login] ✅ Magic link de connexion envoyé avec succès à "<email>"`
-- `[Login] ⚠️ Utilisateur non trouvé pour "<email>". Doit passer par /signup.`
-- `[Auth/Callback] ✅ Session PKCE échangée avec succès: { id, email }`
+Les logs `debug()` n'apparaissent qu'en développement et ne contiennent ni email, ni identifiant, ni jeton.
+
+- `[Login] Vérification de la session active.` / `[Login] Session existante détectée.`
+- `[Login] Demande de lien de connexion.`
+- `[Login] Lien de connexion envoyé.`
+- `[Login] Échec de l'envoi du lien de connexion.` (avertissement, par exemple compte inconnu)
+- `[Auth/Callback] Lien magique validé.` puis `[Auth/Callback] Authentification réussie, redirection en cours.`

@@ -1,3 +1,5 @@
+> **Archivé le 2026-11-14 (#124), ne plus suivre.** Raison : « Phase 2 » du projet : il fait exécuter `supabase-schema.sql`, un schéma d'avant l'authentification aujourd'hui supprimé. Installation à jour : [`README.md`](../../README.md) et [`DEPLOYMENT.md`](../../DEPLOYMENT.md).
+
 # 🗄️ Configuration Supabase - Phase 2
 
 ## ✅ Ce qui a été fait

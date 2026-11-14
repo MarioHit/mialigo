@@ -1,3 +1,5 @@
+> **Archivé le 2026-11-14 (#124), ne plus suivre.** Raison : mise en place initiale de Vercel (branche `init_next`, comparaison avec GitHub Pages). Les étapes DNS OVH restent valables pour une réinstallation complète ; la configuration courante est dans [`DEPLOYMENT.md`](../../DEPLOYMENT.md).
+
 # 🚀 Déploiement sur Vercel avec domaine OVH
 
 ## ✅ Préparation effectuée

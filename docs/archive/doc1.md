@@ -1,3 +1,5 @@
+> **Archivé le 2026-11-14 (#124), ne plus suivre.** Raison : diagnostic d'août 2026 (dashboard vide), qui cite du code disparu. Flux à jour : [`auth-workflow.md`](../auth-workflow.md), [`login-workflow.md`](../login-workflow.md), [`links-workflow.md`](../links-workflow.md).
+
 Voici l'explication complète et détaillée de l'architecture, suivie de l'analyse des anomalies observées (dashboard vide, utilisateur manquant en BDD, synchronisation dark mode) et des diagrammes de séquence UML.
 
 ---
