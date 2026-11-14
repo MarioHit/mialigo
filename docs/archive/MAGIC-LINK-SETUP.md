@@ -1,3 +1,5 @@
+> **Archivé le 2026-11-14 (#124), ne plus suivre.** Raison : il cite un `supabase-auth-config.sql` qui n'existe pas et décrit une création de compte depuis `/login` (aujourd'hui : `/signup`). À jour : [`DEPLOYMENT.md`](../../DEPLOYMENT.md) (URL de redirection), [`mail-template-login.md`](../mail-template-login.md) (modèles d'email), [`auth-workflow.md`](../auth-workflow.md).
+
 # 🔐 Configuration de l'authentification Magic Link
 
 Ce guide explique comment configurer l'authentification par magic link (lien magique) avec Supabase.
