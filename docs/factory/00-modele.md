@@ -1,6 +1,6 @@
 # Étape N : <nom de l'étape>
 
-> Modèle de fiche d'étape de la software factory. Copier ce fichier vers `NN-<slug>.md`, le remplir dans la PR de l'étape, et l'ajouter à la feuille de route de [`docs/factory.md`](../factory.md). Le _pourquoi_ du choix technique va dans l'ADR ; cette fiche décrit le processus vécu, en mots simples.
+> Modèle de fiche d'étape de la software factory. Copier ce fichier vers `NN-<slug>.md`, le remplir dans la PR de l'étape, et l'ajouter à la feuille de route de [`docs/FACTORY.md`](../FACTORY.md). Le _pourquoi_ du choix technique va dans l'ADR ; cette fiche décrit le processus vécu, en mots simples.
 
 - **Issue** : #…
 - **ADR** : [ADR-00XX](../decisions/00XX-….md)

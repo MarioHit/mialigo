@@ -4,6 +4,12 @@ Toutes les évolutions notables de Mialigo sont consignées dans ce fichier, éc
 
 Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le projet respecte le [versionnage sémantique](https://semver.org/lang/fr/). Chaque version correspond à une mise en production : même numéro dans `package.json`, tag Git `vX.Y.Z` sur le merge vers `main`. Chaque modification inscrit sa ligne directement dans la section de la prochaine version, la plus haute du fichier tant qu'elle n'est pas en production. Les catégories sont celles de Keep a Changelog (Ajouté, Modifié, Obsolète, Supprimé, Corrigé, Sécurité), plus « Interne » pour les changements sans effet visible sur le site (voir [ADR-0010](docs/decisions/0010-versionnage-semver-tags.md) et [ADR-0015](docs/decisions/0015-version-par-pr.md)).
 
+## [0.9.2] - 2026-11-14
+
+### Interne
+
+- Nouvelle carte de la chaîne de travail, écrite pour débuter : le parcours complet d'une demande jusqu'à la mise en ligne, qui fait quoi à chaque étape, et un aide-mémoire des fichiers de réglage. Une commande vérifie qu'elle reste à jour. ([#115])
+
 ## [0.9.1] - 2026-11-09
 
 ### Interne
@@ -107,6 +113,7 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 - Pages légales : conditions générales d'utilisation, politique de confidentialité, mentions légales, contact et suppression de compte.
 - Les adresses email des utilisateurs ne sont jamais visibles publiquement.
 
+[0.9.2]: https://github.com/MarioHit/mialigo/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/MarioHit/mialigo/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/MarioHit/mialigo/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/MarioHit/mialigo/compare/v0.7.0...v0.8.0
@@ -135,3 +142,4 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 [#90]: https://github.com/MarioHit/mialigo/issues/90
 [#98]: https://github.com/MarioHit/mialigo/issues/98
 [#104]: https://github.com/MarioHit/mialigo/issues/104
+[#115]: https://github.com/MarioHit/mialigo/issues/115
