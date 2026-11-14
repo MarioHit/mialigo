@@ -168,18 +168,18 @@ Dans chaque tableau, **Exécutants possibles** liste qui peut faire l'étape (to
 
 ## Aide-mémoire : où se trouve quoi
 
-| Emplacement                                                   | Ce qu'il contient                                                                                                                                  | Qui le lit                   |
-| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| `AGENTS.md`                                                   | Les règles de travail : Git (branches, merge, interdits), workflow (issue, Project, ADR), CHANGELOG et versions.                                   | Claude et tout agent de code |
-| `CLAUDE.md`                                                   | Le guide du code pour Claude : commandes, architecture, pièges (Supabase, secrets). Il inclut `AGENTS.md`.                                         | Claude                       |
-| `.claude/settings.json`                                       | Les réglages de Claude Code partagés dans le dépôt, surtout les **interdictions** (ne jamais lire ni modifier les fichiers `.env`).                | Claude Code                  |
-| `.claude/commands/`                                           | Les **commandes personnalisées** : un fichier `x.md` = une commande `/x` à taper dans Claude Code. Ici : `/factory` ; à venir : `/story`, `/ship`. | Claude Code                  |
-| `.claude/agents/`                                             | Des **sous-agents** spécialisés (un fichier par agent : rôle, outils permis). _Vide pour l'instant._                                               | Claude Code                  |
-| `.claude/skills/`                                             | Des **skills** : des savoir-faire empaquetés (instructions + fichiers) que Claude charge quand la tâche s'y prête. _Vide pour l'instant._          | Claude Code                  |
-| `.github/workflows/`                                          | Les **robots GitHub Actions** : `gitleaks.yml`, `lint.yml`, `release-pr.yml`, `version-tag.yml`.                                                   | GitHub                       |
-| `.github/ISSUE_TEMPLATE/`, `.github/pull_request_template.md` | Les **modèles** d'issue et de PR.                                                                                                                  | GitHub                       |
-| `docs/decisions/`                                             | Les **ADR** : une décision technique par fichier, avec les options écartées. Index dans `README.md`, modèle `0000-modele.md`.                      | Tout le monde                |
-| `docs/factory/`                                               | Une **fiche par étape** de construction de la factory (avant, ce qui change, après), et `lecons.md`, le journal des erreurs trouvées en review.    | Toi                          |
+| Emplacement                                                   | Ce qu'il contient                                                                                                                                                                 | Qui le lit                   |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| `AGENTS.md`                                                   | Les règles de travail : Git (branches, merge, interdits), workflow (issue, Project, ADR), CHANGELOG et versions.                                                                  | Claude et tout agent de code |
+| `CLAUDE.md`                                                   | Le guide du code pour Claude : commandes, architecture, pièges (Supabase, secrets). Il inclut `AGENTS.md`.                                                                        | Claude                       |
+| `.claude/settings.json`                                       | Les réglages de Claude Code partagés dans le dépôt, surtout les **interdictions** (ne jamais lire ni modifier les fichiers `.env`).                                               | Claude Code                  |
+| `.claude/commands/`                                           | Les **commandes personnalisées** : un fichier `x.md` = une commande `/x` à taper dans Claude Code. Ici : `/factory` ; à venir : `/story`, `/ship`.                                | Claude Code                  |
+| `.claude/agents/`                                             | Des **sous-agents** spécialisés (un fichier par agent : rôle, outils permis). _Vide pour l'instant._                                                                              | Claude Code                  |
+| `.claude/skills/`                                             | Des **skills** : des savoir-faire empaquetés (instructions + fichiers) que Claude charge quand la tâche s'y prête. _Vide pour l'instant._                                         | Claude Code                  |
+| `.github/workflows/`                                          | Les **robots GitHub Actions** : `gitleaks.yml`, `lint.yml`, `release-pr.yml`, `version-tag.yml`.                                                                                  | GitHub                       |
+| `.github/ISSUE_TEMPLATE/`, `.github/pull_request_template.md` | Les **modèles** d'issue et de PR.                                                                                                                                                 | GitHub                       |
+| `docs/decisions/`                                             | Les **ADR** : une décision technique par fichier, avec les options écartées. Index dans `README.md`, modèle `0000-modele.md`.                                                     | Tout le monde                |
+| `docs/factory/`                                               | Une **fiche par étape** de construction de la factory (avant, ce qui change, après), et `lecons.md`, le journal de toutes les erreurs de la chaîne (en review ou après le merge). | Toi                          |
 
 ## Definition of Ready (DoR) : une issue est prête quand
 
@@ -233,11 +233,7 @@ Chaque étape est livrée seule et apporte déjà quelque chose. Sa PR contient 
 
 ## Leçons apprises
 
-Les erreurs trouvées en review sont notées dans [`factory/lecons.md`](factory/lecons.md), avec leur cause, la PR et un statut (**vue une fois**, **récurrente**, **devenue une règle**, **automatisée**). Une erreur qui revient doit devenir une règle, puis un check : c'est ainsi que la chaîne s'améliore.
-
-Autres incidents de la chaîne (hors review) :
-
-- 2026-11-09 : la PR #111 a été mergée sans relire la version de `main`, déjà passée en 0.9.0 ; la ligne du CHANGELOG s'est retrouvée dans une version déjà en production (corrigé par #113). Règle : vérifier la version de `main` dans une étape à part, juste avant le merge (`AGENTS.md`, Changelog and versions, point 5).
+Toutes les erreurs de la chaîne, qu'elles soient trouvées en review (Copilot ou humaine) ou après le merge, sont notées dans un journal unique : [`factory/lecons.md`](factory/lecons.md). Pour chacune : ce qui s'est passé, la cause, qui l'a trouvée, la PR et un statut (**vue une fois**, **récurrente**, **devenue une règle**, **automatisée**). Une erreur qui revient doit devenir une règle, puis un check : c'est ainsi que la chaîne s'améliore.
 
 ## Réutiliser dans un autre projet
 

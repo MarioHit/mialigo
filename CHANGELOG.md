@@ -8,7 +8,7 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ### Interne
 
-- Nouvelle règle de travail : chaque correction demandée lors d'une relecture est relue en entier et comparée à sa source avant d'être envoyée, et un journal garde la trace des erreurs trouvées en relecture pour qu'elles ne se répètent pas. ([#120])
+- Nouvelle règle de travail : chaque correction demandée lors d'une relecture est relue en entier et comparée à sa source avant d'être envoyée, et un journal unique garde la trace de toutes les erreurs, trouvées en relecture ou après la mise en ligne, pour qu'elles ne se répètent pas. ([#120])
 
 ## [0.9.3] - 2026-11-14
 
