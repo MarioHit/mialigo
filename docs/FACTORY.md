@@ -102,14 +102,14 @@ Dans chaque tableau, **Exécutants possibles** liste qui peut faire l'étape (to
 
 ### 5. Pull request (PR)
 
-|                          |                                                                                                                    |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------ |
-| **Ce qu'elle fait**      | Propose les changements de la branche pour `pre-prod`, avec description, façon de tester et checklist « terminé ». |
-| **Exécutants possibles** | Toi (sur GitHub) ; Claude (`gh pr create`) ; GitHub Action (possible, non utilisé).                                |
-| **Aujourd'hui**          | Claude.                                                                                                            |
-| **Entrée**               | La branche et le rapport de développement.                                                                         |
-| **Sortie attendue**      | Une PR vers `pre-prod` suivant le modèle, avec `Closes #n` et la Definition of Done cochée.                        |
-| **Configurée dans**      | `.github/pull_request_template.md` ; `AGENTS.md`.                                                                  |
+|                          |                                                                                                                                                                                                                                                                  |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Ce qu'elle fait**      | Propose les changements de la branche pour `pre-prod`, avec description, façon de tester et checklist « terminé ».                                                                                                                                               |
+| **Exécutants possibles** | Toi (sur GitHub) ; Claude (`gh pr create`) ; GitHub Action (possible, non utilisé).                                                                                                                                                                              |
+| **Aujourd'hui**          | Claude.                                                                                                                                                                                                                                                          |
+| **Entrée**               | La branche et le rapport de développement.                                                                                                                                                                                                                       |
+| **Sortie attendue**      | Une PR vers `pre-prod` suivant le modèle, avec `Closes #n` et la Definition of Done cochée pour ce qui est déjà fait (CHANGELOG, version, ADR, migration, docs, secrets) ; les cases « critères vérifiés sur la preview » et « checks verts » restent décochées. |
+| **Configurée dans**      | `.github/pull_request_template.md` ; `AGENTS.md`.                                                                                                                                                                                                                |
 
 ### 6. Checks et test sur la preview
 
@@ -119,7 +119,7 @@ Dans chaque tableau, **Exécutants possibles** liste qui peut faire l'étape (to
 | **Exécutants possibles** | GitHub Action et Vercel (checks) ; toi (test sur la preview) ; Claude (relecture, et plus tard tests automatiques du parcours, étape « tests de bout en bout » de la feuille de route). |
 | **Aujourd'hui**          | GitHub Actions et Vercel, puis toi sur la preview.                                                                                                                                      |
 | **Entrée**               | Chaque push sur la PR.                                                                                                                                                                  |
-| **Sortie attendue**      | Tous les checks verts et les critères d'acceptation validés sur la preview.                                                                                                             |
+| **Sortie attendue**      | Tous les checks verts, les critères d'acceptation validés sur la preview, et les deux dernières cases de la DoD cochées : la checklist est alors complète.                              |
 | **Configurée dans**      | `.github/workflows/gitleaks.yml` (« Scan des secrets », obligatoire), `.github/workflows/lint.yml` (« Lint ») ; Vercel (`vercel.json`, réglages du projet Vercel) ; `.gitleaksignore`.  |
 
 ### 7. Merge dans pre-prod
