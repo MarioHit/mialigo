@@ -113,14 +113,14 @@ Dans chaque tableau, **Exécutants possibles** liste qui peut faire l'étape (to
 
 ### 6. Checks et test sur la preview
 
-|                          |                                                                                                                                                                                         |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Ce qu'elle fait**      | Vérifie la PR : pas de secret, pas d'erreur de lint, le site se construit ; Vercel publie une **preview** sur laquelle on vérifie les critères d'acceptation.                           |
-| **Exécutants possibles** | GitHub Action et Vercel (checks) ; toi (test sur la preview) ; Claude (relecture, et plus tard tests automatiques du parcours, étape « tests de bout en bout » de la feuille de route). |
-| **Aujourd'hui**          | GitHub Actions et Vercel, puis toi sur la preview.                                                                                                                                      |
-| **Entrée**               | Chaque push sur la PR.                                                                                                                                                                  |
-| **Sortie attendue**      | Tous les checks verts, les critères d'acceptation validés sur la preview, et les deux dernières cases de la DoD cochées : la checklist est alors complète.                              |
-| **Configurée dans**      | `.github/workflows/gitleaks.yml` (« Scan des secrets », obligatoire), `.github/workflows/lint.yml` (« Lint ») ; Vercel (`vercel.json`, réglages du projet Vercel) ; `.gitleaksignore`.  |
+|                          |                                                                                                                                                                                                                        |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Ce qu'elle fait**      | Vérifie la PR : pas de secret, pas d'erreur de lint, le site se construit ; Vercel publie une **preview** sur laquelle on vérifie les critères d'acceptation.                                                          |
+| **Exécutants possibles** | GitHub Action et Vercel (checks) ; toi (test sur la preview) ; Claude (relecture, et plus tard tests automatiques du parcours, étape « tests de bout en bout » de la feuille de route).                                |
+| **Aujourd'hui**          | GitHub Actions et Vercel, puis toi sur la preview.                                                                                                                                                                     |
+| **Entrée**               | Chaque push sur la PR.                                                                                                                                                                                                 |
+| **Sortie attendue**      | Tous les checks verts, les critères d'acceptation validés sur la preview, et les cases « critères d'acceptation vérifiés sur la preview » et « tous les checks sont verts » cochées : la checklist est alors complète. |
+| **Configurée dans**      | `.github/workflows/gitleaks.yml` (« Scan des secrets », obligatoire), `.github/workflows/lint.yml` (« Lint ») ; Vercel (`vercel.json`, réglages du projet Vercel) ; `.gitleaksignore`.                                 |
 
 ### 7. Merge dans pre-prod
 
