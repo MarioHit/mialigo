@@ -1,4 +1,4 @@
-# Modèle « User story » (software factory, docs/factory.md, ADR-0023).
+# Modèle « User story » (software factory, docs/FACTORY.md, ADR-0023).
 # Une issue est « prête » (Definition of Ready) quand toutes les sections
 # obligatoires sont remplies et qu'elle a une priorité.
 name: User story

@@ -17,7 +17,7 @@
 ### Dans le processus
 
 1. **Créer une issue** : sur GitHub, « New issue » propose deux formulaires, **User story** (« En tant que… je veux… afin de… », critères « Étant donné / Quand / Alors », hors périmètre, dépendances, priorité P0–P4) ou **Bug** (étapes, attendu / obtenu, environnement). Les issues vierges sont désactivées.
-2. **Avant de commencer** : on vérifie la _Definition of Ready_ (`docs/factory.md`) : critères écrits, tient dans une PR, priorité, maquette si c'est visuel.
+2. **Avant de commencer** : on vérifie la _Definition of Ready_ (`docs/FACTORY.md`) : critères écrits, tient dans une PR, priorité, maquette si c'est visuel.
 3. **Ouvrir la PR** : la description se pré-remplit avec `Closes #`, « Ce qui change », « Comment tester sur la preview », un encart « Migration SQL » et la checklist _Definition of Done_ en 8 cases.
 4. **Avant de merger** : le mainteneur relit la checklist cochée au lieu de tout se rappeler.
 5. **Les agents** (Claude Code) créent leurs issues et PR avec `gh` en reprenant les mêmes sections (règle ajoutée dans `AGENTS.md`).
@@ -26,7 +26,7 @@
 
 - **Pour le mainteneur** : 2 à 3 minutes de plus pour écrire une issue (les critères d'acceptation), mais moins d'allers-retours et de PR à refaire. Le test sur la preview suit les critères écrits.
 - **Pour les agents / développeurs** : la description de PR suit le modèle et coche la DoD ; l'issue suit un des deux modèles, même créée en ligne de commande.
-- **Sur les outils et la CI** : 4 fichiers dans `.github/` (3 modèles d'issue/config, 1 modèle de PR), `docs/factory.md`, cette fiche, `docs/factory.html`. Aucun check en plus, aucun coût.
+- **Sur les outils et la CI** : 4 fichiers dans `.github/` (3 modèles d'issue/config, 1 modèle de PR), `docs/FACTORY.md`, cette fiche, `docs/factory.html`. Aucun check en plus, aucun coût.
 - **Limites** :
   - les modèles ne s'activent qu'une fois sur `main` (pas sur la preview) ;
   - la checklist ne bloque rien d'elle-même : une case non cochée n'empêche pas le merge (les étapes 2 à 5 rendront la plupart des cases automatiques) ;
@@ -36,7 +36,7 @@
 
 - Chaque issue dit qui, quoi, pourquoi, et comment savoir que c'est fini.
 - Chaque PR montre la même checklist « terminé », donc aucune étape (CHANGELOG, version, ADR, migration, test sur la preview) n'est oubliée sans que ça se voie.
-- La chaîne est décrite à un seul endroit (`docs/factory.md`), avec sa feuille de route, et se recopie dans un autre projet.
+- La chaîne est décrite à un seul endroit (`docs/FACTORY.md`), avec sa feuille de route, et se recopie dans un autre projet.
 
 **Pour vérifier soi-même** (après la mise en prod) :
 

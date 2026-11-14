@@ -37,3 +37,4 @@ Un ADR « Acceptée » n'est plus modifié sur le fond. Pour changer de décisio
 | [0020](0020-themes-de-page.md) | Thèmes de page en variables CSS, stockés dans `users.theme` (jsonb validé par CHECK) | Acceptée | 2026-11-08 |
 | [0022](0022-disposition-nid-abeille-bulles.md) | Dispositions nid d'abeille et bulles, réglage du thème rendu en CSS | Acceptée | 2026-11-08 |
 | [0023](0023-software-factory.md) | Software factory sur GitHub, construite étape par étape | Acceptée | 2026-11-08 |
+| [0024](0024-carte-factory-commande.md) | Carte de la factory dans `docs/FACTORY.md`, tenue à jour par une règle et la commande `/factory` | Acceptée | 2026-11-14 |
