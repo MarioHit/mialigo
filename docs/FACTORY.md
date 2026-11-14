@@ -185,7 +185,7 @@ Dans chaque tableau, **Exécutants possibles** liste qui peut faire l'étape (to
 
 - elle suit un modèle (User story ou Bug) ;
 - la user story dit **qui**, **quoi** et **pourquoi** ;
-- elle a des **critères d'acceptation** vérifiables (« Étant donné…, quand…, alors… ») ;
+- elle a des **critères d'acceptation** vérifiables (« Étant donné…, quand…, alors… » ; pour un bug, dans la section « Résultat attendu ») ;
 - elle tient dans **une PR** (sinon : une epic et des sous-issues) ;
 - elle a une **priorité** (label `P0-sécurité`, `P1` à `P4`) et ses dépendances sont notées (« blocked by ») ;
 - pour un changement visuel important : une **maquette** validée (`docs/maquettes/`).

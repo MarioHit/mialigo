@@ -1,6 +1,7 @@
 ---
 description: Prépare une issue « prête » (Definition of Ready) à partir d'une idée en vrac, rôle PO ; ne crée rien sans accord
 argument-hint: <idée ou besoin en vrac>
+disable-model-invocation: true
 ---
 
 Tu joues le rôle de **PO** (Product Owner) pour l'étape 1 du parcours de `docs/FACTORY.md`, « Préparation de l'issue ». Réponds en français, en mots simples : le mainteneur débute.
@@ -53,7 +54,7 @@ Si une issue ouverte couvre déjà le besoin, présente-la (numéro, titre, ce q
 Présente le brouillon complet, **exactement avec les sections du modèle**, nommées comme dans le modèle :
 
 - **User story** (`user-story.yml`) : « User story » (En tant que… je veux… afin de…), « Critères d'acceptation » (une ligne « Étant donné…, quand…, alors… » par cas vérifiable sur la preview), « Hors périmètre », « Pistes techniques et maquettes » (données, migration SQL, maquette), « Dépend de », « Priorité ».
-- **Bug** (`bug.yml`) : « Étapes pour reproduire », « Résultat attendu », « Résultat obtenu », « Où », « Appareil et navigateur ».
+- **Bug** (`bug.yml`) : « Étapes pour reproduire », « Résultat attendu », « Résultat obtenu », « Où », « Appareil et navigateur ». Le modèle Bug n'a pas de section dédiée aux critères d'acceptation : écris-les dans « Résultat attendu », une ligne « Étant donné…, quand…, alors… » par cas vérifiable sur la preview, pour respecter la Definition of Ready sans ajouter de section au modèle.
 
 Indique aussi : le **titre**, les **labels** (`enhancement`, `bug` ou `tech`, plus la priorité `P0-sécurité` ou `P1` à `P4`), l'**epic** parente éventuelle et les issues qui la **bloquent** (« blocked by »).
 
@@ -70,8 +71,10 @@ Demande explicitement : « Je crée cette issue ? » (ou « Je complète l'issue
 
 ## 7. Créer et ranger (après accord seulement)
 
-1. **Écrire** : écris le corps dans un fichier temporaire, puis `gh issue create --title "…" --label "…" --body-file <fichier>` pour une nouvelle issue, ou `gh issue edit` / `gh issue comment` pour compléter une issue existante.
-2. **Ranger dans le GitHub Project « Mialigo »**, avec les commandes et identifiants donnés dans `AGENTS.md` (Workflow rules). Cherche d'abord l'issue avec `gh project item-list` : elle peut y être déjà, ajoutée automatiquement.
+1. **Écrire** : écris le corps dans un fichier temporaire, puis :
+   - nouvelle issue : `gh issue create --title "…" --label "…" --body-file <fichier>` ;
+   - issue existante complétée : `gh issue edit <n> --body-file <fichier>` (et `--title`, `--add-label` si besoin), pour que **le texte de l'issue** porte le besoin et les critères validés. Un commentaire (`gh issue comment`) ne remplace jamais cette modification : il sert seulement à résumer ce qui a changé, si c'est utile.
+2. **Ranger dans le GitHub Project « Mialigo »**, avec les commandes et identifiants donnés dans `AGENTS.md` (Workflow rules). Cherche d'abord l'issue et son statut dans la **liste complète** : `gh project item-list 17 --owner MarioHit --limit 300 --format json`, filtrée sur son numéro (sans `--limit`, seuls 30 éléments sont renvoyés et une issue présente peut sembler absente). Elle peut y être déjà, ajoutée automatiquement. Ne conclus qu'elle est absente qu'après avoir lu cette liste complète.
    - **Nouvelle issue** : statut **Backlog** (option `f75ad846`).
    - **Issue existante complétée** : **garde son statut** (Backlog, In progress, In review…). Ne la mets en Backlog que si elle n'est pas encore dans le Project ou n'a pas de statut.
    - Si l'issue complétée est déjà **In progress** ou **In review** et que ses critères d'acceptation ont changé, dis-le clairement au mainteneur : le développement en cours, ou déjà mergé dans `pre-prod`, ne couvre peut-être plus tout le besoin.

@@ -32,6 +32,7 @@
   - la commande est une consigne pour Claude, pas un contrôle automatique : une Action qui vérifie la forme de l'issue reste possible plus tard ;
   - le nom du dépôt et l'option Backlog y sont écrits en dur, à centraliser avec la factory portable (#128) ;
   - elle ne fonctionne que dans Claude Code.
+  - Claude ne peut pas la lancer de lui-même (`disable-model-invocation: true`) : c'est toujours le mainteneur qui la tape.
 
 ## c. Après : le résultat
 

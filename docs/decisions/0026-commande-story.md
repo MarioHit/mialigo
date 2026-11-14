@@ -25,6 +25,7 @@ Option 1. La commande est explicite (on la tape quand on veut), elle peut dialog
 
 Règles retenues dans la commande :
 
+- elle se lance seulement quand le mainteneur la tape : `disable-model-invocation: true` empêche Claude de la déclencher de lui-même ;
 - elle ne code pas, ne crée pas de branche et ne passe rien en In progress (c'est l'étape `/ship`) ;
 - rien n'est créé ou modifié sur GitHub sans accord explicite sur le brouillon final ;
 - au plus 4 questions, à choix, avec une recommandation, et jamais ce que le dépôt dit déjà ;
