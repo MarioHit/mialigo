@@ -12,7 +12,7 @@ La chaîne de travail qui mène chaque user story de l'idée à la production, s
 Chaque étape est définie par son **entrée** (ce qu'elle reçoit) et sa **sortie attendue** (ce qu'elle doit produire), pas par celui qui la fait. Une même étape peut être faite :
 
 - par **toi**, à la main ;
-- par **Claude** (Claude Code), en suivant `AGENTS.md` ou une commande (`/factory`, plus tard `/story` et `/ship`) ;
+- par **Claude** (Claude Code), en suivant `AGENTS.md` ou une commande (`/factory`, `/story`, plus tard `/ship`) ;
 - par une **GitHub Action**, un robot déclenché par un événement.
 
 Peu importe l'exécutant : l'étape est réussie si sa sortie respecte ce qui est attendu, et l'étape suivante ne regarde que cette sortie. On peut donc confier une étape à Claude, la reprendre à la main un jour où il le faut, ou l'automatiser plus tard, sans changer le reste de la chaîne.
@@ -58,14 +58,14 @@ Dans chaque tableau, **Exécutants possibles** liste qui peut faire l'étape (to
 
 ### 1. Préparation de l'issue (rôle PO)
 
-|                          |                                                                                                                                                                                              |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Ce qu'elle fait**      | Transforme une idée floue en besoin clair : pour qui, quoi, pourquoi, critères d'acceptation, ce qui est hors périmètre, maquette si c'est visuel, découpage si c'est trop gros pour une PR. |
-| **Exécutants possibles** | Toi (seul, ou en discutant avec Claude) ; Claude (commande `/story`, à venir) ; GitHub Action : seulement pour vérifier la forme (champs remplis), pas pour décider du besoin.               |
-| **Aujourd'hui**          | Toi, en discutant avec Claude (questions, maquettes HTML).                                                                                                                                   |
-| **Entrée**               | Une idée ou un besoin brut (une phrase, un retour d'utilisateur, un bug constaté).                                                                                                           |
-| **Sortie attendue**      | Une issue qui respecte la [Definition of Ready](#definition-of-ready-dor--une-issue-est-prête-quand).                                                                                        |
-| **Configurée dans**      | `.github/ISSUE_TEMPLATE/user-story.yml`, `bug.yml`, `config.yml` ; Definition of Ready (ce fichier) ; `docs/maquettes/`.                                                                     |
+|                          |                                                                                                                                                                                                                                                        |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Ce qu'elle fait**      | Transforme une idée floue en besoin clair : pour qui, quoi, pourquoi, critères d'acceptation, ce qui est hors périmètre, maquette si c'est visuel, découpage si c'est trop gros pour une PR.                                                           |
+| **Exécutants possibles** | Toi (seul, ou en discutant avec Claude) ; Claude (commande `/story <idée>`) ; GitHub Action : seulement pour vérifier la forme (champs remplis), pas pour décider du besoin.                                                                           |
+| **Aujourd'hui**          | Toi avec Claude, par la commande `/story` : questions à choix, recherche de doublons, découpage en epic si besoin, maquette HTML si c'est visuel, brouillon contrôlé point par point avec la Definition of Ready, création seulement après ton accord. |
+| **Entrée**               | Une idée ou un besoin brut (une phrase, un retour d'utilisateur, un bug constaté).                                                                                                                                                                     |
+| **Sortie attendue**      | Une issue qui respecte la [Definition of Ready](#definition-of-ready-dor--une-issue-est-prête-quand).                                                                                                                                                  |
+| **Configurée dans**      | `.claude/commands/story.md` ; `.github/ISSUE_TEMPLATE/user-story.yml`, `bug.yml`, `config.yml` ; Definition of Ready (ce fichier) ; `docs/maquettes/` ; [ADR-0026](decisions/0026-commande-story.md).                                                  |
 
 ### 2. Issue prête
 
@@ -173,7 +173,7 @@ Dans chaque tableau, **Exécutants possibles** liste qui peut faire l'étape (to
 | `AGENTS.md`                                                   | Les règles de travail : Git (branches, merge, interdits), workflow (issue, Project, ADR), CHANGELOG et versions.                                                                  | Claude et tout agent de code |
 | `CLAUDE.md`                                                   | Le guide du code pour Claude : commandes, architecture, pièges (Supabase, secrets). Il inclut `AGENTS.md`.                                                                        | Claude                       |
 | `.claude/settings.json`                                       | Les réglages de Claude Code partagés dans le dépôt, surtout les **interdictions** (ne jamais lire ni modifier les fichiers `.env`).                                               | Claude Code                  |
-| `.claude/commands/`                                           | Les **commandes personnalisées** : un fichier `x.md` = une commande `/x` à taper dans Claude Code. Ici : `/factory` ; à venir : `/story`, `/ship`.                                | Claude Code                  |
+| `.claude/commands/`                                           | Les **commandes personnalisées** : un fichier `x.md` = une commande `/x` à taper dans Claude Code. Ici : `/factory`, `/story` ; à venir : `/ship`.                                | Claude Code                  |
 | `.claude/agents/`                                             | Des **sous-agents** spécialisés (un fichier par agent : rôle, outils permis). _Vide pour l'instant._                                                                              | Claude Code                  |
 | `.claude/skills/`                                             | Des **skills** : des savoir-faire empaquetés (instructions + fichiers) que Claude charge quand la tâche s'y prête. _Vide pour l'instant._                                         | Claude Code                  |
 | `.github/workflows/`                                          | Les **robots GitHub Actions** : `gitleaks.yml`, `lint.yml`, `release-pr.yml`, `version-tag.yml`.                                                                                  | GitHub                       |
@@ -185,9 +185,9 @@ Dans chaque tableau, **Exécutants possibles** liste qui peut faire l'étape (to
 
 - elle suit un modèle (User story ou Bug) ;
 - la user story dit **qui**, **quoi** et **pourquoi** ;
-- elle a des **critères d'acceptation** vérifiables (« Étant donné…, quand…, alors… ») ;
+- elle a des **critères d'acceptation** vérifiables (« Étant donné…, quand…, alors… » ; pour un bug, dans la section « Résultat attendu ») ;
 - elle tient dans **une PR** (sinon : une epic et des sous-issues) ;
-- elle a une **priorité** (P0 à P4) et ses dépendances sont notées (« blocked by ») ;
+- elle a une **priorité** (label `P0-sécurité`, `P1` à `P4`) et ses dépendances sont notées (« blocked by ») ;
 - pour un changement visuel important : une **maquette** validée (`docs/maquettes/`).
 
 ## Definition of Done (DoD) : une user story est terminée quand
@@ -212,7 +212,7 @@ Chaque ligne indique les exécutants possibles de ce que l'étape met en place.
 | Étape                                                   | Issue                                                  | Fiche                           | Statut            | Exécutants possibles                            | Apport                                                    |
 | ------------------------------------------------------- | ------------------------------------------------------ | ------------------------------- | ----------------- | ----------------------------------------------- | --------------------------------------------------------- |
 | 1. Cadre : modèles, DoR / DoD, ADR fondateur            | [#104](https://github.com/MarioHit/mialigo/issues/104) | [01-cadre](factory/01-cadre.md) | en place (v0.9.1) | toi, Claude (GitHub applique les modèles)       | chaque US est bien posée, aucune étape oubliée            |
-| 2. Commande `/story` : préparation de l'issue (rôle PO) | à créer                                                | —                               | à faire           | toi (en dialogue), Claude                       | une idée brute devient une issue qui respecte la DoR      |
+| 2. Commande `/story` : préparation de l'issue (rôle PO) | [#127](https://github.com/MarioHit/mialigo/issues/127) | [02-story](factory/02-story.md) | en cours          | toi (en dialogue), Claude                       | une idée brute devient une issue qui respecte la DoR      |
 | 3. Commande `/ship` : développement                     | à créer                                                | —                               | à faire           | Claude, toi                                     | l'issue prête devient code, CHANGELOG, version et rapport |
 | 4. CI qualité : TypeScript, build, Dependabot           | [#105](https://github.com/MarioHit/mialigo/issues/105) | —                               | à faire           | GitHub Action                                   | erreurs de type et build cassé bloqués avant Vercel       |
 | 5. Tests unitaires (Vitest)                             | [#106](https://github.com/MarioHit/mialigo/issues/106) | —                               | à faire           | GitHub Action (Claude ou toi les écrivent)      | la logique métier est vérifiée à chaque PR                |
@@ -220,7 +220,7 @@ Chaque ligne indique les exécutants possibles de ce que l'étape met en place.
 | 7. Migrations SQL vérifiées en CI                       | [#108](https://github.com/MarioHit/mialigo/issues/108) | —                               | à faire           | GitHub Action                                   | une migration cassée n'atteint pas la prod                |
 | 8. Observabilité (Umami, erreurs)                       | [#109](https://github.com/MarioHit/mialigo/issues/109) | —                               | à faire           | toi (installation), GitHub Action (déploiement) | usage et erreurs visibles, sans dépendre d'un tiers       |
 
-Hors étapes : [#115](https://github.com/MarioHit/mialigo/issues/115) (cette carte et la commande `/factory`), [#118](https://github.com/MarioHit/mialigo/issues/118) (étapes interchangeables).
+Hors étapes : [#128](https://github.com/MarioHit/mialigo/issues/128) (factory portable dans un autre dépôt), [#115](https://github.com/MarioHit/mialigo/issues/115) (cette carte et la commande `/factory`), [#118](https://github.com/MarioHit/mialigo/issues/118) (étapes interchangeables).
 
 Chaque étape est livrée seule et apporte déjà quelque chose. Sa PR contient :
 
