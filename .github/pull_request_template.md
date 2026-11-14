@@ -1,4 +1,4 @@
-<!-- Modèle de PR (software factory, docs/factory.md, ADR-0023). Cible : pre-prod. -->
+<!-- Modèle de PR (software factory, docs/FACTORY.md, ADR-0023). Cible : pre-prod. -->
 
 Closes #
 
