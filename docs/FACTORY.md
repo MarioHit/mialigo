@@ -113,14 +113,14 @@ Dans chaque tableau, **Exécutants possibles** liste qui peut faire l'étape (to
 
 ### 6. Checks et test sur la preview
 
-|                          |                                                                                                                                                                                                                        |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Ce qu'elle fait**      | Vérifie la PR : pas de secret, pas d'erreur de lint, le site se construit ; Vercel publie une **preview** sur laquelle on vérifie les critères d'acceptation.                                                          |
-| **Exécutants possibles** | GitHub Action et Vercel (checks) ; toi (test sur la preview) ; Claude (relecture, et plus tard tests automatiques du parcours, étape « tests de bout en bout » de la feuille de route).                                |
-| **Aujourd'hui**          | GitHub Actions et Vercel, puis toi sur la preview.                                                                                                                                                                     |
-| **Entrée**               | Chaque push sur la PR.                                                                                                                                                                                                 |
-| **Sortie attendue**      | Tous les checks verts, les critères d'acceptation validés sur la preview, et les cases « critères d'acceptation vérifiés sur la preview » et « tous les checks sont verts » cochées : la checklist est alors complète. |
-| **Configurée dans**      | `.github/workflows/gitleaks.yml` (« Scan des secrets », obligatoire), `.github/workflows/lint.yml` (« Lint ») ; Vercel (`vercel.json`, réglages du projet Vercel) ; `.gitleaksignore`.                                 |
+|                          |                                                                                                                                                                                                                                                                                                                                                           |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Ce qu'elle fait**      | Vérifie la PR : pas de secret, pas d'erreur de lint, le site se construit ; Copilot relit la PR et laisse des commentaires ; Vercel publie une **preview** sur laquelle on vérifie les critères d'acceptation. Chaque correction de review suit la règle de relecture d'`AGENTS.md`, et l'erreur est notée dans [`factory/lecons.md`](factory/lecons.md). |
+| **Exécutants possibles** | GitHub Action et Vercel (checks) ; Copilot (review automatique de GitHub) ; toi (test sur la preview) ; Claude (corrections de review, relecture, et plus tard tests automatiques du parcours, étape « tests de bout en bout » de la feuille de route).                                                                                                   |
+| **Aujourd'hui**          | GitHub Actions, Vercel et Copilot, puis toi sur la preview ; Claude corrige les retours de review à ta demande.                                                                                                                                                                                                                                           |
+| **Entrée**               | Chaque push sur la PR.                                                                                                                                                                                                                                                                                                                                    |
+| **Sortie attendue**      | Tous les checks verts, les critères d'acceptation validés sur la preview, et les cases « critères d'acceptation vérifiés sur la preview » et « tous les checks sont verts » cochées : la checklist est alors complète.                                                                                                                                    |
+| **Configurée dans**      | `.github/workflows/gitleaks.yml` (« Scan des secrets », obligatoire), `.github/workflows/lint.yml` (« Lint ») ; Vercel (`vercel.json`, réglages du projet Vercel) ; `.gitleaksignore`.                                                                                                                                                                    |
 
 ### 7. Merge dans pre-prod
 
@@ -168,18 +168,18 @@ Dans chaque tableau, **Exécutants possibles** liste qui peut faire l'étape (to
 
 ## Aide-mémoire : où se trouve quoi
 
-| Emplacement                                                   | Ce qu'il contient                                                                                                                                  | Qui le lit                   |
-| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| `AGENTS.md`                                                   | Les règles de travail : Git (branches, merge, interdits), workflow (issue, Project, ADR), CHANGELOG et versions.                                   | Claude et tout agent de code |
-| `CLAUDE.md`                                                   | Le guide du code pour Claude : commandes, architecture, pièges (Supabase, secrets). Il inclut `AGENTS.md`.                                         | Claude                       |
-| `.claude/settings.json`                                       | Les réglages de Claude Code partagés dans le dépôt, surtout les **interdictions** (ne jamais lire ni modifier les fichiers `.env`).                | Claude Code                  |
-| `.claude/commands/`                                           | Les **commandes personnalisées** : un fichier `x.md` = une commande `/x` à taper dans Claude Code. Ici : `/factory` ; à venir : `/story`, `/ship`. | Claude Code                  |
-| `.claude/agents/`                                             | Des **sous-agents** spécialisés (un fichier par agent : rôle, outils permis). _Vide pour l'instant._                                               | Claude Code                  |
-| `.claude/skills/`                                             | Des **skills** : des savoir-faire empaquetés (instructions + fichiers) que Claude charge quand la tâche s'y prête. _Vide pour l'instant._          | Claude Code                  |
-| `.github/workflows/`                                          | Les **robots GitHub Actions** : `gitleaks.yml`, `lint.yml`, `release-pr.yml`, `version-tag.yml`.                                                   | GitHub                       |
-| `.github/ISSUE_TEMPLATE/`, `.github/pull_request_template.md` | Les **modèles** d'issue et de PR.                                                                                                                  | GitHub                       |
-| `docs/decisions/`                                             | Les **ADR** : une décision technique par fichier, avec les options écartées. Index dans `README.md`, modèle `0000-modele.md`.                      | Tout le monde                |
-| `docs/factory/`                                               | Une **fiche par étape** de construction de la factory (avant, ce qui change, après).                                                               | Toi                          |
+| Emplacement                                                   | Ce qu'il contient                                                                                                                                                                 | Qui le lit                   |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| `AGENTS.md`                                                   | Les règles de travail : Git (branches, merge, interdits), workflow (issue, Project, ADR), CHANGELOG et versions.                                                                  | Claude et tout agent de code |
+| `CLAUDE.md`                                                   | Le guide du code pour Claude : commandes, architecture, pièges (Supabase, secrets). Il inclut `AGENTS.md`.                                                                        | Claude                       |
+| `.claude/settings.json`                                       | Les réglages de Claude Code partagés dans le dépôt, surtout les **interdictions** (ne jamais lire ni modifier les fichiers `.env`).                                               | Claude Code                  |
+| `.claude/commands/`                                           | Les **commandes personnalisées** : un fichier `x.md` = une commande `/x` à taper dans Claude Code. Ici : `/factory` ; à venir : `/story`, `/ship`.                                | Claude Code                  |
+| `.claude/agents/`                                             | Des **sous-agents** spécialisés (un fichier par agent : rôle, outils permis). _Vide pour l'instant._                                                                              | Claude Code                  |
+| `.claude/skills/`                                             | Des **skills** : des savoir-faire empaquetés (instructions + fichiers) que Claude charge quand la tâche s'y prête. _Vide pour l'instant._                                         | Claude Code                  |
+| `.github/workflows/`                                          | Les **robots GitHub Actions** : `gitleaks.yml`, `lint.yml`, `release-pr.yml`, `version-tag.yml`.                                                                                  | GitHub                       |
+| `.github/ISSUE_TEMPLATE/`, `.github/pull_request_template.md` | Les **modèles** d'issue et de PR.                                                                                                                                                 | GitHub                       |
+| `docs/decisions/`                                             | Les **ADR** : une décision technique par fichier, avec les options écartées. Index dans `README.md`, modèle `0000-modele.md`.                                                     | Tout le monde                |
+| `docs/factory/`                                               | Une **fiche par étape** de construction de la factory (avant, ce qui change, après), et `lecons.md`, le journal de toutes les erreurs de la chaîne (en review ou après le merge). | Toi                          |
 
 ## Definition of Ready (DoR) : une issue est prête quand
 
@@ -231,9 +231,13 @@ Chaque étape est livrée seule et apporte déjà quelque chose. Sa PR contient 
   - **c. Après** : le résultat obtenu et comment le vérifier soi-même ;
 - la mise à jour de ce fichier (parcours, tableaux, feuille de route) et de [factory.html](factory.html).
 
+## Leçons apprises
+
+Toutes les erreurs de la chaîne, qu'elles soient trouvées en review (Copilot ou humaine) ou après le merge, sont notées dans un journal unique : [`factory/lecons.md`](factory/lecons.md). Pour chacune : ce qui s'est passé, la cause, qui l'a trouvée, la PR et un statut (**vue une fois**, **récurrente**, **devenue une règle**, **automatisée**). Une erreur qui revient doit devenir une règle, puis un check : c'est ainsi que la chaîne s'améliore.
+
 ## Réutiliser dans un autre projet
 
-1. Copier `.github/` (modèles et workflows), `.claude/` (réglages et commandes), ce document et le dossier `docs/factory/` (les fiches servent d'exemple ; garder `00-modele.md`).
+1. Copier `.github/` (modèles et workflows), `.claude/` (réglages et commandes), ce document et le dossier `docs/factory/` (les fiches servent d'exemple ; garder `00-modele.md` et vider le journal de `lecons.md`).
 2. Adapter les noms propres : branches (`pre-prod`, `main`), numéro et identifiants du GitHub Project, liens des ADR.
 3. Reprendre les règles de travail d'`AGENTS.md` (branches, merge, CHANGELOG, version) et le modèle d'ADR `docs/decisions/0000-modele.md`.
 4. Créer les labels de priorité `P0-sécurité`, `P1` à `P4`, `tech`, `enhancement`, `bug`.
