@@ -138,17 +138,23 @@
     <div class="eyebrow">Le parcours</div>
     <h2>Le trajet d'une user story, de l'idée à la prod</h2>
     <ol class="line">
-      <li class="post"><span class="who">Toi</span><h3>1. L'issue</h3><p>Le besoin, écrit avec le modèle « User story » et ses critères d'acceptation.</p></li>
-      <li class="post"><span class="who">Agent / dev</span><h3>2. La branche</h3><p>L'issue passe en In progress, le travail se fait à part.</p></li>
-      <li class="post"><span class="who">Agent / dev</span><h3>3. La PR</h3><p>Demande de modification vers pre-prod, avec la checklist « terminé ».</p></li>
-      <li class="post gate"><span class="who">Automatique</span><h3>4. Les checks</h3><p>Lint, secrets, build… puis types, tests, SQL (étapes 2 à 5).</p></li>
-      <li class="post gate"><span class="who">Toi</span><h3>5. La preview</h3><p>Tu testes le vrai site, critère par critère.</p></li>
-      <li class="post"><span class="who">Agent / dev</span><h3>6. Merge pre-prod</h3><p>L'issue passe en In review, la PR de mise en prod se met à jour seule.</p></li>
-      <li class="post"><span class="who">Toi</span><h3>7. Merge main</h3><p>Tu décides quand mettre en production.</p></li>
-      <li class="post prod"><span class="who">Automatique</span><h3>8. En production</h3><p>Tag de version créé, issue en Done.</p></li>
+      <li class="post"><span class="who">Toi · Claude</span><h3>1. Préparer l'issue</h3><p>Rôle PO : une idée brute devient un besoin clair, avec ses critères d'acceptation. Sortie : une issue « prête ».</p></li>
+      <li class="post"><span class="who">Toi · Claude · Action</span><h3>2. L'issue</h3><p>Rangée dans le projet en Backlog, avec sa priorité et ses liens.</p></li>
+      <li class="post"><span class="who">Toi · Claude</span><h3>3. La branche</h3><p>L'issue passe en In progress, le travail se fait à part.</p></li>
+      <li class="post"><span class="who">Toi · Claude</span><h3>4. Le développement</h3><p>Code, CHANGELOG, version, et un court rapport : fait, vérifié, supposé.</p></li>
+      <li class="post"><span class="who">Toi · Claude</span><h3>5. La PR</h3><p>Demande de modification vers pre-prod, avec la checklist « terminé ».</p></li>
+      <li class="post gate"><span class="who">Action · Toi</span><h3>6. Checks et preview</h3><p>Les robots vérifient (lint, secrets, build…), puis tu testes le vrai site, critère par critère.</p></li>
+      <li class="post"><span class="who">Toi · Claude</span><h3>7. Merge pre-prod</h3><p>L'issue passe en In review.</p></li>
+      <li class="post"><span class="who">Action</span><h3>8. PR de mise en prod</h3><p>Elle se crée ou se complète toute seule.</p></li>
+      <li class="post gate"><span class="who">Toi seul</span><h3>9. Merge main</h3><p>Tu décides quand mettre en production.</p></li>
+      <li class="post prod"><span class="who">Action seule</span><h3>10. En production</h3><p>Tag de version créé, issue en Done.</p></li>
     </ol>
     <div class="legend"><span class="l-gate">Porte de contrôle : on ne passe que si c'est vert</span><span class="l-prod">Livré</span></div>
-    <p style="margin-top:14px">Si un contrôle échoue (check rouge, critère pas rempli sur la preview), la story revient à l'étape 2 : on corrige sur la même branche, la PR se met à jour.</p>
+    <p style="margin-top:14px">Si un contrôle échoue (check rouge, critère pas rempli sur la preview), la story revient au développement (étape 4) : on corrige sur la même branche, la PR se met à jour.</p>
+    <div class="analogy" style="margin-top:14px">
+      <p><strong>Seule compte la sortie.</strong> Chaque étape est définie par ce qu'elle reçoit et ce qu'elle doit produire, pas par celui qui la fait. Le petit texte au-dessus de chaque étape dit qui <em>peut</em> la faire : toi à la main, Claude, ou un robot GitHub (« Action »).</p>
+      <p>Comme à l'usine : un poste peut être tenu par une personne ou une machine, tant que la pièce qui en sort est conforme. Tu peux donc confier une étape à Claude, la reprendre à la main, ou l'automatiser plus tard sans rien changer au reste. Seules exceptions, par sécurité : le merge dans main reste à toi, le tag reste au robot.</p>
+    </div>
   </section>
 
   <section>
@@ -171,12 +177,12 @@
 
   <section>
     <div class="eyebrow">La mise en place</div>
-    <h2>Six étapes, chacune utile toute seule</h2>
+    <h2>Huit étapes, chacune utile toute seule</h2>
     <p>On construit la factory pièce par pièce. Chaque étape est une issue, une PR, une ADR (la trace écrite du choix) et une <strong>fiche d'étape</strong> dans <code>docs/factory/</code> qui raconte en mots simples : <em>avant</em> (ce qui se passait), <em>ce qui change</em> (dans le processus, et les impacts) et <em>après</em> (le résultat). Chaque exemple vient de problèmes rencontrés pour de vrai sur Mialigo.</p>
     <div class="stages">
       <article class="stage">
         <div class="num">1</div>
-        <header><h3>Le cadre</h3><span class="badge now">En cours · #104</span></header>
+        <header><h3>Le cadre</h3><span class="badge now">En place · v0.9.1</span></header>
         <dl>
           <dt>Ce que c'est</dt><dd>Modèles d'issue (User story, Bug) et de PR, Definition of Ready et Definition of Done, document de référence.</dd>
           <dt>Outils</dt><dd>Modèles GitHub dans <code>.github/</code>, <code>docs/FACTORY.md</code>, ADR-0023.</dd>
@@ -188,6 +194,24 @@
       </article>
       <article class="stage">
         <div class="num">2</div>
+        <header><h3>La commande /story</h3><span class="badge">À venir</span></header>
+        <dl>
+          <dt>Ce que c'est</dt><dd>Tu tapes <code>/story</code> avec ton idée en vrac ; Claude joue le rôle de PO : il te pose les bonnes questions, propose les critères d'acceptation, une maquette si c'est visuel, et écrit l'issue « prête ».</dd>
+          <dt>Exécutants</dt><dd>Toi (en dialogue) et Claude ; tu peux toujours écrire l'issue toi-même.</dd>
+        </dl>
+        <p class="catch"><strong>Ce que ça évite :</strong> une issue où l'idée réelle n'est pas écrite, comme la #20 (forme des blocs), devenue la PR #97 à côté de ce que tu voulais.</p>
+      </article>
+      <article class="stage">
+        <div class="num">3</div>
+        <header><h3>La commande /ship</h3><span class="badge">À venir</span></header>
+        <dl>
+          <dt>Ce que c'est</dt><dd>Tu tapes <code>/ship #n</code> ; Claude développe l'issue de bout en bout : branche, code, CHANGELOG, version, PR, et un court rapport (ce qui a été fait, comment c'est vérifié, ce qu'il a supposé).</dd>
+          <dt>Exécutants</dt><dd>Claude ; toi, si tu codes à la main, avec la même sortie attendue.</dd>
+        </dl>
+        <p class="catch"><strong>Ce que ça évite :</strong> une hypothèse silencieuse : le rapport dit noir sur blanc ce qui a été supposé, tu le vois avant de tester.</p>
+      </article>
+      <article class="stage">
+        <div class="num">4</div>
         <header><h3>La CI qualité</h3><span class="badge">À venir · #105</span></header>
         <dl>
           <dt>Ce que c'est</dt><dd>À chaque PR, un robot vérifie les types TypeScript et construit le site ; Dependabot propose les mises à jour des dépendances.</dd>
@@ -196,7 +220,7 @@
         <p class="catch"><strong>Ce que ça attrape :</strong> une fonction renommée mais encore appelée ailleurs sous son ancien nom, avant même que Vercel ne construise la preview.</p>
       </article>
       <article class="stage">
-        <div class="num">3</div>
+        <div class="num">5</div>
         <header><h3>Les tests unitaires</h3><span class="badge">À venir · #106</span></header>
         <dl>
           <dt>Ce que c'est</dt><dd>De petits programmes qui vérifient la logique : lecture d'un thème, ordre des blocs, contraste des couleurs…</dd>
@@ -205,7 +229,7 @@
         <p class="catch"><strong>Ce que ça attrape :</strong> des couleurs d'accent proposées qui étaient illisibles sur fond clair ; un test sur la liste l'aurait signalé aussitôt.</p>
       </article>
       <article class="stage">
-        <div class="num">4</div>
+        <div class="num">6</div>
         <header><h3>Les tests de bout en bout</h3><span class="badge">À venir · #107</span></header>
         <dl>
           <dt>Ce que c'est</dt><dd>Un navigateur automatique ouvre la preview, clique comme un vrai visiteur et prend des captures d'écran.</dd>
@@ -214,7 +238,7 @@
         <p class="catch"><strong>Ce que ça attrape :</strong> les hexagones tout noirs en style Minimal, ou l'erreur « Maximum update depth » au glisser-déposer, sans attendre que tu les trouves.</p>
       </article>
       <article class="stage">
-        <div class="num">5</div>
+        <div class="num">7</div>
         <header><h3>Les migrations SQL vérifiées</h3><span class="badge">À venir · #108</span></header>
         <dl>
           <dt>Ce que c'est</dt><dd>Une base de données jetable, en CI, rejoue le schéma et chaque migration, puis vérifie les règles (l'email reste invisible, les contraintes acceptent les bonnes valeurs).</dd>
@@ -223,7 +247,7 @@
         <p class="catch"><strong>Ce que ça attrape :</strong> une contrainte qui refuserait un nouveau réglage (comme la disposition « Nid d'abeille » avant sa migration).</p>
       </article>
       <article class="stage">
-        <div class="num">6</div>
+        <div class="num">8</div>
         <header><h3>L'observabilité</h3><span class="badge">À venir · #109</span></header>
         <dl>
           <dt>Ce que c'est</dt><dd>Voir l'usage du site et ses erreurs. D'abord Vercel Web Analytics (#110, sans cookies), puis Umami installé sur ton serveur.</dd>
@@ -253,6 +277,8 @@
     <dl class="glossary">
       <div><dt>User story (US)</dt><dd>Un besoin vu par l'utilisateur : « En tant que…, je veux…, afin de… ».</dd></div>
       <div><dt>Critères d'acceptation</dt><dd>Les cas précis qui prouvent que la story est faite : « Étant donné…, quand…, alors… ».</dd></div>
+      <div><dt>PO (Product Owner)</dt><dd>Le rôle qui décide quoi construire et pourquoi, et qui écrit le besoin. Ici, c'est toi, aidé de Claude.</dd></div>
+      <div><dt>Exécutant</dt><dd>Celui qui fait une étape : toi, Claude ou un robot GitHub (Action). Il est interchangeable tant que la sortie attendue est respectée.</dd></div>
       <div><dt>Epic</dt><dd>Une grosse story découpée en plusieurs sous-issues (ici #103).</dd></div>
       <div><dt>DoR / DoD</dt><dd>Definition of Ready : quand une issue est prête à être codée. Definition of Done : quand elle est vraiment terminée.</dd></div>
       <div><dt>PR (pull request)</dt><dd>Une demande d'intégrer une branche dans une autre, relue et vérifiée avant le merge.</dd></div>
@@ -266,5 +292,5 @@
     </dl>
   </section>
 
-  <footer>Référence détaillée : <code>docs/FACTORY.md</code> · Décision : ADR-0023 · Suivi : epic #103 sur GitHub.</footer>
+  <footer>Référence détaillée : <code>docs/FACTORY.md</code> · Décisions : ADR-0023, ADR-0025 · Suivi : epic #103 sur GitHub.</footer>
 </main>
