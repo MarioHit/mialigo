@@ -70,9 +70,12 @@ Demande explicitement : « Je crée cette issue ? » (ou « Je complète l'issue
 
 ## 7. Créer et ranger (après accord seulement)
 
-1. Écris le corps dans un fichier temporaire, puis `gh issue create --title "…" --label "…" --body-file <fichier>` (ou `gh issue edit` / `gh issue comment` pour compléter une issue existante).
-2. Ajoute l'issue au GitHub Project « Mialigo » en **Backlog**, avec les commandes et identifiants donnés dans `AGENTS.md` (Workflow rules ; option Backlog : `f75ad846`). Elle peut y être déjà, ajoutée automatiquement : cherche-la avec `gh project item-list` avant de l'ajouter.
-3. Rattache-la à son epic : `gh api repos/MarioHit/mialigo/issues/<epic>/sub_issues -F sub_issue_id=<id numérique de l'issue>` (l'id s'obtient avec `gh api repos/MarioHit/mialigo/issues/<n> -q .id`).
-4. Ajoute chaque blocage : `gh api repos/MarioHit/mialigo/issues/<n>/dependencies/blocked_by -F issue_id=<id numérique de l'issue bloquante>`.
-5. Relis l'issue créée (`gh issue view <n>`) et vérifie titre, sections, labels, statut et liens ; corrige ce qui manque.
-6. Rends compte en quelques lignes : le lien, le statut, l'epic, les blocages, et la prochaine étape (`/ship #<n>` quand le mainteneur veut la développer).
+1. **Écrire** : écris le corps dans un fichier temporaire, puis `gh issue create --title "…" --label "…" --body-file <fichier>` pour une nouvelle issue, ou `gh issue edit` / `gh issue comment` pour compléter une issue existante.
+2. **Ranger dans le GitHub Project « Mialigo »**, avec les commandes et identifiants donnés dans `AGENTS.md` (Workflow rules). Cherche d'abord l'issue avec `gh project item-list` : elle peut y être déjà, ajoutée automatiquement.
+   - **Nouvelle issue** : statut **Backlog** (option `f75ad846`).
+   - **Issue existante complétée** : **garde son statut** (Backlog, In progress, In review…). Ne la mets en Backlog que si elle n'est pas encore dans le Project ou n'a pas de statut.
+   - Si l'issue complétée est déjà **In progress** ou **In review** et que ses critères d'acceptation ont changé, dis-le clairement au mainteneur : le développement en cours, ou déjà mergé dans `pre-prod`, ne couvre peut-être plus tout le besoin.
+3. **Rattacher à l'epic**, si ce n'est pas déjà fait (vérifie avec `gh api repos/MarioHit/mialigo/issues/<epic>/sub_issues`) : `gh api repos/MarioHit/mialigo/issues/<epic>/sub_issues -F sub_issue_id=<id numérique de l'issue>` (l'id s'obtient avec `gh api repos/MarioHit/mialigo/issues/<n> -q .id`).
+4. **Ajouter chaque blocage** qui n'existe pas encore (vérifie avec `gh api repos/MarioHit/mialigo/issues/<n>/dependencies/blocked_by`) : `gh api repos/MarioHit/mialigo/issues/<n>/dependencies/blocked_by -F issue_id=<id numérique de l'issue bloquante>`.
+5. **Relire** l'issue créée ou complétée (`gh issue view <n>`) : titre, sections, labels, statut et liens ; corrige ce qui manque.
+6. **Rendre compte** en quelques lignes : le lien, le statut, l'epic, les blocages, et la prochaine étape (`/ship #<n>` quand le mainteneur veut la développer).
